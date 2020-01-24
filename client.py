@@ -59,16 +59,17 @@ class App(tk.Frame):
         sleep(SLEEP_PERIOD)
         self.refresh_param_values(processor_id)
 
-    def set_sync_mode(self, mode):
-        sushi_mode = sushi_rpc.SyncMode.Mode.INTERNAL
-        if mode == "Midi":
-            sushi_mode = sushi_rpc.SyncMode.Mode.MIDI
-        elif mode == "Gate":
-            sushi_mode = sushi_rpc.SyncMode.Mode.GATE
-        elif mode == "Link":
-            sushi_mode = sushi_rpc.SyncMode.Mode.LINK
+    def set_sync_mode(self, str_mode):
+        if str_mode == "Internal":
+            mode = 1
+        elif str_mode == "Midi":
+            mode = 2
+        elif str_mode == "Gate":
+            mode = 2
+        elif str_mode == "Link":
+            mode = 3
 
-        self.sushi.set_sync_mode(sushi_mode)
+        self.sushi.set_sync_mode(mode)
 
     def set_play_mode(self, mode):
         sushi_mode = 2 if mode else 1
@@ -149,7 +150,6 @@ class App(tk.Frame):
         proc_frame.pack(fill="both", side="top")
         frame = tk.Frame(proc_frame, width=SLIDER_WIDTH) 
         frame.pack(fill="y", side="left")
-        self.create_program_selector(frame, proc)
         self.processor_params[proc.id] = []
         count = 0
         
@@ -206,7 +206,7 @@ class App(tk.Frame):
         variable.set(SYNCMODES[0])
         selector = tk.OptionMenu(frame, variable, *SYNCMODES)
         selector.config(width=6)
-        variable.trace('w', lambda v,a,b,n=SYNCMODES,var=variable: self.set_sync_mode(p, var.get()))
+        variable.trace('w', lambda v,a,b,n=SYNCMODES,var=variable: self.set_sync_mode(var.get()))
         selector.pack(side="left", fill="both", expand=50)
 
         self.stop_button = tk.Button(frame, text="Stop", command=self.stop)
