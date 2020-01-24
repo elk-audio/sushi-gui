@@ -1,7 +1,16 @@
+import os
 from time import sleep
 import threading
-import pygro
 import tkinter as tk
+
+from elkpy import sushicontroller as sc
+SUSHI_ADDRESS = ('localhost:51051')
+# Get protofile to generate grpc library
+proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
+if proto_file is None:
+    print("Environment variable SUSHI_GRPC_ELKPY_PROTO not defined, set it to point the .proto definition")
+    sys.exit(-1)
+
 
 SLEEP_PERIOD = 0.0001# increase to limit the number of simultaneous set requests (Re's don't like that)
 POLL_PERIOD = 1
@@ -30,7 +39,7 @@ class PollingThread:
 class App(tk.Frame):
     def __init__(self, controller, master=None):
         super().__init__(master)
-        self.cont = controller
+        self.sushi = controller
         self.master = master
         self.widgets = []
         self.processor_params = {}
@@ -38,21 +47,17 @@ class App(tk.Frame):
         self.create_widgets()
 
     def set_parameter(self, processor_id, parameter_id, value):
-        self.cont.SetParameterValue(parameter={"processor_id": processor_id, "parameter_id": parameter_id}, value=value) 
-        sleep(SLEEP_PERIOD )
-        ##txt_val = self.cont.GetParameterValueAsString(parameter={"processor_id": processor_id, "parameter_id":parameter_id})
+        self.sushi.set_parameter_value(processor_id, parameter_id, value) 
+        sleep(SLEEP_PERIOD)
+        ##txt_val = self.sushi.get_parameter_value_as_string(processor_id, parameter_id)
         ##self.value_display.delete(0, tk.END)
         ##self.value_display.insert(0, str(value) + " ("+str(txt_val.value)+")")
 
     def set_program(self, processor_id, program, programs):
         program_id = programs.index(program)
-        self.cont.SetProcessorProgram(processor= processor_id, program=program_id)
+        self.sushi.set_processor_program(processor_id, program_id)
         sleep(SLEEP_PERIOD)
         self.refresh_param_values(processor_id)
-
-    def set_bypass(self, processor_id, bypassed):
-        print("Setting bypass "+str(bypassed) + " on proc: " + str(processor_id))
-        self.cont.SetProcessorBypassState(processor= processor_id, value=bypassed)
 
     def set_sync_mode(self, mode):
         sushi_mode = sushi_rpc.SyncMode.Mode.INTERNAL
@@ -63,22 +68,17 @@ class App(tk.Frame):
         elif mode == "Link":
             sushi_mode = sushi_rpc.SyncMode.Mode.LINK
 
-        self.cont.SetSyncMode(sushi_mode)
+        self.sushi.set_sync_mode(sushi_mode)
 
     def set_play_mode(self, mode):
-        sushi_mode = 1 if mode else 0
-        self.cont.SetPlayingMode({"mode": 2})
+        sushi_mode = 2 if mode else 1
+        self.sushi.set_playing_mode(sushi_mode)
 
     def set_tempo(self, new_tempo):
-        print("Set tempo called with " + str(new_tempo))
-        self.cont.SetTempo(tempo=new_tempo)
-
-    def get_tempo(self):
-        tempo = self.cont.GetTempo()
-        return tempo.value
+        self.sushi.set_tempo(new_tempo)
 
     def stop(self):
-        self.set_play_mode(True)
+        self.set_play_mode(False)
         self.stop_button.config(state=tk.DISABLED)
         self.play_button.config(state=tk.NORMAL)
 
@@ -90,10 +90,9 @@ class App(tk.Frame):
 
     def get_parameter(self, processor_id, parameter_id):
         try:
-            return self.cont.GetParameterValue(parameter={"processor_id": processor_id, "parameter_id":parameter_id}).value
+            return self.sushi.get_parameter_value(processor_id, parameter_id)
         except:
             return 0
-        return val.value
 
     def refresh_param_values(self, processor_id):
         for i in self.processor_params[processor_id]:
@@ -102,19 +101,19 @@ class App(tk.Frame):
 
     def create_widgets(self):
         self.create_transport_section()
-        tracks = self.cont.GetTracks()
-        for t in tracks.tracks:
+        tracks = self.sushi.get_tracks()
+        for t in tracks:
             self.create_track(t)
             separator = tk.Frame(self, height=2, width=2, bd=1, relief="sunken")
             separator.pack(fill="y", side="left", padx=5, pady=5)
 
     def create_track(self, track):
-        processors = self.cont.GetTrackProcessors(TrackId={"id": track.id})
+        processors = self.sushi.get_track_processors(track.id)
         frame = tk.Frame(self)
         frame.pack(fill="both", side="left")
         processor_count = 0
 
-        for p in processors.processors:
+        for p in processors:
             if processor_count > 1:
                  new_frame = tk.Frame(self)
                  new_frame.pack(fill="both", side="left")
@@ -130,8 +129,8 @@ class App(tk.Frame):
             separator.pack(fill="x", side="top", padx=5, pady=5)
 
         pan_vol_frame = tk.Frame(frame)
-        params = self.cont.GetTrackParameters(TrackId={"id": track.id})
-        for p in params.parameters:
+        params = self.sushi.get_track_parameters(track.id)
+        for p in params:
             l = tk.Label(pan_vol_frame, text=p.name)
             l.pack(side="top")
             def_val = self.get_parameter(track.id, p.id)
@@ -145,7 +144,7 @@ class App(tk.Frame):
         pan_vol_frame.pack(fill="y", side="bottom")
 
     def create_processor(self, parent, proc):
-        params = self.cont.GetProcessorParameters(ProcId={"id": proc.id})
+        params = self.sushi.get_processor_parameters(proc.id)
         proc_frame = tk.Frame(parent) 
         proc_frame.pack(fill="both", side="top")
         frame = tk.Frame(proc_frame, width=SLIDER_WIDTH) 
@@ -154,7 +153,7 @@ class App(tk.Frame):
         self.processor_params[proc.id] = []
         count = 0
         
-        for p in params.parameters:
+        for p in params:
             if count > COLUMN_HEIGHT:
                 new_frame = tk.Frame(proc_frame) 
                 new_frame.pack(fill="y", side="left")
@@ -179,8 +178,8 @@ class App(tk.Frame):
     
     def create_program_selector(self, parent, proc):
         try:
-            programs = self.cont.GetProcessorPrograms(ProcId={"id": proc.id})
-            program_names = [p.name for p in programs.programs]
+            programs = self.sushi.get_processor_programs(proc.id)
+            program_names = [p.name for p in programs]
             label = tk.Label(parent, text="Programs")
             label.pack(side="top")
             variable = tk.StringVar(parent)
@@ -196,7 +195,7 @@ class App(tk.Frame):
     def create_bypass_button(self, frame, proc):
         var = tk.IntVar()
         button = tk.Checkbutton(frame, text = "Enabled", variable = var,
-                 command=lambda v=var,p=proc.id: self.set_bypass(p, not bool(v.get())))
+                 command=lambda v=var,p=proc.id: self.sushi.set_processor_bypass_state(p, not bool(v.get())))
         button.pack(side="top", fill="both", expand=0)
 
     def create_transport_section(self):
@@ -226,13 +225,15 @@ class App(tk.Frame):
         self.tempo_entry = tempo_entry
 
     def update(self):
-        self.tempo_entry.delete(0, tk.END)
-        self.tempo_entry.insert(0, str(int(self.get_tempo())))
+        tempo = self.sushi.get_tempo()
+        if str(int(tempo)) != self.tempo_entry.get():
+            self.tempo_entry.delete(0, tk.END)
+            self.tempo_entry.insert(0, str(int(tempo)))
 
 def main():
-    w = pygro.create_wrappers('../protos/sushi_rpc.proto', 'localhost:51051')
+    controller = sc.SushiController(SUSHI_ADDRESS, proto_file)
     root = tk.Tk()
-    app = App(w.SushiController, master=root)
+    app = App(controller, master=root)
     poll = PollingThread(app)
     app.mainloop()
     poll.stop()
