@@ -233,6 +233,7 @@ class App(tk.Frame):
 def main():
     controller = sc.SushiController(SUSHI_ADDRESS, proto_file)
     root = tk.Tk()
+    root.wm_title("Sushi")
     app = App(controller, master=root)
     poll = PollingThread(app)
     app.mainloop()
