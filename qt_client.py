@@ -17,7 +17,8 @@ if proto_file is None:
 
 SYNCMODES = ["Internal", "Midi", "Gate", "Link"]
 
-MAX_PARAMETERS_IN_COLUMN = 15
+
+MAX_COLUMNS              = 1
 PARAMETER_VALUE_WIDTH    = 80
 SLIDER_HEIGHT            = 15
 SLIDER_MIN_WIDTH         = 100
@@ -33,20 +34,10 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('Sushi')
         #self.setGeometry(100,100,1000,1000)
 
-
         self._window_layout = QVBoxLayout()
         self._centralWidget = QWidget(self)
         self._centralWidget.setLayout(self._window_layout)
-
-        self._scroll = QScrollArea()
-        self._scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self._scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self._scroll.setWidgetResizable(True)
-        self._scroll.setMaximumWidth(1000)
-        self._scroll.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
-        self._scroll.setWidget(self._centralWidget)
-        
-        self.setCentralWidget(self._scroll)
+        self.setCentralWidget(self._centralWidget)
 
         self.tpbar = TransportBarWidget(self._controller)
         self._window_layout.addWidget(self.tpbar)
@@ -124,17 +115,37 @@ class TrackWidget(QGroupBox):
         self._connect_signals()
 
     def _create_processors(self, track_info):
+        scroll = QScrollArea()
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setWidgetResizable(True)
+        scroll.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+        #scroll.setMinimumHeight(400)
+        scroll.setFrameShape(QFrame.NoFrame)
+
+        proc_layout = QVBoxLayout(self)
+        frame = QWidget(self)
+        frame.setLayout(proc_layout)
+        frame.setContentsMargins(0,0,0,0)
+        frame.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.MinimumExpanding)
+        scroll.setWidget(frame)
+        self._layout.addWidget(scroll)
+
         processors = self._controller.get_track_processors(track_info.id)
         for p in processors:
             processor = ProcessorWidget(self._controller, p, self)
-            self._layout.addWidget(processor)
+            proc_layout.addWidget(processor)
             self._processors.append(processor)
 
-        self._layout.addStretch(0)
+        #self._layout.addStretch(0)
 
     def _create_common_controls(self, track_info):
         pan_gain_layout = QHBoxLayout(self)
-        self._layout.addLayout(pan_gain_layout)
+        pan_gain_layout.setContentsMargins(0,0,0,0)
+        pan_gain_box = QGroupBox("Master", self)
+        pan_gain_box.setMaximumHeight(220)
+        pan_gain_box.setLayout(pan_gain_layout)
+        self._layout.addWidget(pan_gain_box)
         self._pan_gain = [PanGainWidget(self._id, "Main Bus", 0, 1, self._controller, self)]
         pan_gain_layout.addWidget(self._pan_gain[0], 0, Qt.AlignLeft)
 
@@ -179,13 +190,13 @@ class ProcessorWidget(QGroupBox):
 
     def _create_parameters(self):
         parameters = self._controller.get_processor_parameters(self._id)
-        columns = int(len(parameters) / MAX_PARAMETERS_IN_COLUMN) + 1
+        param_count = len(parameters)
         param_layout = QHBoxLayout()
         self._layout.addLayout(param_layout)
-        for col in range(0, columns):
+        for col in range(0, MAX_COLUMNS):
             col_layout = QVBoxLayout()
             param_layout.addLayout(col_layout)
-            for p in parameters[col * MAX_PARAMETERS_IN_COLUMN: (col + 1)  * (MAX_PARAMETERS_IN_COLUMN)]:
+            for p in parameters[col::MAX_COLUMNS]:
                 parameter = ParameterWidget(p, self._id, self._controller, self)
                 col_layout.addWidget(parameter)
                 self._parameters.append(parameter)
