@@ -19,6 +19,7 @@ SYNCMODES = ["Internal", "Midi", "Gate", "Link"]
 
 
 MAX_COLUMNS              = 1
+PROCESSOR_WIDTH          = 300
 PARAMETER_VALUE_WIDTH    = 80
 SLIDER_HEIGHT            = 15
 SLIDER_MIN_WIDTH         = 100
@@ -41,9 +42,8 @@ class MainWindow(QMainWindow):
 
         self.tpbar = TransportBarWidget(self._controller)
         self._window_layout.addWidget(self.tpbar)
-        self._tracks = []
+        self.tracks = {}
         self._create_tracks()
-
 
     def _create_tracks(self):
         self._track_layout = QHBoxLayout(self)
@@ -52,7 +52,7 @@ class MainWindow(QMainWindow):
         for t in tracks:
             track = TrackWidget(self._controller, t, self)
             self._track_layout.addWidget(track)
-            self._tracks.append(track)
+            self.tracks[t.id] = track
         
 
 class TransportBarWidget(QGroupBox):
@@ -102,6 +102,7 @@ class TransportBarWidget(QGroupBox):
         self._play_button.setChecked(playing)
         self._stop_button.setChecked(not playing)
 
+
 class TrackWidget(QGroupBox):
     def __init__(self, controller, track_info, parent):
         super().__init__(track_info.name, parent)
@@ -109,7 +110,7 @@ class TrackWidget(QGroupBox):
         self._controller = controller
         self._layout = QVBoxLayout(self)
         self.setLayout(self._layout)
-        self._processors = []
+        self.processors = {}
         self._create_processors(track_info)
         self._create_common_controls(track_info)
         self._connect_signals()
@@ -120,12 +121,11 @@ class TrackWidget(QGroupBox):
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll.setWidgetResizable(True)
         scroll.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
-        #scroll.setMinimumHeight(400)
         scroll.setFrameShape(QFrame.NoFrame)
 
-        proc_layout = QVBoxLayout(self)
+        self._proc_layout = QVBoxLayout(self)
         frame = QWidget(self)
-        frame.setLayout(proc_layout)
+        frame.setLayout(self._proc_layout)
         frame.setContentsMargins(0,0,0,0)
         frame.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.MinimumExpanding)
         scroll.setWidget(frame)
@@ -133,11 +133,11 @@ class TrackWidget(QGroupBox):
 
         processors = self._controller.get_track_processors(track_info.id)
         for p in processors:
-            processor = ProcessorWidget(self._controller, p, self)
-            proc_layout.addWidget(processor)
-            self._processors.append(processor)
+            processor = ProcessorWidget(self._controller, p, track_info.id, self)
+            self._proc_layout.addWidget(processor)
+            self.processors[p.id] = processor
 
-        #self._layout.addStretch(0)
+        self._proc_layout.addStretch()
 
     def _create_common_controls(self, track_info):
         pan_gain_layout = QHBoxLayout(self)
@@ -174,12 +174,19 @@ class TrackWidget(QGroupBox):
         state = self._mute_button.isChecked()
         self._controller.set_processor_bypass_state(self._id, state)
 
+    def delete_processor(self, processor):
+        p = self.processors.pop(processor) 
+        p.setParent(None)
+        self._proc_layout.removeWidget(p)
+
 
 class ProcessorWidget(QGroupBox):
-    def __init__(self, controller, processor_info, parent):
-        super().__init__(processor_info.name)
+    def __init__(self, controller, processor_info, track_id, parent):
+        super().__init__(processor_info.name, parent)
+        self.setFixedWidth(PROCESSOR_WIDTH * MAX_COLUMNS)
         self._controller = controller
         self._id = processor_info.id
+        self._track_id = track_id
         self._parameters = []
         self._layout = QVBoxLayout(self)
         self.setLayout(self._layout)
@@ -208,50 +215,49 @@ class ProcessorWidget(QGroupBox):
         common_layout = QHBoxLayout(self)
         self._layout.addLayout(common_layout)
 
-        self._mute_button = QPushButton("Mute", self)
+        self._mute_button = QPushButton(self)
         self._mute_button.setCheckable(True)
         self._mute_button.setChecked(self._controller.get_processor_bypass_state(self._id))
+        self._mute_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_MediaVolumeMuted")))
+        self._mute_button.setToolTip("Mute processor")
         common_layout.addWidget(self._mute_button)
-        self._delete_button = QPushButton("Delete", self)
-        self._delete_button.setCheckable(True)
+        self._delete_button = QPushButton(self)
+        self._delete_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_BrowserStop")))
+        self._delete_button.setToolTip("Delete _processor")
         common_layout.addWidget(self._delete_button)
 
         self._up_button = QPushButton("", self)
         self._up_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_ArrowUp")))
+        self._up_button.setToolTip("Move processor up")
         common_layout.addWidget(self._up_button)
         self._down_button = QPushButton("", self)
         self._down_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_ArrowDown")))
+        self._down_button.setToolTip("Move processor down")
         common_layout.addWidget(self._down_button)
-        #common_layout.addStretch(0)
-
-        if processor_info.program_count > 0:
-            program_layout = QHBoxLayout(self)
-            self._layout.addLayout(program_layout)
     
-            programs = self._controller.get_processor_programs(self._id)
-            label = QLabel("Program", self)
-            program_layout.addWidget(label)
-            self._program_selector = QComboBox(self)
-            program_layout.addWidget(self._program_selector)
-            program_layout.addStretch(0)
-            for program in programs:
-                self._program_selector.addItem(program.name)
-
-            self._program_selector.currentIndexChanged.connect(self.program_change)
-        
-        ##else:
-        #    label = QLabel("Plugin doesn't have any programs", self)
-        #    common_layout.addWidget(label)
-
+        programs = self._controller.get_processor_programs(self._id)
+        self._program_selector = QComboBox(self)
+        common_layout.addWidget(self._program_selector)
+        for program in programs:
+            self._program_selector.addItem(program.name)
+            
+        if len(programs) == 0:
+            self._program_selector.addItem("No programs")
+    
 
     def _connect_signals(self):
-        self._mute_button.clicked.connect(self.mute_processor)
+        self._mute_button.clicked.connect(self.mute_processor_clicked)
+        self._program_selector.currentIndexChanged.connect(self.program_selector_changed)
+        self._delete_button.clicked.connect(self.delete_processor_clicked)
 
-    def mute_processor(self, arg):
+    def delete_processor_clicked(self):
+        self._controller.delete_processor(self._track_id, self._id)
+
+    def mute_processor_clicked(self, arg):
         state = self._mute_button.isChecked()
         self._controller.set_processor_bypass_state(self._id, state)        
 
-    def program_change(self, program_id):
+    def program_selector_changed(self, program_id):
         self._controller.set_processor_program(self._id, program_id)
         for param in self._parameters:
             param.update()
@@ -335,13 +341,25 @@ class PanGainWidget(QWidget):
         self._pan_label = QLabel("", self)
         self._layout.addWidget(self._pan_label, 0, Qt.AlignHCenter)
 
+        value = self._controller.get_parameter_value(self._processor_id, self._pan_id)
+        self._pan_slider.setValue(value * SLIDER_MAX_VALUE)
         self.pan_changed()
+        value = self._controller.get_parameter_value(self._processor_id, self._gain_id)
+        self._gain_slider.setValue(value * SLIDER_MAX_VALUE)
         self.gain_changed()
         self._connect_signals()
 
     def _connect_signals(self):
         self._pan_slider.valueChanged.connect(self.pan_changed)
         self._gain_slider.valueChanged.connect(self.gain_changed)
+
+    def _update_values(self):
+        value = self._controller.get_parameter_value(self._processor_id, self._pan_id)
+        self._pan_slider.setValue(value * SLIDER_MAX_VALUE)
+        self.pan_changed()
+        value = self._controller.get_parameter_value(self._processor_id, self._gain_id)
+        self._gain_slider.setValue(value * SLIDER_MAX_VALUE)
+        self.gain_changed()
 
     def pan_changed(self):
         value = float(self._pan_slider.value()) / SLIDER_MAX_VALUE
@@ -370,6 +388,11 @@ class Controller(sc.SushiController):
         self.set_playing_mode(1)
         if not self._view is  None:
             self._view.tpbar.set_playing(False)
+
+    def delete_processor(self, track_id, processor_id):
+        #call sushi and delete the processor
+        self._view.tracks[track_id].delete_processor(processor_id)
+
 
     def set_sync_mode_txt(self, txt_mode):
         if txt_mode == "Internal":
