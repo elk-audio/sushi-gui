@@ -18,15 +18,23 @@ if proto_file is None:
 
 SYNCMODES = ["Internal", "Midi", "Gate", "Link"]
 
-
+# Number of columns of parameters to display per processor
+# 1-3 works reasonably well
 MAX_COLUMNS              = 1
+
 PROCESSOR_WIDTH          = 300
 PARAMETER_VALUE_WIDTH    = 80
+ICON_BUTTON_WIDTH        = 30
 SLIDER_HEIGHT            = 15
 SLIDER_MIN_WIDTH         = 100
 PAN_SLIDER_WIDTH         = 60
-# Slider values are ints in QT
+
+# Slider values are ints in QT, so we need to scale with an integer factor to get 0-1 floats
 SLIDER_MAX_VALUE         = 1024
+
+class Direction(IntEnum):
+    UP = 1
+    DOWN = 2
 
 
 class MainWindow(QMainWindow):
@@ -37,9 +45,9 @@ class MainWindow(QMainWindow):
         #self.setGeometry(100,100,1000,1000)
 
         self._window_layout = QVBoxLayout()
-        self._centralWidget = QWidget(self)
-        self._centralWidget.setLayout(self._window_layout)
-        self.setCentralWidget(self._centralWidget)
+        self._central_widget = QWidget(self)
+        self._central_widget.setLayout(self._window_layout)
+        self.setCentralWidget(self._central_widget)
 
         self.tpbar = TransportBarWidget(self._controller)
         self._window_layout.addWidget(self.tpbar)
@@ -135,7 +143,7 @@ class TrackWidget(QGroupBox):
         processors = self._controller.get_track_processors(track_info.id)
         for p in processors:
             processor = ProcessorWidget(self._controller, p, track_info.id, self)
-            self._proc_layout.addWidget(processor)
+            self._proc_layout.addWidget(processor, 0)
             self.processors[p.id] = processor
 
         self._proc_layout.addStretch()
@@ -175,16 +183,32 @@ class TrackWidget(QGroupBox):
         state = self._mute_button.isChecked()
         self._controller.set_processor_bypass_state(self._id, state)
 
-    def delete_processor(self, processor):
-        p = self.processors.pop(processor) 
-        p.setParent(None)
+    def delete_processor(self, processor_id):
+        p = self.processors.pop(processor_id)
+        p.deleteLater() # Otherwise traces are left hanging
         self._proc_layout.removeWidget(p)
+
+    def move_processor(self, processor_id, direction):
+        p = self.processors[processor_id]
+        index = self._proc_layout.indexOf(p)
+        
+        if direction == Direction.UP and index > 0:
+            self._proc_layout.removeWidget(p)
+            self._proc_layout.insertWidget(index - 1, p)
+
+        # There is a "hidden" strech element that should always remain at the end
+        # for layout purposes, so never move the processor past that element.
+        elif direction == Direction.DOWN and index < self._proc_layout.count() - 2:
+            self._proc_layout.removeWidget(p)
+            self._proc_layout.insertWidget(index + 1, p)
 
 
 class ProcessorWidget(QGroupBox):
     def __init__(self, controller, processor_info, track_id, parent):
         super().__init__(processor_info.name, parent)
         self.setFixedWidth(PROCESSOR_WIDTH * MAX_COLUMNS)
+        # Make sure the ProcessorWidget doesn't expand to much, as that looks ugly
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
         self._controller = controller
         self._id = processor_info.id
         self._track_id = track_id
@@ -220,39 +244,53 @@ class ProcessorWidget(QGroupBox):
         self._mute_button.setCheckable(True)
         self._mute_button.setChecked(self._controller.get_processor_bypass_state(self._id))
         self._mute_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_MediaVolumeMuted")))
+        self._mute_button.setFixedWidth(ICON_BUTTON_WIDTH)
         self._mute_button.setToolTip("Mute processor")
         common_layout.addWidget(self._mute_button)
+
         self._delete_button = QPushButton(self)
-        self._delete_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_BrowserStop")))
+        self._delete_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_DialogCancelButton")))
+        self._delete_button.setFixedWidth(ICON_BUTTON_WIDTH)
         self._delete_button.setToolTip("Delete _processor")
         common_layout.addWidget(self._delete_button)
 
         self._up_button = QPushButton("", self)
         self._up_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_ArrowUp")))
         self._up_button.setToolTip("Move processor up")
+        self._up_button.setFixedWidth(ICON_BUTTON_WIDTH)
         common_layout.addWidget(self._up_button)
+
         self._down_button = QPushButton("", self)
         self._down_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_ArrowDown")))
         self._down_button.setToolTip("Move processor down")
+        self._down_button.setFixedWidth(ICON_BUTTON_WIDTH)
         common_layout.addWidget(self._down_button)
     
-        programs = self._controller.get_processor_programs(self._id)
+
         self._program_selector = QComboBox(self)
         common_layout.addWidget(self._program_selector)
-        for program in programs:
-            self._program_selector.addItem(program.name)
+        if processor_info.program_count > 0:
+            for program in self._controller.get_processor_programs(self._id):
+                self._program_selector.addItem(program.name)
             
-        if len(programs) == 0:
+        else:
             self._program_selector.addItem("No programs")
     
-
     def _connect_signals(self):
         self._mute_button.clicked.connect(self.mute_processor_clicked)
         self._program_selector.currentIndexChanged.connect(self.program_selector_changed)
         self._delete_button.clicked.connect(self.delete_processor_clicked)
+        self._up_button.clicked.connect(self.up_clicked)
+        self._down_button.clicked.connect(self.down_clicked)
 
     def delete_processor_clicked(self):
         self._controller.delete_processor(self._track_id, self._id)
+
+    def up_clicked(self):
+        self._controller.move_processor(self._track_id, self._id, Direction.UP)
+
+    def down_clicked(self):
+        self._controller.move_processor(self._track_id, self._id, Direction.DOWN)
 
     def mute_processor_clicked(self, arg):
         state = self._mute_button.isChecked()
@@ -261,7 +299,7 @@ class ProcessorWidget(QGroupBox):
     def program_selector_changed(self, program_id):
         self._controller.set_processor_program(self._id, program_id)
         for param in self._parameters:
-            param.update()
+            param.refresh()
 
 
 class ParameterWidget(QWidget):
@@ -291,13 +329,13 @@ class ParameterWidget(QWidget):
 
         value = self._controller.get_parameter_value(self._processor_id, self._id)
         self._value_slider.setValue(value * SLIDER_MAX_VALUE)
-        self.update()
+        self.refresh()
         self._connect_signals()
 
     def _connect_signals(self):
         self._value_slider.valueChanged.connect(self.value_changed)
 
-    def update(self):
+    def refresh(self):
         value = self._controller.get_parameter_value(self._processor_id, self._id)
         self._value_slider.setValue(value * SLIDER_MAX_VALUE)
         txt_value = self._controller.get_parameter_value_as_string(self._processor_id, self._id)
@@ -308,6 +346,7 @@ class ParameterWidget(QWidget):
         self._controller.set_parameter_value(self._processor_id, self._id, value)
         txt_value = self._controller.get_parameter_value_as_string(self._processor_id, self._id)
         self._value_label.setText(txt_value + " " + self._unit)
+
 
 class PanGainWidget(QWidget):
     def __init__(self, processor_id, name, gain_id, pan_id, controller, parent):
@@ -391,9 +430,38 @@ class Controller(sc.SushiController):
             self._view.tpbar.set_playing(False)
 
     def delete_processor(self, track_id, processor_id):
-        #call sushi and delete the processor
+        self.delete_processor_from_track(processor_id, track_id)
         self._view.tracks[track_id].delete_processor(processor_id)
 
+    def move_processor(self, track_id, processor_id, direction):
+        track_info = self.get_track_info(track_id)
+        print(track_info)
+        index = track_info.processors.index(processor_id)
+
+        print("Index {} in {}".format(index, track_info.processors))
+        proc_count = len(track_info.processors)
+        if (Direction.UP and index == 0) or (direction == direction.DOWN and index == proc_count - 1):
+            # Processor is not in a place where it can be moved
+            return
+
+        # only true if moving down and processor position is second to last
+        add_to_back = direction == Direction.DOWN and index == proc_count - 2
+        before_processor = 0 
+        if direction == Direction.UP:
+            before_processor = track_info.processors[index - 1] 
+        elif not add_to_back:
+            before_processor = track_info.processors[index + 2]
+
+        print("Moving processor {} from pos {} to before {}, add to back: {}".format(processor_id, index, before_processor, add_to_back))
+        self.move_processor_on_track(processor_id, track_id, track_id, add_to_back, before_processor)
+        track_info = self.get_track_info(track_id)
+        print("New order: {}".format(track_info.processors))
+
+        sleep(0.2)
+        track_info = self.get_track_info(track_id)
+        print("New order: {}".format(track_info.processors))
+        #self._controller.move_processor_on_track
+        self._view.tracks[track_id].move_processor(processor_id, direction)
 
     def set_sync_mode_txt(self, txt_mode):
         if txt_mode == "Internal":
