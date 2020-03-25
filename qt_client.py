@@ -4,9 +4,10 @@ import threading
 from elkpy import sushicontroller as sc
 from elkpy import sushi_info_types as sushi
 import sys
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import *
+from PySide2.QtCore import Qt
+from PySide2.QtWidgets import *
 from functools import partial
+from enum import IntEnum
 
 SUSHI_ADDRESS = ('localhost:51051')
 # Get protofile to generate grpc library
