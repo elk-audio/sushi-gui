@@ -49,6 +49,16 @@ class ParameterType(IntEnum):
     STRING_PROPERTY = 4
     DATA_PROPERTY = 5
 
+class PluginType(IntEnum):
+    '''
+    Enum class to hold a value matching the different plugin format types.
+    '''
+    INTERNAL = 1
+    VST2X = 2
+    VST3X = 3
+    LV2 = 4
+
+
 ################
 # Info Classes #
 ################
@@ -64,8 +74,8 @@ class ParameterInfo(object):
         name (str): The name of the parameter.
         unit (str): The unit of the parameter.
         automatable (bool): If the parameter is automatable or not.
-        min_range (float): The minimum value of the parameter.
-        max_range (float): The maximum value of the parameter.
+        min_domain_range (float): The minimum value of the parameter.
+        max_domain_range (float): The maximum value of the parameter.
     '''
 
     def __init__(self, grpc_ParameterInfo = None):
@@ -108,14 +118,14 @@ class ParameterInfo(object):
             self.automatable = False
 
         try:
-            self.min_range = grpc_ParameterInfo.min_range
+            self.min_domain_range = grpc_ParameterInfo.min_domain_range
         except:
-            self.min_range = 0.0
+            self.min_domain_range = 0.0
 
         try:
-            self.max_range = grpc_ParameterInfo.max_range
+            self.max_domain_range = grpc_ParameterInfo.max_domain_range
         except:
-            self.max_range = 0.0
+            self.max_domain_range = 0.0
 
     def __str__(self):
         s = '{\n'
@@ -125,8 +135,8 @@ class ParameterInfo(object):
         s += ' name: %s \n' %self.name
         s += ' unit: %s \n' %self.unit
         s += ' automatable: %s \n' %self.automatable
-        s += ' min_range: %s \n' %self.min_range
-        s += ' max_range: %s \n' %self.max_range
+        s += ' min_domain_range: %s \n' %self.min_domain_range
+        s += ' max_domain_range: %s \n' %self.max_domain_range
         s += '}'
         return s
 
@@ -140,8 +150,8 @@ class ParameterInfo(object):
             and self.name == other.name \
             and self.unit == other.unit \
             and self.automatable == other .automatable \
-            and self.min_range == other.min_range \
-            and self.max_range == other.max_range
+            and self.min_domain_range == other.min_domain_range \
+            and self.max_domain_range == other.max_domain_range
 
 class ProcessorInfo(object):
     '''
@@ -251,9 +261,11 @@ class TrackInfo(object):
             self.output_busses = 0
 
         try:
-            self.processor_count = grpc_TrackInfo.processor_count
+            self.processors = []
+            for processor_id in grpc_TrackInfo.processors:
+                self.processors.append(processor_id.id)
         except:
-            self.processor_count = 0
+            self.processors = 0
 
     def __str__(self):
         s = '{\n'
@@ -264,7 +276,7 @@ class TrackInfo(object):
         s += ' input_busses: %s \n' %self.input_busses
         s += ' output_channels: %s \n' %self.output_channels
         s += ' output_busses: %s \n' %self.output_busses
-        s += ' processor_count: %s \n' %self.processor_count
+        s += ' processors: %s \n' %self.processors
         s += '}'
         return s
 
@@ -279,7 +291,7 @@ class TrackInfo(object):
             and self.input_busses == other.input_busses \
             and self.output_channels == other.output_channels \
             and self.output_busses == other.output_busses \
-            and self.processor_count == other.processor_count
+            and self.processor == other.processor
 
 class ProgramInfo(object):
     '''
