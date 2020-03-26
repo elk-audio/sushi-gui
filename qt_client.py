@@ -16,7 +16,8 @@ if proto_file is None:
     print("Environment variable SUSHI_GRPC_ELKPY_PROTO not defined, set it to point the .proto definition")
     sys.exit(-1)
 
-SYNCMODES = ["Internal", "Midi", "Gate", "Link"]
+SYNCMODES = ['Internal', 'Midi', 'Gate', 'Link']
+PLUGIN_TYPES = ['Internal', 'Vst2x', 'Vst3x', 'LV2']
 
 # Number of columns of parameters to display per processor
 # 1-3 works reasonably well
@@ -52,16 +53,26 @@ class MainWindow(QMainWindow):
         self.tpbar = TransportBarWidget(self._controller)
         self._window_layout.addWidget(self.tpbar)
         self.tracks = {}
-        self._create_tracks()
-
-    def _create_tracks(self):
         self._track_layout = QHBoxLayout(self)
         self._window_layout.addLayout(self._track_layout)
+
+        self._create_tracks()
+
+    def delete_track(self, track_id):
+        track = self.tracks.pop(track_id)
+        track.deleteLater() # Otherwise traces are left hanging
+        self._track_layout.removeWidget(track)
+
+    def create_track(self, track_info):
+        if (track_info.id not in self.tracks):
+            track = TrackWidget(self._controller, track_info, self)
+            self._track_layout.addWidget(track)
+            self.tracks[track_info.id] = track
+
+    def _create_tracks(self):
         tracks = self._controller.get_tracks()
         for t in tracks:
-            track = TrackWidget(self._controller, t, self)
-            self._track_layout.addWidget(track)
-            self.tracks[t.id] = track
+            self.create_track(t)
         
 
 class TransportBarWidget(QGroupBox):
@@ -98,6 +109,10 @@ class TransportBarWidget(QGroupBox):
         self._play_button.setCheckable(True)
         self._layout.addWidget(self._play_button)
 
+        self._add_track_button = QPushButton("New Track", self)
+        self._layout.addWidget(self._add_track_button)
+
+
         self._layout.addStretch(0)
         self._connect_signals()
 
@@ -106,6 +121,7 @@ class TransportBarWidget(QGroupBox):
         self._stop_button.clicked.connect(self._controller.set_stopped)
         self._syncmode.currentTextChanged.connect(self._controller.set_sync_mode_txt)
         self._tempo.valueChanged.connect(self._controller.set_tempo)
+        self._add_track_button.clicked.connect(self._controller.add_track)
 
     def set_playing(self, playing):
         self._play_button.setChecked(playing)
@@ -178,10 +194,14 @@ class TrackWidget(QGroupBox):
 
     def _connect_signals(self):
         self._mute_button.clicked.connect(self.mute_track)
+        self._delete_button.clicked.connect(self.delete_track)
 
     def mute_track(self, arg):
         state = self._mute_button.isChecked()
         self._controller.set_processor_bypass_state(self._id, state)
+
+    def delete_track(self, arg):
+        self._controller.delete_track(self._id)
 
     def delete_processor(self, processor_id):
         p = self.processors.pop(processor_id)
@@ -249,9 +269,9 @@ class ProcessorWidget(QGroupBox):
         common_layout.addWidget(self._mute_button)
 
         self._delete_button = QPushButton(self)
-        self._delete_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_DialogCancelButton")))
+        self._delete_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_DialogCloseButton")))
         self._delete_button.setFixedWidth(ICON_BUTTON_WIDTH)
-        self._delete_button.setToolTip("Delete _processor")
+        self._delete_button.setToolTip("Delete processor")
         common_layout.addWidget(self._delete_button)
 
         self._up_button = QPushButton("", self)
@@ -413,6 +433,179 @@ class PanGainWidget(QWidget):
         txt_gain = self._controller.get_parameter_value_as_string(self._processor_id, self._gain_id)
         self._gain_label.setText(txt_gain + " " + "dB")
 
+
+class AddTrackDialog(QDialog):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setModal(True)
+        self.setWindowTitle("Add new stereo track")
+
+        self._ok = False
+        self._name = ""
+        self._has_input = False
+        self._input_bus = 0
+        self._output_bus = 0
+
+        self._layout = QGridLayout(self)
+        self.setLayout(self._layout)
+
+        name_label = QLabel("Name", self)
+        self._layout.addWidget(name_label, 0,0)
+        self._name_entry = QLineEdit(self)
+        self._layout.addWidget(self._name_entry,0,1)
+
+        has_input_label = QLabel("Has Input")
+        self._layout.addWidget(has_input_label, 2, 0)
+        self._has_input_check = QCheckBox("", self)
+        self._has_input_check.setChecked(True)
+        self._layout.addWidget(self._has_input_check, 2, 1)
+
+        input_label = QLabel("Input bus", self)
+        self._layout.addWidget(input_label, 1,0)
+        self._input_spin_box = QSpinBox(self)
+        self._layout.addWidget(self._input_spin_box,1,1)
+
+        output_label = QLabel("Output bus", self)
+        self._layout.addWidget(output_label, 3,0)
+        self._output_spin_box = QSpinBox(self)
+        self._layout.addWidget(self._output_spin_box,3,1)
+
+        self._ok_button = QPushButton("Ok", self)
+        self._layout.addWidget(self._ok_button,4,1)
+        self._cancel_button = QPushButton("Cancel", self)
+        self._layout.addWidget(self._cancel_button,4,0)
+        
+        self._connect_signals()
+
+    def _connect_signals(self):
+        self._name_entry.textChanged.connect(self.name_changed)
+        self._has_input_check.stateChanged.connect(self.checkbox_toggled)
+        self._input_spin_box.valueChanged.connect(self.input_changed)
+        self._output_spin_box.valueChanged.connect(self.output_changed)
+        self._ok_button.clicked.connect(self.ok_clicked)
+        self._cancel_button.clicked.connect(self.cancel_clicked)
+
+    def checkbox_toggled(self, state):
+        self._has_input = self._has_input_check.isChecked()
+        if self._has_input:
+            self._input_spin_box.setEnabled(True)
+        else:
+            self._input_spin_box.setEnabled(False)
+
+    def name_changed(self, name):
+        self._name = name
+
+    def input_changed(self, value):
+        self._input_bus = value
+
+    def output_changed(self, value):
+        self._output_bus = value
+
+    def ok_clicked(self):
+        self._ok = True
+        self.close()
+
+    def cancel_clicked(self):
+        self.close()
+
+    def get_data(self):
+        return self._ok, self._name, self._has_input, self._input_bus, self._output_bus
+
+
+class AddPluginDialog(QDialog):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setModal(True)
+        self.setWindowTitle("Add new plugin")
+
+        self._ok = False
+        self._type = 0
+        self._uid = ""
+        self._path = ""
+        self._name = ""
+
+        self._layout = QGridLayout(self)
+        self.setLayout(self._layout)
+
+        type_label = QLabel("Type", self)
+        self._layout.addWidget(type_label, 0, 0)
+        self._type_box = QComboBox(self)
+        self._layout.addWidget(self._type_box, 0, 1)
+        for t in PLUGIN_TYPES:
+            self._type_box.addItem(t)
+
+        name_label = QLabel("Name", self)
+        self._layout.addWidget(name_label, 1,0)
+        self._name_entry = QLineEdit(self)
+        self._name_entry.setMinimumWidth(200)
+        self._layout.addWidget(self._name_entry,1,1)
+
+        self._uid_label = QLabel("Uid", self)
+        self._layout.addWidget(self._uid_label, 2,0)
+        self._uid_entry = QLineEdit(self)
+        self._layout.addWidget(self._uid_entry,2,1)
+
+        self._path_label = QLabel("Path", self)
+        self._layout.addWidget(self._path_label, 3,0)
+        self._path_entry = QLineEdit(self)
+        self._path_entry.setEnabled(False)
+        self._layout.addWidget(self._path_entry,3,1)
+
+        self._ok_button = QPushButton("Ok", self)
+        self._layout.addWidget(self._ok_button,4,1)
+        self._cancel_button = QPushButton("Cancel", self)
+        self._layout.addWidget(self._cancel_button,4,0)
+        
+        self._connect_signals()
+
+    def _connect_signals(self):
+        self._type_box.currentIndexChanged.connect(self.type_changed)
+        self._name_entry.textChanged.connect(self.name_changed)
+        self._path_entry.textChanged.connect(self.path_changed)
+        self._uid_entry.textChanged.connect(self.uid_changed)
+        self._ok_button.clicked.connect(self.ok_clicked)
+        self._cancel_button.clicked.connect(self.cancel_clicked)
+
+    def type_changed(self, type_index):
+        type = type_index + 1
+        self._type = type
+        if (type == sushi.PluginType.INTERNAL):
+            self._path_entry.setEnabled(False)
+            self._uid_entry.setEnabled(True)
+
+        elif (type == sushi.PluginType.VST2X):
+            self._path_entry.setEnabled(True)
+            self._uid_entry.setEnabled(False)
+
+        elif (type == sushi.PluginType.VST3X):
+            self._path_entry.setEnabled(True)
+            self._uid_entry.setEnabled(True)
+
+        elif (type == sushi.PluginType.LV2):
+            self._path_entry.setEnabled(False)
+            self._uid_entry.setEnabled(True)
+
+
+    def name_changed(self, value):
+        self._name = value
+
+    def uid_changed(self, value):
+        self._uid = value
+
+    def path_changed(self, value):
+        self._path = value
+
+    def ok_clicked(self):
+        self._ok = True
+        self.close()
+
+    def cancel_clicked(self):
+        self.close()
+
+    def get_data(self):
+        return self._ok, self._type, self._name, self._path, self._uid
+
+
 # Expand the controller with a few convinience functions that better match our use case
 class Controller(sc.SushiController):
     def __init__(self, address, proto_file):
@@ -433,12 +626,30 @@ class Controller(sc.SushiController):
         self.delete_processor_from_track(processor_id, track_id)
         self._view.tracks[track_id].delete_processor(processor_id)
 
+    def delete_track(self, track_id):
+        super().delete_track(track_id)
+        self._view.delete_track(track_id)
+
+    def add_track(self, arg):
+        dialog = AddTrackDialog(self._view)
+        dialog.exec_()
+        ok, name, has_input, input_bus, output_bus = dialog.get_data()
+        if (ok):
+            try:
+                self.create_stereo_track(name, output_bus, has_input, input_bus)
+                #When notifications are working, we can wait for a notification instead
+                sleep(0.2)
+                new_track = self.get_tracks()[-1]
+                self._view.create_track(new_track)
+
+            except e:
+                print("Error creating track: {}".format(e))
+
+
     def move_processor(self, track_id, processor_id, direction):
         track_info = self.get_track_info(track_id)
-        print(track_info)
         index = track_info.processors.index(processor_id)
 
-        print("Index {} in {}".format(index, track_info.processors))
         proc_count = len(track_info.processors)
         if (Direction.UP and index == 0) or (direction == direction.DOWN and index == proc_count - 1):
             # Processor is not in a place where it can be moved
@@ -452,15 +663,9 @@ class Controller(sc.SushiController):
         elif not add_to_back:
             before_processor = track_info.processors[index + 2]
 
-        print("Moving processor {} from pos {} to before {}, add to back: {}".format(processor_id, index, before_processor, add_to_back))
         self.move_processor_on_track(processor_id, track_id, track_id, add_to_back, before_processor)
         track_info = self.get_track_info(track_id)
-        print("New order: {}".format(track_info.processors))
 
-        sleep(0.2)
-        track_info = self.get_track_info(track_id)
-        print("New order: {}".format(track_info.processors))
-        #self._controller.move_processor_on_track
         self._view.tracks[track_id].move_processor(processor_id, direction)
 
     def set_sync_mode_txt(self, txt_mode):
