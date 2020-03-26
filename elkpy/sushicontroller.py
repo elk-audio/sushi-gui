@@ -1041,7 +1041,7 @@ class SushiController(object):
                 name = name,
                 uid = uid,
                 path = path,
-                type = type,
+                type = self._sushi_proto.PluginType(type = int(type)),
                 track = self._sushi_proto.TrackIdentifier(id = track_identifier),
                 position = self._sushi_proto.ProcessorPosition(add_to_back = add_to_back, before_processor = self._sushi_proto.ProcessorIdentifier(id = before_processor))))
 

@@ -13,7 +13,7 @@ SUSHI_ADDRESS = ('localhost:51051')
 # Get protofile to generate grpc library
 proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
 if proto_file is None:
-    print("Environment variable SUSHI_GRPC_ELKPY_PROTO not defined, set it to point the .proto definition")
+    print('Environment variable SUSHI_GRPC_ELKPY_PROTO not defined, set it to point the .proto definition')
     sys.exit(-1)
 
 SYNCMODES = ['Internal', 'Midi', 'Gate', 'Link']
@@ -69,6 +69,9 @@ class MainWindow(QMainWindow):
             self._track_layout.addWidget(track)
             self.tracks[track_info.id] = track
 
+    def create_processor_on_track(self, plugin_info, track_id):
+        self.tracks[track_id].create_processor(plugin_info)
+
     def _create_tracks(self):
         tracks = self._controller.get_tracks()
         for t in tracks:
@@ -84,14 +87,14 @@ class TransportBarWidget(QGroupBox):
         self._create_widgets()
 
     def _create_widgets(self):
-        self._syncmode_label = QLabel("Sync mode", self)
+        self._syncmode_label = QLabel('Sync mode', self)
         self._layout.addWidget(self._syncmode_label)
         self._syncmode = QComboBox(self)
         for mode in SYNCMODES:
             self._syncmode.addItem(mode)
 
         self._layout.addWidget(self._syncmode)
-        self._tempo_label = QLabel("Tempo", self)
+        self._tempo_label = QLabel('Tempo', self)
         self._layout.addWidget(self._tempo_label)
 
         self._tempo = QDoubleSpinBox(self)
@@ -99,17 +102,17 @@ class TransportBarWidget(QGroupBox):
         self._tempo.setValue(self._controller.get_tempo())
         self._layout.addWidget(self._tempo)
 
-        self._stop_button = QPushButton("", self)
-        self._stop_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_MediaStop")))
+        self._stop_button = QPushButton('', self)
+        self._stop_button.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_MediaStop')))
         self._stop_button.setCheckable(True)
         self._layout.addWidget(self._stop_button)
 
-        self._play_button = QPushButton("", self)
-        self._play_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_MediaPlay")))
+        self._play_button = QPushButton('', self)
+        self._play_button.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_MediaPlay')))
         self._play_button.setCheckable(True)
         self._layout.addWidget(self._play_button)
 
-        self._add_track_button = QPushButton("New Track", self)
+        self._add_track_button = QPushButton('New Track', self)
         self._layout.addWidget(self._add_track_button)
 
 
@@ -140,6 +143,12 @@ class TrackWidget(QGroupBox):
         self._create_common_controls(track_info)
         self._connect_signals()
 
+    def create_processor(self, proc_info):
+        if proc_info.id not in self.processors:
+            processor = ProcessorWidget(self._controller, proc_info, self._id, self)
+            self._proc_layout.addWidget(processor, 0)
+            self.processors[proc_info.id] = processor
+
     def _create_processors(self, track_info):
         scroll = QScrollArea()
         scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -167,41 +176,47 @@ class TrackWidget(QGroupBox):
     def _create_common_controls(self, track_info):
         pan_gain_layout = QHBoxLayout(self)
         pan_gain_layout.setContentsMargins(0,0,0,0)
-        pan_gain_box = QGroupBox("Master", self)
+        pan_gain_box = QGroupBox('Master', self)
         pan_gain_box.setMaximumHeight(220)
         pan_gain_box.setLayout(pan_gain_layout)
         self._layout.addWidget(pan_gain_box)
-        self._pan_gain = [PanGainWidget(self._id, "Main Bus", 0, 1, self._controller, self)]
+        self._pan_gain = [PanGainWidget(self._id, 'Main Bus', 0, 1, self._controller, self)]
         pan_gain_layout.addWidget(self._pan_gain[0], 0, Qt.AlignLeft)
 
         # Create 1 pan/gain control per extra output bus
         for bus in range(1, track_info.output_busses):
-            gain_id = self._controller.get_parameter_id(track_info.id, "gain_sub_" + str(bus))
-            pan_id = self._controller.get_parameter_id(track_info.id, "pan_sub_" + str(bus))
-            pan_gain = PanGainWidget(self._id, "Sub Bus " + str(bus), gain_id, pan_id, self._controller, self)
+            gain_id = self._controller.get_parameter_id(track_info.id, 'gain_sub_' + str(bus))
+            pan_id = self._controller.get_parameter_id(track_info.id, 'pan_sub_' + str(bus))
+            pan_gain = PanGainWidget(self._id, 'Sub Bus ' + str(bus), gain_id, pan_id, self._controller, self)
             pan_gain_layout.addWidget(pan_gain)
             self._pan_gain.append(pan_gain)
 
         self._track_buttons = QHBoxLayout(self)
         self._layout.addLayout(self._track_buttons)
-        self._mute_button = QPushButton("Mute", self)
-        self._track_buttons.addWidget(self._mute_button)
-        self._mute_button.setCheckable(True)
-        self._mute_button.setChecked(self._controller.get_processor_bypass_state(self._id))
-        self._delete_button = QPushButton("Delete", self)
+        #self._mute_button = QPushButton('Mute', self)
+        #self._track_buttons.addWidget(self._mute_button)
+        #self._mute_button.setCheckable(True)
+        #self._mute_button.setChecked(self._controller.get_processor_bypass_state(self._id))
+        self._delete_button = QPushButton('Delete', self)
         self._track_buttons.addWidget(self._delete_button)
+        self._add_plugin_button = QPushButton('Add Plugin', self)
+        self._track_buttons.addWidget(self._add_plugin_button)
         self._track_buttons.addStretch(0)
 
     def _connect_signals(self):
-        self._mute_button.clicked.connect(self.mute_track)
+        #self._mute_button.clicked.connect(self.mute_track)
         self._delete_button.clicked.connect(self.delete_track)
+        self._add_plugin_button.clicked.connect(self.add_plugin)
 
     def mute_track(self, arg):
-        state = self._mute_button.isChecked()
+        #state = self._mute_button.isChecked()
         self._controller.set_processor_bypass_state(self._id, state)
 
     def delete_track(self, arg):
         self._controller.delete_track(self._id)
+
+    def add_plugin(self, arg):
+        self._controller.add_plugin(self._id)
 
     def delete_processor(self, processor_id):
         p = self.processors.pop(processor_id)
@@ -216,7 +231,7 @@ class TrackWidget(QGroupBox):
             self._proc_layout.removeWidget(p)
             self._proc_layout.insertWidget(index - 1, p)
 
-        # There is a "hidden" strech element that should always remain at the end
+        # There is a 'hidden' strech element that should always remain at the end
         # for layout purposes, so never move the processor past that element.
         elif direction == Direction.DOWN and index < self._proc_layout.count() - 2:
             self._proc_layout.removeWidget(p)
@@ -263,26 +278,26 @@ class ProcessorWidget(QGroupBox):
         self._mute_button = QPushButton(self)
         self._mute_button.setCheckable(True)
         self._mute_button.setChecked(self._controller.get_processor_bypass_state(self._id))
-        self._mute_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_MediaVolumeMuted")))
+        self._mute_button.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_MediaVolumeMuted')))
         self._mute_button.setFixedWidth(ICON_BUTTON_WIDTH)
-        self._mute_button.setToolTip("Mute processor")
+        self._mute_button.setToolTip('Mute processor')
         common_layout.addWidget(self._mute_button)
 
         self._delete_button = QPushButton(self)
-        self._delete_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_DialogCloseButton")))
+        self._delete_button.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_DialogCloseButton')))
         self._delete_button.setFixedWidth(ICON_BUTTON_WIDTH)
-        self._delete_button.setToolTip("Delete processor")
+        self._delete_button.setToolTip('Delete processor')
         common_layout.addWidget(self._delete_button)
 
-        self._up_button = QPushButton("", self)
-        self._up_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_ArrowUp")))
-        self._up_button.setToolTip("Move processor up")
+        self._up_button = QPushButton('', self)
+        self._up_button.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_ArrowUp')))
+        self._up_button.setToolTip('Move processor up')
         self._up_button.setFixedWidth(ICON_BUTTON_WIDTH)
         common_layout.addWidget(self._up_button)
 
-        self._down_button = QPushButton("", self)
-        self._down_button.setIcon(self.style().standardIcon(getattr(QStyle, "SP_ArrowDown")))
-        self._down_button.setToolTip("Move processor down")
+        self._down_button = QPushButton('', self)
+        self._down_button.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_ArrowDown')))
+        self._down_button.setToolTip('Move processor down')
         self._down_button.setFixedWidth(ICON_BUTTON_WIDTH)
         common_layout.addWidget(self._down_button)
     
@@ -294,7 +309,7 @@ class ProcessorWidget(QGroupBox):
                 self._program_selector.addItem(program.name)
             
         else:
-            self._program_selector.addItem("No programs")
+            self._program_selector.addItem('No programs')
     
     def _connect_signals(self):
         self._mute_button.clicked.connect(self.mute_processor_clicked)
@@ -341,7 +356,7 @@ class ParameterWidget(QWidget):
         self._value_slider.setRange(0, SLIDER_MAX_VALUE)
         self._layout.addWidget(self._value_slider)
 
-        self._value_label = QLabel("0.0" + parameter_info.unit, self)
+        self._value_label = QLabel('0.0' + parameter_info.unit, self)
         self._value_label.setFixedWidth(PARAMETER_VALUE_WIDTH)
         self._value_label.setAlignment(Qt.AlignRight)
         self._layout.addWidget(self._value_label)
@@ -359,13 +374,13 @@ class ParameterWidget(QWidget):
         value = self._controller.get_parameter_value(self._processor_id, self._id)
         self._value_slider.setValue(value * SLIDER_MAX_VALUE)
         txt_value = self._controller.get_parameter_value_as_string(self._processor_id, self._id)
-        self._value_label.setText(txt_value + " " + self._unit)
+        self._value_label.setText(txt_value + ' ' + self._unit)
 
     def value_changed(self):
         value = float(self._value_slider.value()) / SLIDER_MAX_VALUE
         self._controller.set_parameter_value(self._processor_id, self._id, value)
         txt_value = self._controller.get_parameter_value_as_string(self._processor_id, self._id)
-        self._value_label.setText(txt_value + " " + self._unit)
+        self._value_label.setText(txt_value + ' ' + self._unit)
 
 
 class PanGainWidget(QWidget):
@@ -389,7 +404,7 @@ class PanGainWidget(QWidget):
         self._gain_slider.setValue(SLIDER_MAX_VALUE / 2)
         self._layout.addWidget(self._gain_slider, 0, Qt.AlignHCenter)
 
-        self._gain_label = QLabel("", self)
+        self._gain_label = QLabel('', self)
         self._layout.addWidget(self._gain_label, 0, Qt.AlignHCenter)
 
         self._pan_slider = QSlider(Qt.Orientation.Horizontal, self)
@@ -398,7 +413,7 @@ class PanGainWidget(QWidget):
         self._pan_slider.setValue(SLIDER_MAX_VALUE / 2)
         self._layout.addWidget(self._pan_slider, 0, Qt.AlignHCenter)
 
-        self._pan_label = QLabel("", self)
+        self._pan_label = QLabel('', self)
         self._layout.addWidget(self._pan_label, 0, Qt.AlignHCenter)
 
         value = self._controller.get_parameter_value(self._processor_id, self._pan_id)
@@ -431,17 +446,17 @@ class PanGainWidget(QWidget):
         value = float(self._gain_slider.value()) / SLIDER_MAX_VALUE
         self._controller.set_parameter_value(self._processor_id, self._gain_id, value)
         txt_gain = self._controller.get_parameter_value_as_string(self._processor_id, self._gain_id)
-        self._gain_label.setText(txt_gain + " " + "dB")
+        self._gain_label.setText(txt_gain + ' ' + 'dB')
 
 
 class AddTrackDialog(QDialog):
     def __init__(self, parent):
         super().__init__(parent)
         self.setModal(True)
-        self.setWindowTitle("Add new stereo track")
+        self.setWindowTitle('Add new stereo track')
 
         self._ok = False
-        self._name = ""
+        self._name = ''
         self._has_input = False
         self._input_bus = 0
         self._output_bus = 0
@@ -449,30 +464,30 @@ class AddTrackDialog(QDialog):
         self._layout = QGridLayout(self)
         self.setLayout(self._layout)
 
-        name_label = QLabel("Name", self)
+        name_label = QLabel('Name', self)
         self._layout.addWidget(name_label, 0,0)
         self._name_entry = QLineEdit(self)
         self._layout.addWidget(self._name_entry,0,1)
 
-        has_input_label = QLabel("Has Input")
+        has_input_label = QLabel('Has Input')
         self._layout.addWidget(has_input_label, 2, 0)
-        self._has_input_check = QCheckBox("", self)
+        self._has_input_check = QCheckBox('', self)
         self._has_input_check.setChecked(True)
         self._layout.addWidget(self._has_input_check, 2, 1)
 
-        input_label = QLabel("Input bus", self)
+        input_label = QLabel('Input bus', self)
         self._layout.addWidget(input_label, 1,0)
         self._input_spin_box = QSpinBox(self)
         self._layout.addWidget(self._input_spin_box,1,1)
 
-        output_label = QLabel("Output bus", self)
+        output_label = QLabel('Output bus', self)
         self._layout.addWidget(output_label, 3,0)
         self._output_spin_box = QSpinBox(self)
         self._layout.addWidget(self._output_spin_box,3,1)
 
-        self._ok_button = QPushButton("Ok", self)
+        self._ok_button = QPushButton('Ok', self)
         self._layout.addWidget(self._ok_button,4,1)
-        self._cancel_button = QPushButton("Cancel", self)
+        self._cancel_button = QPushButton('Cancel', self)
         self._layout.addWidget(self._cancel_button,4,0)
         
         self._connect_signals()
@@ -516,44 +531,44 @@ class AddPluginDialog(QDialog):
     def __init__(self, parent):
         super().__init__(parent)
         self.setModal(True)
-        self.setWindowTitle("Add new plugin")
+        self.setWindowTitle('Add new plugin')
 
         self._ok = False
-        self._type = 0
-        self._uid = ""
-        self._path = ""
-        self._name = ""
+        self._type = sushi.PluginType.INTERNAL
+        self._uid = ''
+        self._path = ''
+        self._name = ''
 
         self._layout = QGridLayout(self)
         self.setLayout(self._layout)
 
-        type_label = QLabel("Type", self)
+        type_label = QLabel('Type', self)
         self._layout.addWidget(type_label, 0, 0)
         self._type_box = QComboBox(self)
         self._layout.addWidget(self._type_box, 0, 1)
         for t in PLUGIN_TYPES:
             self._type_box.addItem(t)
 
-        name_label = QLabel("Name", self)
+        name_label = QLabel('Name', self)
         self._layout.addWidget(name_label, 1,0)
         self._name_entry = QLineEdit(self)
         self._name_entry.setMinimumWidth(200)
         self._layout.addWidget(self._name_entry,1,1)
 
-        self._uid_label = QLabel("Uid", self)
+        self._uid_label = QLabel('Uid', self)
         self._layout.addWidget(self._uid_label, 2,0)
         self._uid_entry = QLineEdit(self)
         self._layout.addWidget(self._uid_entry,2,1)
 
-        self._path_label = QLabel("Path", self)
+        self._path_label = QLabel('Path', self)
         self._layout.addWidget(self._path_label, 3,0)
         self._path_entry = QLineEdit(self)
         self._path_entry.setEnabled(False)
         self._layout.addWidget(self._path_entry,3,1)
 
-        self._ok_button = QPushButton("Ok", self)
+        self._ok_button = QPushButton('Ok', self)
         self._layout.addWidget(self._ok_button,4,1)
-        self._cancel_button = QPushButton("Cancel", self)
+        self._cancel_button = QPushButton('Cancel', self)
         self._layout.addWidget(self._cancel_button,4,0)
         
         self._connect_signals()
@@ -634,7 +649,7 @@ class Controller(sc.SushiController):
         dialog = AddTrackDialog(self._view)
         dialog.exec_()
         ok, name, has_input, input_bus, output_bus = dialog.get_data()
-        if (ok):
+        if ok:
             try:
                 self.create_stereo_track(name, output_bus, has_input, input_bus)
                 #When notifications are working, we can wait for a notification instead
@@ -643,7 +658,23 @@ class Controller(sc.SushiController):
                 self._view.create_track(new_track)
 
             except e:
-                print("Error creating track: {}".format(e))
+                print('Error creating track: {}'.format(e))
+
+    def add_plugin(self, track_id):
+        dialog = AddPluginDialog(self._view)
+        dialog.exec_()
+        ok, type, name, path, uid = dialog.get_data()
+        print(dialog.get_data())
+        if ok:
+            try:
+                self.create_processor_on_track(name, uid, path, type, track_id, True, 0)
+                #When notifications are working, we can wait for a notification instead
+                sleep(0.4)
+                new_plugin = self.get_track_processors(track_id)[-1]
+                self._view.create_processor_on_track(new_plugin, track_id)
+
+            except e:
+                print('Error creating plugin: {}'.format(e))   
 
 
     def move_processor(self, track_id, processor_id, direction):
@@ -669,11 +700,11 @@ class Controller(sc.SushiController):
         self._view.tracks[track_id].move_processor(processor_id, direction)
 
     def set_sync_mode_txt(self, txt_mode):
-        if txt_mode == "Internal":
+        if txt_mode == 'Internal':
             self.set_sync_mode(sushi.SyncMode.INTERNAL)
-        elif txt_mode == "Link":
+        elif txt_mode == 'Link':
             self.set_sync_mode(sushi.SyncMode.LINK)
-        if txt_mode == "Midi":
+        if txt_mode == 'Midi':
             self.set_sync_mode(sushi.SyncMode.MIDI)
 
     def set_view(self, view):
