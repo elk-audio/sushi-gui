@@ -146,7 +146,7 @@ class TrackWidget(QGroupBox):
     def create_processor(self, proc_info):
         if proc_info.id not in self.processors:
             processor = ProcessorWidget(self._controller, proc_info, self._id, self)
-            self._proc_layout.addWidget(processor, 0)
+            self._proc_layout.insertWidget(self._proc_layout.count() - 1, processor)
             self.processors[proc_info.id] = processor
 
     def _create_processors(self, track_info):
@@ -457,7 +457,7 @@ class AddTrackDialog(QDialog):
 
         self._ok = False
         self._name = ''
-        self._has_input = False
+        self._has_input = True
         self._input_bus = 0
         self._output_bus = 0
 
@@ -501,7 +501,7 @@ class AddTrackDialog(QDialog):
         self._cancel_button.clicked.connect(self.cancel_clicked)
 
     def checkbox_toggled(self, state):
-        self._has_input = self._has_input_check.isChecked()
+        self._has_input = state
         if self._has_input:
             self._input_spin_box.setEnabled(True)
         else:
@@ -682,7 +682,7 @@ class Controller(sc.SushiController):
         index = track_info.processors.index(processor_id)
 
         proc_count = len(track_info.processors)
-        if (Direction.UP and index == 0) or (direction == direction.DOWN and index == proc_count - 1):
+        if (direction == Direction.UP and index == 0) or (direction == direction.DOWN and index == proc_count - 1):
             # Processor is not in a place where it can be moved
             return
 
