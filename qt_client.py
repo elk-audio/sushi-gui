@@ -597,8 +597,8 @@ class AddPluginDialog(QDialog):
             self._uid_entry.setEnabled(True)
 
         elif (type == sushi.PluginType.LV2):
-            self._path_entry.setEnabled(False)
-            self._uid_entry.setEnabled(True)
+            self._path_entry.setEnabled(True)
+            self._uid_entry.setEnabled(False)
 
 
     def name_changed(self, value):
