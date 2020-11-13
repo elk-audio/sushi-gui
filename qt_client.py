@@ -73,7 +73,7 @@ class MainWindow(QMainWindow):
         self.tracks[track_id].create_processor(plugin_info)
 
     def _create_tracks(self):
-        tracks = self._controller.get_tracks()
+        tracks = self._controller.audio_graph.get_all_tracks()
         for t in tracks:
             self.create_track(t)
         
@@ -99,7 +99,7 @@ class TransportBarWidget(QGroupBox):
 
         self._tempo = QDoubleSpinBox(self)
         self._tempo.setRange(20, 999)
-        self._tempo.setValue(self._controller.get_tempo())
+        self._tempo.setValue(self._controller.transport.get_tempo())
         self._layout.addWidget(self._tempo)
 
         self._stop_button = QPushButton('', self)
@@ -123,7 +123,7 @@ class TransportBarWidget(QGroupBox):
         self._play_button.clicked.connect(self._controller.set_playing)
         self._stop_button.clicked.connect(self._controller.set_stopped)
         self._syncmode.currentTextChanged.connect(self._controller.set_sync_mode_txt)
-        self._tempo.valueChanged.connect(self._controller.set_tempo)
+        self._tempo.valueChanged.connect(self._controller.transport.set_tempo)
         self._add_track_button.clicked.connect(self._controller.add_track)
 
     def set_playing(self, playing):
@@ -165,7 +165,7 @@ class TrackWidget(QGroupBox):
         scroll.setWidget(frame)
         self._layout.addWidget(scroll)
 
-        processors = self._controller.get_track_processors(track_info.id)
+        processors = self._controller.audio_graph.get_track_processors(track_info.id)
         for p in processors:
             processor = ProcessorWidget(self._controller, p, track_info.id, self)
             self._proc_layout.addWidget(processor, 0)
@@ -185,8 +185,8 @@ class TrackWidget(QGroupBox):
 
         # Create 1 pan/gain control per extra output bus
         for bus in range(1, track_info.output_busses):
-            gain_id = self._controller.get_parameter_id(track_info.id, 'gain_sub_' + str(bus))
-            pan_id = self._controller.get_parameter_id(track_info.id, 'pan_sub_' + str(bus))
+            gain_id = self._controller.parameters.get_parameter_id(track_info.id, 'gain_sub_' + str(bus))
+            pan_id = self._controller.parameters.get_parameter_id(track_info.id, 'pan_sub_' + str(bus))
             pan_gain = PanGainWidget(self._id, 'Sub Bus ' + str(bus), gain_id, pan_id, self._controller, self)
             pan_gain_layout.addWidget(pan_gain)
             self._pan_gain.append(pan_gain)
@@ -210,10 +210,10 @@ class TrackWidget(QGroupBox):
 
     def mute_track(self, arg):
         #state = self._mute_button.isChecked()
-        self._controller.set_processor_bypass_state(self._id, state)
+        self._controller.audio_graph.set_processor_bypass_state(self._id, state)
 
     def delete_track(self, arg):
-        self._controller.delete_track(self._id)
+        self._controller.audio_graph.delete_track(self._id)
 
     def add_plugin(self, arg):
         self._controller.add_plugin(self._id)
@@ -256,7 +256,7 @@ class ProcessorWidget(QGroupBox):
         self._connect_signals()
 
     def _create_parameters(self):
-        parameters = self._controller.get_processor_parameters(self._id)
+        parameters = self._controller.parameters.get_processor_parameters(self._id)
         param_count = len(parameters)
         param_layout = QHBoxLayout()
         self._layout.addLayout(param_layout)
@@ -277,7 +277,7 @@ class ProcessorWidget(QGroupBox):
 
         self._mute_button = QPushButton(self)
         self._mute_button.setCheckable(True)
-        self._mute_button.setChecked(self._controller.get_processor_bypass_state(self._id))
+        self._mute_button.setChecked(self._controller.audio_graph.get_processor_bypass_state(self._id))
         self._mute_button.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_MediaVolumeMuted')))
         self._mute_button.setFixedWidth(ICON_BUTTON_WIDTH)
         self._mute_button.setToolTip('Mute processor')
@@ -305,7 +305,7 @@ class ProcessorWidget(QGroupBox):
         self._program_selector = QComboBox(self)
         common_layout.addWidget(self._program_selector)
         if processor_info.program_count > 0:
-            for program in self._controller.get_processor_programs(self._id):
+            for program in self._controller.programs.get_processor_programs(self._id):
                 self._program_selector.addItem(program.name)
             
         else:
@@ -319,7 +319,7 @@ class ProcessorWidget(QGroupBox):
         self._down_button.clicked.connect(self.down_clicked)
 
     def delete_processor_clicked(self):
-        self._controller.delete_processor(self._track_id, self._id)
+        self._controller.audio_graph.delete_processor(self._track_id, self._id)
 
     def up_clicked(self):
         self._controller.move_processor(self._track_id, self._id, Direction.UP)
@@ -329,10 +329,10 @@ class ProcessorWidget(QGroupBox):
 
     def mute_processor_clicked(self, arg):
         state = self._mute_button.isChecked()
-        self._controller.set_processor_bypass_state(self._id, state)        
+        self._controller.audio_graph.set_processor_bypass_state(self._id, state)        
 
     def program_selector_changed(self, program_id):
-        self._controller.set_processor_program(self._id, program_id)
+        self._controller.programs.set_processor_program(self._id, program_id)
         for param in self._parameters:
             param.refresh()
 
@@ -362,7 +362,7 @@ class ParameterWidget(QWidget):
         self._layout.addWidget(self._value_label)
         self._layout.setContentsMargins(0,0,0,0)
 
-        value = self._controller.get_parameter_value(self._processor_id, self._id)
+        value = self._controller.parameters.get_parameter_value(self._processor_id, self._id)
         self._value_slider.setValue(value * SLIDER_MAX_VALUE)
         self.refresh()
         self._connect_signals()
@@ -371,15 +371,15 @@ class ParameterWidget(QWidget):
         self._value_slider.valueChanged.connect(self.value_changed)
 
     def refresh(self):
-        value = self._controller.get_parameter_value(self._processor_id, self._id)
+        value = self._controller.parameters.get_parameter_value(self._processor_id, self._id)
         self._value_slider.setValue(value * SLIDER_MAX_VALUE)
-        txt_value = self._controller.get_parameter_value_as_string(self._processor_id, self._id)
+        txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self._id)
         self._value_label.setText(txt_value + ' ' + self._unit)
 
     def value_changed(self):
         value = float(self._value_slider.value()) / SLIDER_MAX_VALUE
-        self._controller.set_parameter_value(self._processor_id, self._id, value)
-        txt_value = self._controller.get_parameter_value_as_string(self._processor_id, self._id)
+        self._controller.parameters.set_parameter_value(self._processor_id, self._id, value)
+        txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self._id)
         self._value_label.setText(txt_value + ' ' + self._unit)
 
 
@@ -416,10 +416,10 @@ class PanGainWidget(QWidget):
         self._pan_label = QLabel('', self)
         self._layout.addWidget(self._pan_label, 0, Qt.AlignHCenter)
 
-        value = self._controller.get_parameter_value(self._processor_id, self._pan_id)
+        value = self._controller.parameters.get_parameter_value(self._processor_id, self._pan_id)
         self._pan_slider.setValue(value * SLIDER_MAX_VALUE)
         self.pan_changed()
-        value = self._controller.get_parameter_value(self._processor_id, self._gain_id)
+        value = self._controller.parameters.get_parameter_value(self._processor_id, self._gain_id)
         self._gain_slider.setValue(value * SLIDER_MAX_VALUE)
         self.gain_changed()
         self._connect_signals()
@@ -429,23 +429,23 @@ class PanGainWidget(QWidget):
         self._gain_slider.valueChanged.connect(self.gain_changed)
 
     def _update_values(self):
-        value = self._controller.get_parameter_value(self._processor_id, self._pan_id)
+        value = self._controller.parameters.get_parameter_value(self._processor_id, self._pan_id)
         self._pan_slider.setValue(value * SLIDER_MAX_VALUE)
         self.pan_changed()
-        value = self._controller.get_parameter_value(self._processor_id, self._gain_id)
+        value = self._controller.parameters.get_parameter_value(self._processor_id, self._gain_id)
         self._gain_slider.setValue(value * SLIDER_MAX_VALUE)
         self.gain_changed()
 
     def pan_changed(self):
         value = float(self._pan_slider.value()) / SLIDER_MAX_VALUE
-        self._controller.set_parameter_value(self._processor_id, self._pan_id, value)
-        pan_value = self._controller.get_parameter_value(self._processor_id, self._pan_id)
+        self._controller.parameters.set_parameter_value(self._processor_id, self._pan_id, value)
+        pan_value = self._controller.parameters.get_parameter_value(self._processor_id, self._pan_id)
         self._pan_label.setText(str(pan_value))
 
     def gain_changed(self):
         value = float(self._gain_slider.value()) / SLIDER_MAX_VALUE
-        self._controller.set_parameter_value(self._processor_id, self._gain_id, value)
-        txt_gain = self._controller.get_parameter_value_as_string(self._processor_id, self._gain_id)
+        self._controller.parameters.set_parameter_value(self._processor_id, self._gain_id, value)
+        txt_gain = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self._gain_id)
         self._gain_label.setText(txt_gain + ' ' + 'dB')
 
 
@@ -628,21 +628,21 @@ class Controller(sc.SushiController):
         self._view = None
 
     def set_playing(self):
-        self.set_playing_mode(2)
+        self.transport.set_playing_mode(2)
         if not self._view is  None:
             self._view.tpbar.set_playing(True)
 
     def set_stopped(self):
-        self.set_playing_mode(1)
+        self.transport.set_playing_mode(1)
         if not self._view is  None:
             self._view.tpbar.set_playing(False)
 
     def delete_processor(self, track_id, processor_id):
-        self.delete_processor_from_track(processor_id, track_id)
+        self.audio_graph.delete_processor_from_track(processor_id, track_id)
         self._view.tracks[track_id].delete_processor(processor_id)
 
     def delete_track(self, track_id):
-        super().delete_track(track_id)
+        super().audio_graph.delete_track(track_id)
         self._view.delete_track(track_id)
 
     def add_track(self, arg):
@@ -651,10 +651,10 @@ class Controller(sc.SushiController):
         ok, name, has_input, input_bus, output_bus = dialog.get_data()
         if ok:
             try:
-                self.create_stereo_track(name, output_bus, has_input, input_bus)
+                self.audio_graph.create_stereo_track(name, output_bus, has_input, input_bus)
                 #When notifications are working, we can wait for a notification instead
                 sleep(0.2)
-                new_track = self.get_tracks()[-1]
+                new_track = self.audio_graph.get_tracks()[-1]
                 self._view.create_track(new_track)
 
             except e:
@@ -667,10 +667,10 @@ class Controller(sc.SushiController):
         print(dialog.get_data())
         if ok:
             try:
-                self.create_processor_on_track(name, uid, path, type, track_id, True, 0)
+                self.audio_graph.audio_graph.create_processor_on_track(name, uid, path, type, track_id, True, 0)
                 #When notifications are working, we can wait for a notification instead
                 sleep(0.4)
-                new_plugin = self.get_track_processors(track_id)[-1]
+                new_plugin = self.audio_graph.get_track_processors(track_id)[-1]
                 self._view.create_processor_on_track(new_plugin, track_id)
 
             except e:
@@ -678,7 +678,7 @@ class Controller(sc.SushiController):
 
 
     def move_processor(self, track_id, processor_id, direction):
-        track_info = self.get_track_info(track_id)
+        track_info = self.audio_graph.get_track_info(track_id)
         index = track_info.processors.index(processor_id)
 
         proc_count = len(track_info.processors)
@@ -694,18 +694,18 @@ class Controller(sc.SushiController):
         elif not add_to_back:
             before_processor = track_info.processors[index + 2]
 
-        self.move_processor_on_track(processor_id, track_id, track_id, add_to_back, before_processor)
-        track_info = self.get_track_info(track_id)
+        self.audio_graph.move_processor_on_track(processor_id, track_id, track_id, add_to_back, before_processor)
+        track_info = self.audio_graph.get_track_info(track_id)
 
         self._view.tracks[track_id].move_processor(processor_id, direction)
 
     def set_sync_mode_txt(self, txt_mode):
         if txt_mode == 'Internal':
-            self.set_sync_mode(sushi.SyncMode.INTERNAL)
+            self.transport.set_sync_mode(sushi.SyncMode.INTERNAL)
         elif txt_mode == 'Link':
-            self.set_sync_mode(sushi.SyncMode.LINK)
+            self.transport.set_sync_mode(sushi.SyncMode.LINK)
         if txt_mode == 'Midi':
-            self.set_sync_mode(sushi.SyncMode.MIDI)
+            self.transport.set_sync_mode(sushi.SyncMode.MIDI)
 
     def set_view(self, view):
         self._view = view
