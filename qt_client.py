@@ -3,8 +3,7 @@ from time import sleep
 import threading
 from elkpy import sushicontroller as sc
 from elkpy import sushi_info_types as sushi
-import sys
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, Signal, QObject
 from PySide2.QtWidgets import *
 from functools import partial
 from enum import IntEnum
@@ -39,6 +38,9 @@ class Direction(IntEnum):
 
 
 class MainWindow(QMainWindow):
+
+    track_notification_received = Signal(sushi_rpc_pb2.TrackUpdate)
+
     def __init__(self, controller):
         super().__init__()
         self._controller = controller
@@ -50,11 +52,30 @@ class MainWindow(QMainWindow):
         self._central_widget.setLayout(self._window_layout)
         self.setCentralWidget(self._central_widget)
 
+        # Menu / actions
+        self.file_menu = self.menuBar().addMenu("&File")
+        self.settings_menu = self.menuBar().addMenu("&Settings")
+        self.tools_menu = self.menuBar().addMenu("&Tools")
+        self.help_menu = self.menuBar().addMenu("&Info")
+
+        about = QAction('About Sushi', self)
+        about.triggered.connect(self.show_about_sushi)
+        processors = QAction('Show all processors', self)
+        processors.triggered.connect(self.show_all_processors)
+        tracks = QAction('Show all tracks', self)
+        tracks.triggered.connect(self.show_all_tracks)
+
+        self.help_menu.addAction(about)
+        self.help_menu.addAction(processors)
+        self.help_menu.addAction(tracks)
+
         self.tpbar = TransportBarWidget(self._controller)
         self._window_layout.addWidget(self.tpbar)
         self.tracks = {}
         self._track_layout = QHBoxLayout(self)
         self._window_layout.addLayout(self._track_layout)
+
+        self.track_notification_received.connect(self.process_track_notification)
 
         self._create_tracks()
 
@@ -76,7 +97,44 @@ class MainWindow(QMainWindow):
         tracks = self._controller.audio_graph.get_all_tracks()
         for t in tracks:
             self.create_track(t)
-        
+
+    def show_about_sushi(self):
+        version = self._controller.system.get_sushi_version()
+        build_info = self._controller.system.get_build_info()
+        audio_inputs = self._controller.system.get_input_audio_channel_count()
+        audio_outputs = self._controller.system.get_output_audio_channel_count()
+
+        about = QMessageBox()
+        about.setText(f"Sushi version: {version}\n"
+                      f"Buidl info: {build_info}\n"
+                      f"Audio input count: {audio_inputs}\n"
+                      f"Audio output count: {audio_outputs}")
+        about.exec_()
+
+    def show_all_processors(self):
+        r = self._controller.audio_graph.get_all_processors()
+        info = QMessageBox()
+        info.setText(f"{r}")
+        info.exec_()
+
+    def show_all_tracks(self):
+        r = self._controller.audio_graph.get_all_tracks()
+        info = QMessageBox()
+        info.setText(f"{r}")
+        info.exec_()
+
+    def closeEvent(self, event):
+        self._controller.notifications.close()
+        event.accept()
+
+    def process_track_notification(self, n):
+        if n.action == 1:   # TRACK_ADDED
+            for t in self._controller.audio_graph.get_all_tracks():
+                if t.id == n.track.id:
+                    self.create_track(t)
+                    break
+        elif n.action == 2:  # TRACK_DELETED
+            self.delete_track(n.track.id)
 
 class TransportBarWidget(QGroupBox):
     def __init__(self, controller):
@@ -135,6 +193,7 @@ class TrackWidget(QGroupBox):
     def __init__(self, controller, track_info, parent):
         super().__init__(track_info.name, parent)
         self._id = track_info.id
+        self._parent = parent
         self._controller = controller
         self._layout = QVBoxLayout(self)
         self.setLayout(self._layout)
@@ -453,68 +512,83 @@ class AddTrackDialog(QDialog):
     def __init__(self, parent):
         super().__init__(parent)
         self.setModal(True)
-        self.setWindowTitle('Add new stereo track')
+        self.setWindowTitle('Add new track')
 
-        self._ok = False
-        self._name = ''
-        self._has_input = True
-        self._input_bus = 0
-        self._output_bus = 0
+        self.name = ''
+        self.type = ''
+        self.inputs = 0
+        self.outputs = 0
 
         self._layout = QGridLayout(self)
         self.setLayout(self._layout)
 
-        name_label = QLabel('Name', self)
-        self._layout.addWidget(name_label, 0,0)
+        self.name_label = QLabel('Name', self)
+        self._layout.addWidget(self.name_label, 0,0)
         self._name_entry = QLineEdit(self)
         self._layout.addWidget(self._name_entry,0,1)
 
-        has_input_label = QLabel('Has Input')
-        self._layout.addWidget(has_input_label, 2, 0)
-        self._has_input_check = QCheckBox('', self)
-        self._has_input_check.setChecked(True)
-        self._layout.addWidget(self._has_input_check, 2, 1)
+        nr_of_channels = QLabel('Track type:')
+        self._layout.addWidget(nr_of_channels, 2, 0)
+        self._track_type = QComboBox(self)
+        self._track_type.addItem('Mono')
+        self._track_type.addItem('Stereo')
+        self._track_type.addItem('Multibus')
+        self._track_type.setCurrentIndex(1)
+        self._layout.addWidget(self._track_type, 2, 1)
 
-        input_label = QLabel('Input bus', self)
-        self._layout.addWidget(input_label, 1,0)
-        self._input_spin_box = QSpinBox(self)
-        self._layout.addWidget(self._input_spin_box,1,1)
+        self._inputs_lbl = QLabel('Inputs:')
+        self._inputs_sb = QSpinBox()
+        self._inputs_sb.setMinimum(1)
+        self._inputs_sb.setMaximum(8)
+        self._layout.addWidget(self._inputs_lbl, 3, 0)
+        self._layout.addWidget(self._inputs_sb, 3, 1)
+        self._inputs_lbl.hide()
+        self._inputs_sb.hide()
 
-        output_label = QLabel('Output bus', self)
-        self._layout.addWidget(output_label, 3,0)
-        self._output_spin_box = QSpinBox(self)
-        self._layout.addWidget(self._output_spin_box,3,1)
+        self._outputs_lbl = QLabel('Outputs:')
+        self._outputs_lbl.hide()
+        self._outputs_sb = QSpinBox()
+        self._outputs_sb.hide()
+        self._outputs_sb.setMinimum(1)
+        self._outputs_sb.setMaximum(8)
+        self._layout.addWidget(self._outputs_lbl, 4, 0)
+        self._layout.addWidget(self._outputs_sb, 4, 1)
 
-        self._ok_button = QPushButton('Ok', self)
-        self._layout.addWidget(self._ok_button,4,1)
-        self._cancel_button = QPushButton('Cancel', self)
-        self._layout.addWidget(self._cancel_button,4,0)
+        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok |
+                                               QDialogButtonBox.Cancel)
+        self.button_box.button(QDialogButtonBox.Ok).setDefault(True)
+        self.button_box.button(QDialogButtonBox.Ok).setEnabled(True)
+
+        self._layout.addWidget(self.button_box,5,1)
+        # self._cancel_button = QPushButton('Cancel', self)
+        # self._layout.addWidget(self._cancel_button,5,0)
         
         self._connect_signals()
 
     def _connect_signals(self):
         self._name_entry.textChanged.connect(self.name_changed)
-        self._has_input_check.stateChanged.connect(self.checkbox_toggled)
-        self._input_spin_box.valueChanged.connect(self.input_changed)
-        self._output_spin_box.valueChanged.connect(self.output_changed)
-        self._ok_button.clicked.connect(self.ok_clicked)
-        self._cancel_button.clicked.connect(self.cancel_clicked)
-
-    def checkbox_toggled(self, state):
-        self._has_input = state
-        if self._has_input:
-            self._input_spin_box.setEnabled(True)
-        else:
-            self._input_spin_box.setEnabled(False)
+        self._track_type.currentIndexChanged.connect(self._update_nr_of_channels)
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+        # self._ok_button.clicked.connect(self.ok_clicked)
+        # self._ok_button.set
+        # self._cancel_button.clicked.connect(self.cancel_clicked)
 
     def name_changed(self, name):
         self._name = name
 
-    def input_changed(self, value):
-        self._input_bus = value
-
-    def output_changed(self, value):
-        self._output_bus = value
+    def _update_nr_of_channels(self, idx: int):
+        if idx == 2:
+            self._inputs_sb.show()
+            self._inputs_lbl.show()
+            self._outputs_sb.show()
+            self._outputs_lbl.show()
+        else:
+            self._inputs_sb.hide()
+            self._inputs_lbl.hide()
+            self._outputs_sb.hide()
+            self._outputs_lbl.hide()
+        # self._channel_cnt = idx + 1
 
     def ok_clicked(self):
         self._ok = True
@@ -524,7 +598,7 @@ class AddTrackDialog(QDialog):
         self.close()
 
     def get_data(self):
-        return self._ok, self._name, self._has_input, self._input_bus, self._output_bus
+        return self._ok, self._name, self._channel_cnt
 
 
 class AddPluginDialog(QDialog):
@@ -623,9 +697,15 @@ class AddPluginDialog(QDialog):
 
 # Expand the controller with a few convinience functions that better match our use case
 class Controller(sc.SushiController):
+
     def __init__(self, address, proto_file):
         super().__init__(address, proto_file)
         self._view = None
+        self.notifications.subscribe_to_track_changes(self.emit_notification)
+        # self.notifications.subscribe_to_parameter_updates(self.print_notif)
+
+    def emit_notification(self, notif):
+        self._view.track_notification_received.emit(notif)
 
     def set_playing(self):
         self.transport.set_playing_mode(2)
@@ -643,22 +723,22 @@ class Controller(sc.SushiController):
 
     def delete_track(self, track_id):
         super().audio_graph.delete_track(track_id)
-        self._view.delete_track(track_id)
+        # self._view.delete_track(track_id)
 
-    def add_track(self, arg):
+    def add_track(self):
         dialog = AddTrackDialog(self._view)
-        dialog.exec_()
-        ok, name, has_input, input_bus, output_bus = dialog.get_data()
-        if ok:
-            try:
-                self.audio_graph.create_stereo_track(name, output_bus, has_input, input_bus)
-                #When notifications are working, we can wait for a notification instead
-                sleep(0.2)
-                new_track = self.audio_graph.get_tracks()[-1]
-                self._view.create_track(new_track)
+        if (dialog.exec_()):
+            track_type = dialog._track_type.currentText()
+            inputs = dialog._inputs_sb.value()
+            outputs = dialog._outputs_sb.value()
+            name = dialog._name_entry.text().strip()
 
-            except e:
-                print('Error creating track: {}'.format(e))
+            if track_type == 'Multibus':
+                self.audio_graph.create_multibus_track(name, outputs, inputs)
+            elif track_type == 'Stereo':
+                self.audio_graph.create_track(name, 2)
+            elif track_type == 'Mono':
+                self.audio_graph.create_track(name, 1)
 
     def add_plugin(self, track_id):
         dialog = AddPluginDialog(self._view)
@@ -710,10 +790,17 @@ class Controller(sc.SushiController):
     def set_view(self, view):
         self._view = view
 
+    def process_notification(self, notification):
+        print(f"Received: Proc#{notification.parameter.parameter_id}, Param{notification.value}")
+
+
+
+
 # Client code
 def main():
     app = QApplication(sys.argv)
     controller = Controller(SUSHI_ADDRESS, proto_file)
+    # controller.notifications.subscribe_to_parameter_updates(controller.print_notif)
     window = MainWindow(controller)
     window.show()
     controller.set_view(window)
