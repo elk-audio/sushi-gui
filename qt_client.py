@@ -42,6 +42,7 @@ class MainWindow(QMainWindow):
 
     track_notification_received = Signal(sushi_rpc_pb2.TrackUpdate)
     processor_notification_received = Signal(sushi_rpc_pb2.ProcessorUpdate)
+    parameter_notification_received = Signal(sushi_rpc_pb2.ParameterValue)
 
     def __init__(self, controller):
         super().__init__()
@@ -79,6 +80,7 @@ class MainWindow(QMainWindow):
 
         self.track_notification_received.connect(self.process_track_notification)
         self.processor_notification_received.connect(self.process_processor_notification)
+        self.parameter_notification_received.connect(self.process_parameter_notification)
 
         self._create_tracks()
 
@@ -147,6 +149,22 @@ class MainWindow(QMainWindow):
                     break
         elif n.action == 2:  # PROCESSOR_DELETED
             self.tracks[n.parent_track.id].delete_processor(n.processor.id)
+
+    def process_parameter_notification(self, n):
+        """
+        This is an example implementation of the earlier state of Parameter update notification.
+        sushi.testing.step_sequencer is currently the only processor that emits parameter notifications.
+
+        """
+        for t, v in self.tracks.items():
+            if n.parameter.processor_id in v.processors:
+                param = v.processors[n.parameter.processor_id]._parameters[n.parameter.parameter_id]
+                if n.value == 0.0:
+                    param.setStyleSheet("background-color: rgb(255, 0, 100)")
+                else:
+                    param.setStyleSheet("background-color: white")
+                return
+
 
 
 class TransportBarWidget(QGroupBox):
@@ -329,6 +347,7 @@ class ProcessorWidget(QGroupBox):
 
     def _create_parameters(self):
         parameters = self._controller.parameters.get_processor_parameters(self._id)
+        print(parameters[:])
         param_count = len(parameters)
         param_layout = QHBoxLayout()
         self._layout.addLayout(param_layout)
@@ -664,13 +683,18 @@ class Controller(sc.SushiController):
         self._view = None
         self.notifications.subscribe_to_track_changes(self.emit_notification)
         self.notifications.subscribe_to_processor_changes(self.emit_notification)
-        # self.notifications.subscribe_to_parameter_updates(self.print_notif)
+        self.notifications.subscribe_to_parameter_updates(self.emit_notification)
+        # self.notifications.subscribe_to_transport_changes(self.emit_notification)
 
     def emit_notification(self, notif):
         if type(notif) == sushi_rpc_pb2.TrackUpdate:
             self._view.track_notification_received.emit(notif)
         elif type(notif) == sushi_rpc_pb2.ProcessorUpdate:
             self._view.processor_notification_received.emit(notif)
+        elif type(notif) == sushi_rpc_pb2.ParameterValue:
+            self._view.parameter_notification_received.emit(notif)
+        else:
+            print(type(notif))
 
     def set_playing(self):
         self.transport.set_playing_mode(2)
@@ -761,11 +785,5 @@ def main():
     sys.exit(app.exec_())
 
 
-def sigHandler(*args):
-    print('sigHandler')
-    NotificationController.stop_flag = True
-
-
 if __name__ == '__main__':
-    signal.signal(signal.SIGINT, sigHandler)
     main()
