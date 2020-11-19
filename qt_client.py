@@ -2,6 +2,7 @@ import os
 from time import sleep
 import threading
 from elkpy import sushicontroller as sc
+from elkpy.notificationcontroller import NotificationController
 from elkpy import sushi_info_types as sushi
 from PySide2.QtCore import Qt, Signal, QObject
 from PySide2.QtWidgets import *
@@ -40,6 +41,7 @@ class Direction(IntEnum):
 class MainWindow(QMainWindow):
 
     track_notification_received = Signal(sushi_rpc_pb2.TrackUpdate)
+    processor_notification_received = Signal(sushi_rpc_pb2.ProcessorUpdate)
 
     def __init__(self, controller):
         super().__init__()
@@ -76,6 +78,7 @@ class MainWindow(QMainWindow):
         self._window_layout.addLayout(self._track_layout)
 
         self.track_notification_received.connect(self.process_track_notification)
+        self.processor_notification_received.connect(self.process_processor_notification)
 
         self._create_tracks()
 
@@ -124,7 +127,7 @@ class MainWindow(QMainWindow):
         info.exec_()
 
     def closeEvent(self, event):
-        self._controller.notifications.close()
+        self._controller.notifications._close()
         event.accept()
 
     def process_track_notification(self, n):
@@ -135,6 +138,16 @@ class MainWindow(QMainWindow):
                     break
         elif n.action == 2:  # TRACK_DELETED
             self.delete_track(n.track.id)
+
+    def process_processor_notification(self, n):
+        if n.action == 1:  # PROCESSOR_ADDED
+            for t in self._controller.audio_graph.get_track_processors(n.parent_track.id):
+                if t.id == n.processor.id:
+                    self.create_processor_on_track(t, n.parent_track.id)
+                    break
+        elif n.action == 2:  # PROCESSOR_DELETED
+            self.tracks[n.parent_track.id].delete_processor(n.processor.id)
+
 
 class TransportBarWidget(QGroupBox):
     def __init__(self, controller):
@@ -378,7 +391,7 @@ class ProcessorWidget(QGroupBox):
         self._down_button.clicked.connect(self.down_clicked)
 
     def delete_processor_clicked(self):
-        self._controller.audio_graph.delete_processor(self._track_id, self._id)
+        self._controller.delete_processor(self._track_id, self._id)
 
     def up_clicked(self):
         self._controller.move_processor(self._track_id, self._id, Direction.UP)
@@ -514,11 +527,6 @@ class AddTrackDialog(QDialog):
         self.setModal(True)
         self.setWindowTitle('Add new track')
 
-        self.name = ''
-        self.type = ''
-        self.inputs = 0
-        self.outputs = 0
-
         self._layout = QGridLayout(self)
         self.setLayout(self._layout)
 
@@ -558,24 +566,14 @@ class AddTrackDialog(QDialog):
                                                QDialogButtonBox.Cancel)
         self.button_box.button(QDialogButtonBox.Ok).setDefault(True)
         self.button_box.button(QDialogButtonBox.Ok).setEnabled(True)
+        self._layout.addWidget(self.button_box, 5, 1)
 
-        self._layout.addWidget(self.button_box,5,1)
-        # self._cancel_button = QPushButton('Cancel', self)
-        # self._layout.addWidget(self._cancel_button,5,0)
-        
         self._connect_signals()
 
     def _connect_signals(self):
-        self._name_entry.textChanged.connect(self.name_changed)
         self._track_type.currentIndexChanged.connect(self._update_nr_of_channels)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
-        # self._ok_button.clicked.connect(self.ok_clicked)
-        # self._ok_button.set
-        # self._cancel_button.clicked.connect(self.cancel_clicked)
-
-    def name_changed(self, name):
-        self._name = name
 
     def _update_nr_of_channels(self, idx: int):
         if idx == 2:
@@ -590,31 +588,16 @@ class AddTrackDialog(QDialog):
             self._outputs_lbl.hide()
         # self._channel_cnt = idx + 1
 
-    def ok_clicked(self):
-        self._ok = True
-        self.close()
-
-    def cancel_clicked(self):
-        self.close()
-
-    def get_data(self):
-        return self._ok, self._name, self._channel_cnt
-
 
 class AddPluginDialog(QDialog):
     def __init__(self, parent):
         super().__init__(parent)
-        self.setModal(True)
         self.setWindowTitle('Add new plugin')
-
-        self._ok = False
-        self._type = sushi.PluginType.INTERNAL
-        self._uid = ''
-        self._path = ''
-        self._name = ''
 
         self._layout = QGridLayout(self)
         self.setLayout(self._layout)
+
+        self._type = None
 
         type_label = QLabel('Type', self)
         self._layout.addWidget(type_label, 0, 0)
@@ -640,20 +623,18 @@ class AddPluginDialog(QDialog):
         self._path_entry.setEnabled(False)
         self._layout.addWidget(self._path_entry,3,1)
 
-        self._ok_button = QPushButton('Ok', self)
-        self._layout.addWidget(self._ok_button,4,1)
-        self._cancel_button = QPushButton('Cancel', self)
-        self._layout.addWidget(self._cancel_button,4,0)
+        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok |
+                                               QDialogButtonBox.Cancel)
+        self.button_box.button(QDialogButtonBox.Ok).setDefault(True)
+        self.button_box.button(QDialogButtonBox.Ok).setEnabled(True)
+        self._layout.addWidget(self.button_box, 4, 1)
         
         self._connect_signals()
 
     def _connect_signals(self):
         self._type_box.currentIndexChanged.connect(self.type_changed)
-        self._name_entry.textChanged.connect(self.name_changed)
-        self._path_entry.textChanged.connect(self.path_changed)
-        self._uid_entry.textChanged.connect(self.uid_changed)
-        self._ok_button.clicked.connect(self.ok_clicked)
-        self._cancel_button.clicked.connect(self.cancel_clicked)
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
 
     def type_changed(self, type_index):
         type = type_index + 1
@@ -675,26 +656,6 @@ class AddPluginDialog(QDialog):
             self._uid_entry.setEnabled(False)
 
 
-    def name_changed(self, value):
-        self._name = value
-
-    def uid_changed(self, value):
-        self._uid = value
-
-    def path_changed(self, value):
-        self._path = value
-
-    def ok_clicked(self):
-        self._ok = True
-        self.close()
-
-    def cancel_clicked(self):
-        self.close()
-
-    def get_data(self):
-        return self._ok, self._type, self._name, self._path, self._uid
-
-
 # Expand the controller with a few convinience functions that better match our use case
 class Controller(sc.SushiController):
 
@@ -702,10 +663,14 @@ class Controller(sc.SushiController):
         super().__init__(address, proto_file)
         self._view = None
         self.notifications.subscribe_to_track_changes(self.emit_notification)
+        self.notifications.subscribe_to_processor_changes(self.emit_notification)
         # self.notifications.subscribe_to_parameter_updates(self.print_notif)
 
     def emit_notification(self, notif):
-        self._view.track_notification_received.emit(notif)
+        if type(notif) == sushi_rpc_pb2.TrackUpdate:
+            self._view.track_notification_received.emit(notif)
+        elif type(notif) == sushi_rpc_pb2.ProcessorUpdate:
+            self._view.processor_notification_received.emit(notif)
 
     def set_playing(self):
         self.transport.set_playing_mode(2)
@@ -719,15 +684,13 @@ class Controller(sc.SushiController):
 
     def delete_processor(self, track_id, processor_id):
         self.audio_graph.delete_processor_from_track(processor_id, track_id)
-        self._view.tracks[track_id].delete_processor(processor_id)
 
     def delete_track(self, track_id):
         super().audio_graph.delete_track(track_id)
-        # self._view.delete_track(track_id)
 
     def add_track(self):
         dialog = AddTrackDialog(self._view)
-        if (dialog.exec_()):
+        if dialog.exec_():
             track_type = dialog._track_type.currentText()
             inputs = dialog._inputs_sb.value()
             outputs = dialog._outputs_sb.value()
@@ -742,20 +705,15 @@ class Controller(sc.SushiController):
 
     def add_plugin(self, track_id):
         dialog = AddPluginDialog(self._view)
-        dialog.exec_()
-        ok, type, name, path, uid = dialog.get_data()
-        print(dialog.get_data())
-        if ok:
+        if dialog.exec_():
+            name = dialog._name_entry.text().strip()
+            uid = dialog._uid_entry.text().strip()
+            path = dialog._path_entry.text().strip()
+            p_type = dialog._type
             try:
-                self.audio_graph.audio_graph.create_processor_on_track(name, uid, path, type, track_id, True, 0)
-                #When notifications are working, we can wait for a notification instead
-                sleep(0.4)
-                new_plugin = self.audio_graph.get_track_processors(track_id)[-1]
-                self._view.create_processor_on_track(new_plugin, track_id)
-
-            except e:
+                self.audio_graph.create_processor_on_track(name, uid, path, p_type, track_id, 0, True)
+            except Exception as e:
                 print('Error creating plugin: {}'.format(e))   
-
 
     def move_processor(self, track_id, processor_id, direction):
         track_info = self.audio_graph.get_track_info(track_id)
@@ -790,10 +748,6 @@ class Controller(sc.SushiController):
     def set_view(self, view):
         self._view = view
 
-    def process_notification(self, notification):
-        print(f"Received: Proc#{notification.parameter.parameter_id}, Param{notification.value}")
-
-
 
 
 # Client code
@@ -806,5 +760,12 @@ def main():
     controller.set_view(window)
     sys.exit(app.exec_())
 
+
+def sigHandler(*args):
+    print('sigHandler')
+    NotificationController.stop_flag = True
+
+
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, sigHandler)
     main()
