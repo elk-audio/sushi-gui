@@ -5,7 +5,7 @@ import threading
 from elkpy import sushicontroller as sc
 from elkpy.notificationcontroller import NotificationController
 from elkpy import sushi_info_types as sushi
-from PySide2.QtCore import Qt, Signal, QObject
+from PySide2.QtCore import Qt, Signal
 from PySide2.QtWidgets import *
 from functools import partial
 from enum import IntEnum
@@ -14,11 +14,9 @@ import logging
 import sushi_rpc_pb2
 
 
-logging.basicConfig(level=logging.DEBUG)
-SUSHI_ADDRESS = ('192.168.1.44:51051')
+SUSHI_ADDRESS = ('localhost:51051')
 # Get protofile to generate grpc library
-# proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
-proto_file = Path('C:/Users/Max/source/repos/sushi/rpc_interface/protos/sushi_rpc.proto')
+proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
 if proto_file is None:
     print('Environment variable SUSHI_GRPC_ELKPY_PROTO not defined, set it to point the .proto definition')
     sys.exit(-1)
@@ -697,7 +695,7 @@ class Controller(sc.SushiController):
         super().__init__(address, proto_file)
         self._view = None
         self.notifications.subscribe_to_track_changes(self.emit_notification)
-        # self.notifications.subscribe_to_processor_changes(self.emit_notification)
+        self.notifications.subscribe_to_processor_changes(self.emit_notification)
         self.notifications.subscribe_to_parameter_updates(self.emit_notification)
         # self.notifications.subscribe_to_transport_changes(self.emit_notification)
 
@@ -796,7 +794,6 @@ def main():
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
     controller = Controller(SUSHI_ADDRESS, proto_file)
-    # controller.notifications.subscribe_to_parameter_updates(controller.print_notif)
     window = MainWindow(controller)
     window.show()
     controller.set_view(window)
