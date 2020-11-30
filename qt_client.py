@@ -67,10 +67,13 @@ class MainWindow(QMainWindow):
         processors.triggered.connect(self.show_all_processors)
         tracks = QAction('Show all tracks', self)
         tracks.triggered.connect(self.show_all_tracks)
+        inputs = QAction('Show input connections', self)
+        inputs.triggered.connect(self.show_inputs)
 
         self.help_menu.addAction(about)
         self.help_menu.addAction(processors)
         self.help_menu.addAction(tracks)
+        self.help_menu.addAction(inputs)
 
         self.tpbar = TransportBarWidget(self._controller)
         self._window_layout.addWidget(self.tpbar)
@@ -128,6 +131,12 @@ class MainWindow(QMainWindow):
         info.setText(f"{r}")
         info.exec_()
 
+    def show_inputs(self):
+        r = self._controller.audio_routing.get_all_input_connections()
+        info = QMessageBox()
+        info.setText(f"{r}")
+        info.exec_()
+
     def closeEvent(self, event):
         self._controller.notifications._close()
         event.accept()
@@ -160,9 +169,9 @@ class MainWindow(QMainWindow):
             if n.parameter.processor_id in v.processors:
                 param = v.processors[n.parameter.processor_id]._parameters[n.parameter.parameter_id]
                 if n.value == 0.0:
-                    param.setStyleSheet("background-color: rgb(255, 0, 100)")
+                    param.setStyleSheet("background-color: rgb(200, 0, 0); color: white")
                 else:
-                    param.setStyleSheet("background-color: white")
+                    param.setStyleSheet("background-color: none, color: black")
                 return
 
 
@@ -347,7 +356,6 @@ class ProcessorWidget(QGroupBox):
 
     def _create_parameters(self):
         parameters = self._controller.parameters.get_processor_parameters(self._id)
-        print(parameters[:])
         param_count = len(parameters)
         param_layout = QHBoxLayout()
         self._layout.addLayout(param_layout)
@@ -682,7 +690,7 @@ class Controller(sc.SushiController):
         super().__init__(address, proto_file)
         self._view = None
         self.notifications.subscribe_to_track_changes(self.emit_notification)
-        self.notifications.subscribe_to_processor_changes(self.emit_notification)
+        # self.notifications.subscribe_to_processor_changes(self.emit_notification)
         self.notifications.subscribe_to_parameter_updates(self.emit_notification)
         # self.notifications.subscribe_to_transport_changes(self.emit_notification)
 
