@@ -1,17 +1,10 @@
 import os
 import sys
-from time import sleep
-import threading
-from elkpy import sushicontroller as sc
-from elkpy.notificationcontroller import NotificationController
+from elkpy.sushicontroller import SushiController
 from elkpy import sushi_info_types as sushi
 from PySide2.QtCore import Qt, Signal
 from PySide2.QtWidgets import *
-from functools import partial
 from enum import IntEnum
-from pathlib import Path
-import logging
-import sushi_rpc_pb2
 
 
 SUSHI_ADDRESS = ('localhost:51051')
@@ -45,15 +38,14 @@ class Direction(IntEnum):
 
 class MainWindow(QMainWindow):
 
-    track_notification_received = Signal(sushi_rpc_pb2.TrackUpdate)
-    processor_notification_received = Signal(sushi_rpc_pb2.ProcessorUpdate)
-    parameter_notification_received = Signal(sushi_rpc_pb2.ParameterValue)
+    track_notification_received = Signal(sushi_grpc_types.TrackUpdate)
+    processor_notification_received = Signal(sushi_grpc_types.ProcessorUpdate)
+    parameter_notification_received = Signal(sushi_grpc_types.ParameterValue)
 
     def __init__(self, controller):
         super().__init__()
         self._controller = controller
         self.setWindowTitle('Sushi')
-        #self.setGeometry(100,100,1000,1000)
 
         self._window_layout = QVBoxLayout()
         self._central_widget = QWidget(self)
@@ -689,7 +681,7 @@ class AddPluginDialog(QDialog):
 
 
 # Expand the controller with a few convinience functions that better match our use case
-class Controller(sc.SushiController):
+class Controller(SushiController):
 
     def __init__(self, address, proto_file):
         super().__init__(address, proto_file)
@@ -700,11 +692,11 @@ class Controller(sc.SushiController):
         # self.notifications.subscribe_to_transport_changes(self.emit_notification)
 
     def emit_notification(self, notif):
-        if type(notif) == sushi_rpc_pb2.TrackUpdate:
+        if type(notif) == sushi_grpc_types.TrackUpdate:
             self._view.track_notification_received.emit(notif)
-        elif type(notif) == sushi_rpc_pb2.ProcessorUpdate:
+        elif type(notif) == sushi_grpc_types.ProcessorUpdate:
             self._view.processor_notification_received.emit(notif)
-        elif type(notif) == sushi_rpc_pb2.ParameterValue:
+        elif type(notif) == sushi_grpc_types.ParameterValue:
             self._view.parameter_notification_received.emit(notif)
         else:
             print(type(notif))
@@ -794,6 +786,7 @@ def main():
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
     controller = Controller(SUSHI_ADDRESS, proto_file)
+    sushi_grpc_types = controller.notifications.sushi_proto
     window = MainWindow(controller)
     window.show()
     controller.set_view(window)
