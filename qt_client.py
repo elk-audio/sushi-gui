@@ -2,9 +2,11 @@ import os
 import sys
 from elkpy.sushicontroller import SushiController
 from elkpy import sushi_info_types as sushi
+from elkpy import grpc_gen
 from PySide2.QtCore import Qt, Signal
 from PySide2.QtWidgets import *
 from enum import IntEnum
+from pathlib import Path
 
 
 SUSHI_ADDRESS = ('localhost:51051')
@@ -30,6 +32,9 @@ PAN_SLIDER_WIDTH         = 60
 
 # Slider values are ints in QT, so we need to scale with an integer factor to get 0-1 floats
 SLIDER_MAX_VALUE         = 1024
+
+sushi_grpc_types, _ = grpc_gen.modules_from_proto(proto_file)
+
 
 class Direction(IntEnum):
     UP = 1
@@ -134,10 +139,6 @@ class MainWindow(QMainWindow):
         info.setText(f"{r}")
         info.exec_()
 
-    def closeEvent(self, event):
-        self._controller.notifications._close()
-        event.accept()
-
     def process_track_notification(self, n):
         if n.action == 1:   # TRACK_ADDED
             for t in self._controller.audio_graph.get_all_tracks():
@@ -170,7 +171,6 @@ class MainWindow(QMainWindow):
                 else:
                     param.setStyleSheet("background-color: none, color: black")
                 return
-
 
 
 class TransportBarWidget(QGroupBox):
@@ -778,7 +778,6 @@ class Controller(SushiController):
         self._view = view
 
 
-
 # Client code
 
 
@@ -786,7 +785,6 @@ def main():
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
     controller = Controller(SUSHI_ADDRESS, proto_file)
-    sushi_grpc_types = controller.notifications.sushi_proto
     window = MainWindow(controller)
     window.show()
     controller.set_view(window)
