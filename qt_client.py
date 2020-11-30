@@ -1,4 +1,5 @@
 import os
+import sys
 from time import sleep
 import threading
 from elkpy import sushicontroller as sc
@@ -8,10 +9,16 @@ from PySide2.QtCore import Qt, Signal, QObject
 from PySide2.QtWidgets import *
 from functools import partial
 from enum import IntEnum
+from pathlib import Path
+import logging
+import sushi_rpc_pb2
 
-SUSHI_ADDRESS = ('localhost:51051')
+
+logging.basicConfig(level=logging.DEBUG)
+SUSHI_ADDRESS = ('192.168.1.44:51051')
 # Get protofile to generate grpc library
-proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
+# proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
+proto_file = Path('C:/Users/Max/source/repos/sushi/rpc_interface/protos/sushi_rpc.proto')
 if proto_file is None:
     print('Environment variable SUSHI_GRPC_ELKPY_PROTO not defined, set it to point the .proto definition')
     sys.exit(-1)
@@ -783,8 +790,11 @@ class Controller(sc.SushiController):
 
 
 # Client code
+
+
 def main():
     app = QApplication(sys.argv)
+    app.setStyle('Fusion')
     controller = Controller(SUSHI_ADDRESS, proto_file)
     # controller.notifications.subscribe_to_parameter_updates(controller.print_notif)
     window = MainWindow(controller)
