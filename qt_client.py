@@ -47,6 +47,7 @@ class MainWindow(QMainWindow):
     processor_notification_received = Signal(sushi_grpc_types.ProcessorUpdate)
     parameter_notification_received = Signal(sushi_grpc_types.ParameterValue)
     transport_notification_received = Signal(sushi_grpc_types.TransportUpdate)
+    timing_notification_received = Signal(sushi_grpc_types.CpuTimings)
 
     def __init__(self, controller):
         super().__init__()
@@ -88,6 +89,7 @@ class MainWindow(QMainWindow):
         self.processor_notification_received.connect(self.process_processor_notification)
         self.parameter_notification_received.connect(self.process_parameter_notification)
         self.transport_notification_received.connect(self.process_transport_notification)
+        self.timing_notification_received.connect(self.process_timing_notification)
 
         self._create_tracks()
 
@@ -178,6 +180,9 @@ class MainWindow(QMainWindow):
         if n.HasField('tempo'):
             self.tpbar.set_tempo(n.tempo)
 
+    def process_timing_notification(self, n):
+        self.tpbar.set_cpu_value(n.average)
+
 
 class TransportBarWidget(QGroupBox):
     def __init__(self, controller):
@@ -216,6 +221,8 @@ class TransportBarWidget(QGroupBox):
         self._add_track_button = QPushButton('New Track', self)
         self._layout.addWidget(self._add_track_button)
 
+        self._cpu_meter = QLabel("Cpu: -", self)
+        self._layout.addWidget(self._cpu_meter)
 
         self._layout.addStretch(0)
         self._connect_signals()
@@ -233,6 +240,9 @@ class TransportBarWidget(QGroupBox):
 
     def set_tempo(self, tempo):
         self._tempo.setValue(tempo)
+
+    def set_cpu_value(self, value):
+        self._cpu_meter.setText(f"Cpu: {value * 100:.1f}%")
 
 
 class TrackWidget(QGroupBox):
@@ -699,6 +709,8 @@ class Controller(SushiController):
         self.notifications.subscribe_to_processor_changes(self.emit_notification)
         self.notifications.subscribe_to_parameter_updates(self.emit_notification)
         self.notifications.subscribe_to_transport_changes(self.emit_notification)
+        self.notifications.subscribe_to_timing_updates(self.emit_notification)
+        self.timings.set_timings_enabled(True)
 
     def emit_notification(self, notif):
         if type(notif) == sushi_grpc_types.TrackUpdate:
@@ -709,6 +721,8 @@ class Controller(SushiController):
             self._view.parameter_notification_received.emit(notif)
         elif type(notif) == sushi_grpc_types.TransportUpdate:
             self._view.transport_notification_received.emit(notif)
+        elif type(notif) == sushi_grpc_types.CpuTimings:
+            self._view.timing_notification_received.emit(notif)
         else:
             print(type(notif))
 
