@@ -29,6 +29,7 @@ ICON_BUTTON_WIDTH        = 30
 SLIDER_HEIGHT            = 15
 SLIDER_MIN_WIDTH         = 100
 PAN_SLIDER_WIDTH         = 60
+FILE_BUTTON_WIDTH        = 40
 
 # Slider values are ints in QT, so we need to scale with an integer factor to get 0-1 floats
 SLIDER_MAX_VALUE         = 1024
@@ -368,6 +369,7 @@ class ProcessorWidget(QGroupBox):
 
         self._create_common_controls(processor_info)
         self._create_parameters()
+        self._create_properties()
         self._connect_signals()
 
     def _create_parameters(self):
@@ -384,6 +386,18 @@ class ProcessorWidget(QGroupBox):
                 self._parameters.append(parameter)
 
             col_layout.addStretch()
+        self._layout.addStretch()
+
+    def _create_properties(self):
+        properties = self._controller.parameters.get_processor_properties(self._id)
+        prop_count = len(properties)
+        prop_layout = QVBoxLayout()
+        self._layout.addLayout(prop_layout)
+
+        for p in properties:
+            property = PropertyWidget(p, self._id, self._controller, self)
+            prop_layout.addWidget(property)
+
         self._layout.addStretch()
 
     def _create_common_controls(self, processor_info):
@@ -496,6 +510,48 @@ class ParameterWidget(QWidget):
         self._controller.parameters.set_parameter_value(self._processor_id, self._id, value)
         txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self._id)
         self._value_label.setText(txt_value + ' ' + self._unit)
+
+class PropertyWidget(QWidget):
+    def __init__(self, property_info, processor_id, controller, parent):
+        super().__init__(parent)
+        self._controller = controller
+        self._id = property_info.id
+        self._processor_id = processor_id
+        self._layout = QHBoxLayout(self)
+        self.setLayout(self._layout)
+
+        self._name_label = QLabel(property_info.name, self)
+        self._name_label.setFixedWidth(PARAMETER_VALUE_WIDTH)
+        self._layout.addWidget(self._name_label)
+
+        self._edit_box = QLineEdit(self)
+        self._layout.addWidget(self._edit_box)
+
+        self._file_button = QPushButton('', self)
+        self._file_button.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_DirIcon')))
+        self._file_button.setToolTip("Set to a file location")
+        self._layout.addWidget(self._file_button)
+        self._file_button.clicked.connect(self.open_file_dialog)
+
+        self._layout.setContentsMargins(0,0,0,0)
+
+        value = self._controller.parameters.get_property_value(self._processor_id, self._id)
+        self._edit_box.setText(value)
+        self._connect_signals()
+
+    def _connect_signals(self):
+        self._edit_box.returnPressed.connect(self.value_changed)
+
+    def value_changed(self):
+        value = self._edit_box.text()
+        self._controller.parameters.set_property_value(self._processor_id, self._id, value)
+
+    def open_file_dialog(self):
+        dialog = QFileDialog(self)
+        if dialog.exec_():
+            filename = dialog.selectedFiles()[0]
+            self._edit_box.setText(filename)
+            self._controller.parameters.set_property_value(self._processor_id, self._id, filename)
 
 
 class PanGainWidget(QWidget):
@@ -711,6 +767,7 @@ class Controller(SushiController):
         self.notifications.subscribe_to_transport_changes(self.emit_notification)
         self.notifications.subscribe_to_timing_updates(self.emit_notification)
         self.timings.set_timings_enabled(True)
+        self.timings.reset_all_timings();
 
     def emit_notification(self, notif):
         if type(notif) == sushi_grpc_types.TrackUpdate:
