@@ -309,10 +309,13 @@ class TrackWidget(QGroupBox):
 
         self._track_buttons = QHBoxLayout(self)
         self._layout.addLayout(self._track_buttons)
-        #self._mute_button = QPushButton('Mute', self)
-        #self._track_buttons.addWidget(self._mute_button)
-        #self._mute_button.setCheckable(True)
-        #self._mute_button.setChecked(self._controller.get_processor_bypass_state(self._id))
+        
+        self._mute_button = QPushButton('Mute', self)
+        self._track_buttons.addWidget(self._mute_button)
+        self._mute_button.setCheckable(True)
+        self._mute_id = self._controller.parameters.get_parameter_id(track_info.id, 'mute')
+        self._mute_button.setChecked(self._controller.parameters.get_parameter_value(self._id, self._mute_id) == 1)
+
         self._delete_button = QPushButton('Delete', self)
         self._track_buttons.addWidget(self._delete_button)
         self._add_plugin_button = QPushButton('Add Plugin', self)
@@ -320,13 +323,13 @@ class TrackWidget(QGroupBox):
         self._track_buttons.addStretch(0)
 
     def _connect_signals(self):
-        #self._mute_button.clicked.connect(self.mute_track)
+        self._mute_button.clicked.connect(self.mute_track)
         self._delete_button.clicked.connect(self.delete_track)
         self._add_plugin_button.clicked.connect(self.add_plugin)
 
     def mute_track(self, arg):
-        #state = self._mute_button.isChecked()
-        self._controller.audio_graph.set_processor_bypass_state(self._id, state)
+        state = self._mute_button.isChecked()
+        muted = self._controller.parameters.set_parameter_value(self._id, self._mute_id, 1 if state == True else 0)
 
     def delete_track(self, arg):
         self._controller.audio_graph.delete_track(self._id)
