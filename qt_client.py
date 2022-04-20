@@ -66,6 +66,14 @@ class MainWindow(QMainWindow):
         self.tools_menu = self.menuBar().addMenu("&Tools")
         self.help_menu = self.menuBar().addMenu("&Info")
 
+        save = QAction('Save', self)
+        save.triggered.connect(controller.save_session)
+        load = QAction('Load', self)
+        load.triggered.connect(controller.restore_session)
+
+        self.file_menu.addAction(save)
+        self.file_menu.addAction(load)
+
         about = QAction('About Sushi', self)
         about.triggered.connect(self.show_about_sushi)
         processors = QAction('Show all processors', self)
@@ -439,6 +447,8 @@ class ProcessorWidget(QGroupBox):
         if processor_info.program_count > 0:
             for program in self._controller.programs.get_processor_programs(self._id):
                 self._program_selector.addItem(program.name)
+            current_program =self._controller.programs.get_processor_current_program(self._id)
+            self._program_selector.setCurrentIndex(current_program)
             
         else:
             self._program_selector.addItem('No programs')
@@ -858,6 +868,23 @@ class Controller(SushiController):
             self.transport.set_sync_mode(sushi.SyncMode.LINK)
         if txt_mode == 'Midi':
             self.transport.set_sync_mode(sushi.SyncMode.MIDI)
+
+    def save_session(self):
+        filename, _ = QFileDialog.getSaveFileName(self._view, 'Save Session As', '', "Sushi Files (*.sushi)")
+
+        if filename:
+            saved_session = self.session.save_binary_session();
+            with open(filename, 'wb') as f:
+                f.write(saved_session)
+
+    def restore_session(self):
+        filename, _ = QFileDialog.getOpenFileName(self._view, 'Load Session', '', "Sushi Files (*.sushi)")
+
+        if filename:
+            with open(filename, 'rb') as f:
+                saved_session = f.read()
+
+            self.session.restore_binary_session(saved_session)
 
     def set_view(self, view):
         self._view = view
