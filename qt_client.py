@@ -358,7 +358,7 @@ class TrackWidget(QGroupBox):
             self._proc_layout.removeWidget(p)
             self._proc_layout.insertWidget(index - 1, p)
 
-        # There is a 'hidden' strech element that should always remain at the end
+        # There is a 'hidden' stretch element that should always remain at the end
         # for layout purposes, so never move the processor past that element.
         elif direction == Direction.DOWN and index < self._proc_layout.count() - 2:
             self._proc_layout.removeWidget(p)
@@ -870,9 +870,12 @@ class Controller(SushiController):
             self.transport.set_sync_mode(sushi.SyncMode.MIDI)
 
     def save_session(self):
-        filename, _ = QFileDialog.getSaveFileName(self._view, 'Save Session As', '', "Sushi Files (*.sushi)")
+        filename, _ = QFileDialog.getSaveFileName(self._view, 'Save Session As', '', '')
 
         if filename:
+            if not filename.endswith('.sushi'):
+                filename += '.sushi'
+
             saved_session = self.session.save_binary_session();
             with open(filename, 'wb') as f:
                 f.write(saved_session)
