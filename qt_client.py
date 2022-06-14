@@ -171,19 +171,10 @@ class MainWindow(QMainWindow):
             self.tracks[n.parent_track.id].delete_processor(n.processor.id)
 
     def process_parameter_notification(self, n):
-        """
-        This is an example implementation of the earlier state of Parameter update notification.
-        sushi.testing.step_sequencer is currently the only processor that emits parameter notifications.
-
-        """
         for t, v in self.tracks.items():
             if n.parameter.processor_id in v.processors:
                 param = v.processors[n.parameter.processor_id]._parameters[n.parameter.parameter_id]
-                if n.value == 0.0:
-                    param.setStyleSheet("background-color: rgb(200, 0, 0); color: white")
-                else:
-                    param.setStyleSheet("background-color: none, color: black")
-                return
+                param.set_slider_value(n.value)
 
     def process_transport_notification(self, n):
         if n.HasField('tempo'):
@@ -475,9 +466,6 @@ class ProcessorWidget(QGroupBox):
 
     def program_selector_changed(self, program_id):
         self._controller.programs.set_processor_program(self._id, program_id)
-        for param in self._parameters:
-            param.refresh()
-
 
 class ParameterWidget(QWidget):
     def __init__(self, parameter_info, processor_id, controller, parent):
@@ -523,6 +511,16 @@ class ParameterWidget(QWidget):
         self._controller.parameters.set_parameter_value(self._processor_id, self._id, value)
         txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self._id)
         self._value_label.setText(txt_value + ' ' + self._unit)
+
+    def set_slider_value(self, value):
+        ## Set value without triggering a signal
+        self._value_slider.blockSignals(True)
+        self._value_slider.setValue(value * SLIDER_MAX_VALUE)
+        self._value_slider.blockSignals(False)
+        ## For now, query the txt value, eventually that should be a notification too
+        txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self._id)
+        self._value_label.setText(txt_value + ' ' + self._unit)
+
 
 class PropertyWidget(QWidget):
     def __init__(self, property_info, processor_id, controller, parent):
