@@ -49,6 +49,7 @@ class MainWindow(QMainWindow):
     parameter_notification_received = Signal(sushi_grpc_types.ParameterValue)
     transport_notification_received = Signal(sushi_grpc_types.TransportUpdate)
     timing_notification_received = Signal(sushi_grpc_types.CpuTimings)
+    property_notification_received = Signal(sushi_grpc_types.PropertyValue)
 
     def __init__(self, controller):
         super().__init__()
@@ -99,6 +100,7 @@ class MainWindow(QMainWindow):
         self.parameter_notification_received.connect(self.process_parameter_notification)
         self.transport_notification_received.connect(self.process_transport_notification)
         self.timing_notification_received.connect(self.process_timing_notification)
+        self.property_notification_received.connect(self.process_property_notification)
 
         self._create_tracks()
 
@@ -174,7 +176,8 @@ class MainWindow(QMainWindow):
         for t, v in self.tracks.items():
             if n.parameter.processor_id in v.processors:
                 param = v.processors[n.parameter.processor_id]._parameters[n.parameter.parameter_id]
-                param.set_slider_value(n.value)
+                param.set_slider_value(n.normalized_value)
+                param.set_label_value(n.formatted_value)
 
     def process_transport_notification(self, n):
         if n.HasField('tempo'):
@@ -183,6 +186,11 @@ class MainWindow(QMainWindow):
     def process_timing_notification(self, n):
         self.tpbar.set_cpu_value(n.average)
 
+    def process_property_notification(self, n):
+        for t, v in self.tracks.items():
+            if n.property.processor_id in v.processors:
+                property = v.processors[n.property.processor_id]._properties[n.property.property_id]
+                property.set_value(n.value)
 
 class TransportBarWidget(QGroupBox):
     def __init__(self, controller):
@@ -365,7 +373,8 @@ class ProcessorWidget(QGroupBox):
         self._controller = controller
         self._id = processor_info.id
         self._track_id = track_id
-        self._parameters = []
+        self._parameters = {}
+        self._properties = {}
         self._layout = QVBoxLayout(self)
         self.setLayout(self._layout)
 
@@ -385,7 +394,7 @@ class ProcessorWidget(QGroupBox):
             for p in parameters[col::MAX_COLUMNS]:
                 parameter = ParameterWidget(p, self._id, self._controller, self)
                 col_layout.addWidget(parameter)
-                self._parameters.append(parameter)
+                self._parameters[p.id] = parameter
 
             col_layout.addStretch()
         self._layout.addStretch()
@@ -399,6 +408,7 @@ class ProcessorWidget(QGroupBox):
         for p in properties:
             property = PropertyWidget(p, self._id, self._controller, self)
             prop_layout.addWidget(property)
+            self._properties[p.id] = property
 
         self._layout.addStretch()
 
@@ -509,18 +519,17 @@ class ParameterWidget(QWidget):
     def value_changed(self):
         value = float(self._value_slider.value()) / SLIDER_MAX_VALUE
         self._controller.parameters.set_parameter_value(self._processor_id, self._id, value)
-        txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self._id)
-        self._value_label.setText(txt_value + ' ' + self._unit)
+        #txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self._id)
+        #self._value_label.setText(txt_value + ' ' + self._unit)
 
     def set_slider_value(self, value):
         ## Set value without triggering a signal
         self._value_slider.blockSignals(True)
         self._value_slider.setValue(value * SLIDER_MAX_VALUE)
         self._value_slider.blockSignals(False)
-        ## For now, query the txt value, eventually that should be a notification too
-        txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self._id)
-        self._value_label.setText(txt_value + ' ' + self._unit)
 
+    def set_label_value(self, value):
+        self._value_label.setText(value + ' ' + self._unit)
 
 class PropertyWidget(QWidget):
     def __init__(self, property_info, processor_id, controller, parent):
@@ -556,6 +565,11 @@ class PropertyWidget(QWidget):
     def value_changed(self):
         value = self._edit_box.text()
         self._controller.parameters.set_property_value(self._processor_id, self._id, value)
+
+    def set_value(self, value):
+        self._edit_box.blockSignals(True)
+        self._edit_box.setText(value)
+        self._edit_box.blockSignals(False)
 
     def open_file_dialog(self):
         dialog = QFileDialog(self)
@@ -772,27 +786,39 @@ class Controller(SushiController):
     def __init__(self, address, proto_file):
         super().__init__(address, proto_file)
         self._view = None
+        
+    def emit_notification(self, notif):
+        try:
+            if type(notif) == sushi_grpc_types.TrackUpdate:
+                self._view.track_notification_received.emit(notif)
+            elif type(notif) == sushi_grpc_types.ProcessorUpdate:
+                self._view.processor_notification_received.emit(notif)
+            elif type(notif) == sushi_grpc_types.ParameterUpdate:
+                self._view.parameter_notification_received.emit(notif)
+            elif type(notif) == sushi_grpc_types.TransportUpdate:
+                self._view.transport_notification_received.emit(notif)
+            elif type(notif) == sushi_grpc_types.CpuTimings:
+                self._view.timing_notification_received.emit(notif)
+            elif type(notif) == sushi_grpc_types.PropertyValue:
+                self._view.property_notification_received.emit(notif)
+            else:
+                print(type(notif))
+
+        ## Note, if an exception in a notification handler is not caught, that notification stops working 
+        except Exception as e:
+            print(e)
+
+
+    def subscribe_to_notifications(self):
         self.notifications.subscribe_to_track_changes(self.emit_notification)
         self.notifications.subscribe_to_processor_changes(self.emit_notification)
         self.notifications.subscribe_to_parameter_updates(self.emit_notification)
         self.notifications.subscribe_to_transport_changes(self.emit_notification)
         self.notifications.subscribe_to_timing_updates(self.emit_notification)
+        self.notifications.subscribe_to_property_updates(self.emit_notification)
         self.timings.set_timings_enabled(True)
         self.timings.reset_all_timings();
 
-    def emit_notification(self, notif):
-        if type(notif) == sushi_grpc_types.TrackUpdate:
-            self._view.track_notification_received.emit(notif)
-        elif type(notif) == sushi_grpc_types.ProcessorUpdate:
-            self._view.processor_notification_received.emit(notif)
-        elif type(notif) == sushi_grpc_types.ParameterValue:
-            self._view.parameter_notification_received.emit(notif)
-        elif type(notif) == sushi_grpc_types.TransportUpdate:
-            self._view.transport_notification_received.emit(notif)
-        elif type(notif) == sushi_grpc_types.CpuTimings:
-            self._view.timing_notification_received.emit(notif)
-        else:
-            print(type(notif))
 
     def set_playing(self):
         self.transport.set_playing_mode(2)
@@ -898,6 +924,7 @@ def main():
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
     controller = Controller(SUSHI_ADDRESS, proto_file)
+    controller.subscribe_to_notifications()
     window = MainWindow(controller)
     window.show()
     controller.set_view(window)
