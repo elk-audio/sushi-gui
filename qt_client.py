@@ -532,7 +532,12 @@ class ParameterWidget(QWidget):
         txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self._id)
         self.set_label_value(txt_value)
 
-        self._connect_signals()
+        if parameter_info.automatable:
+            self._connect_signals()
+        else:
+            # It an output only parameter, it's not meant to be set by the user
+            self._value_slider.setEnabled(False)
+
 
     def _connect_signals(self):
         self._value_slider.valueChanged.connect(self.value_changed)
