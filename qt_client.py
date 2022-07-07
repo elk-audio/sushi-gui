@@ -8,7 +8,6 @@ from PySide2.QtWidgets import *
 from enum import IntEnum
 from pathlib import Path
 
-
 SUSHI_ADDRESS = ('localhost:51051')
 # Get protofile to generate grpc library
 proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
@@ -16,8 +15,9 @@ if proto_file is None:
     print('Environment variable SUSHI_GRPC_ELKPY_PROTO not defined, set it to point the .proto definition')
     sys.exit(-1)
 
-SYNCMODES = ['Internal', 'Midi', 'Gate', 'Link']
+SYNCMODES = ['Internal', 'Midi', 'Link']
 PLUGIN_TYPES = ['Internal', 'Vst2x', 'Vst3x', 'LV2']
+MODE_PLAYING = 2
 
 # Number of columns of parameters to display per processor
 # 1-3 works reasonably well
@@ -183,6 +183,9 @@ class MainWindow(QMainWindow):
     def process_transport_notification(self, n):
         if n.HasField('tempo'):
             self.tpbar.set_tempo(n.tempo)
+
+        elif n.HasField('playing_mode'):
+            self.tpbar.set_playing(n.playing_mode.mode == MODE_PLAYING)
 
     def process_timing_notification(self, n):
         self.tpbar.set_cpu_value(n.average)
@@ -710,8 +713,7 @@ class AddTrackDialog(QDialog):
         self._layout.addWidget(self._outputs_lbl, 4, 0)
         self._layout.addWidget(self._outputs_sb, 4, 1)
 
-        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok |
-                                               QDialogButtonBox.Cancel)
+        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_box.button(QDialogButtonBox.Ok).setDefault(True)
         self.button_box.button(QDialogButtonBox.Ok).setEnabled(True)
         self._layout.addWidget(self.button_box, 5, 1)
@@ -734,7 +736,6 @@ class AddTrackDialog(QDialog):
             self._inputs_lbl.hide()
             self._outputs_sb.hide()
             self._outputs_lbl.hide()
-        # self._channel_cnt = idx + 1
 
 
 class AddPluginDialog(QDialog):
@@ -845,13 +846,9 @@ class Controller(SushiController):
 
     def set_playing(self):
         self.transport.set_playing_mode(2)
-        if not self._view is  None:
-            self._view.tpbar.set_playing(True)
 
     def set_stopped(self):
         self.transport.set_playing_mode(1)
-        if not self._view is  None:
-            self._view.tpbar.set_playing(False)
 
     def delete_processor(self, track_id, processor_id):
         self.audio_graph.delete_processor_from_track(processor_id, track_id)
@@ -904,7 +901,6 @@ class Controller(SushiController):
             before_processor = track_info.processors[index + 2]
 
         self.audio_graph.move_processor_on_track(processor_id, track_id, track_id, add_to_back, before_processor)
-        track_info = self.audio_graph.get_track_info(track_id)
 
         self._view.tracks[track_id].move_processor(processor_id, direction)
 
