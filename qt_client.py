@@ -340,11 +340,11 @@ class TrackWidget(QGroupBox):
     def handle_parameter_notification(self, notif):
         for pan_gain in self._pan_gain:
             if notif.parameter.parameter_id == pan_gain.pan_id:
-                pan_gain.set_pan_value(notif.normalized_value)
+                pan_gain.set_pan_slider(notif.normalized_value)
                 pan_gain.set_pan_label(notif.formatted_value)
 
             elif notif.parameter.parameter_id == pan_gain.gain_id:
-                pan_gain.set_gain_value(notif.normalized_value)
+                pan_gain.set_gain_slider(notif.normalized_value)
                 pan_gain.set_gain_label(notif.formatted_value)
 
         if notif.parameter.parameter_id == self._mute_id:
@@ -632,12 +632,12 @@ class PanGainWidget(QWidget):
         self._layout.addWidget(self._pan_label, 0, Qt.AlignHCenter)
 
         value = self._controller.parameters.get_parameter_value(self._processor_id, pan_id)
-        self.set_pan_value(value)
+        self.set_pan_slider(value)
         txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self.pan_id)
         self.set_pan_label(txt_value)
 
         value = self._controller.parameters.get_parameter_value(self._processor_id, gain_id)
-        self.set_gain_value(value)
+        self.set_gain_slider(value)
         txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self.gain_id)
         self.set_gain_label(txt_value)
         
@@ -655,7 +655,7 @@ class PanGainWidget(QWidget):
         value = float(self._gain_slider.value()) / SLIDER_MAX_VALUE
         self._controller.parameters.set_parameter_value(self._processor_id, self.gain_id, value)
 
-    def set_pan_value(self, value):
+    def set_pan_slider(self, value):
         self._pan_slider.blockSignals(True)
         self._pan_slider.setValue(value * SLIDER_MAX_VALUE)
         self._pan_slider.blockSignals(False)
@@ -663,7 +663,7 @@ class PanGainWidget(QWidget):
     def set_pan_label(self, txt_value):
         self._pan_label.setText(txt_value)
 
-    def set_gain_value(self, value):
+    def set_gain_slider(self, value):
         self._gain_slider.blockSignals(True)
         self._gain_slider.setValue(value * SLIDER_MAX_VALUE)
         self._gain_slider.blockSignals(False)
