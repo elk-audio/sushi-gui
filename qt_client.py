@@ -66,6 +66,14 @@ class MainWindow(QMainWindow):
         self.tools_menu = self.menuBar().addMenu("&Tools")
         self.help_menu = self.menuBar().addMenu("&Info")
 
+        save = QAction('Save', self)
+        save.triggered.connect(controller.save_session)
+        load = QAction('Load', self)
+        load.triggered.connect(controller.restore_session)
+
+        self.file_menu.addAction(save)
+        self.file_menu.addAction(load)
+
         about = QAction('About Sushi', self)
         about.triggered.connect(self.show_about_sushi)
         processors = QAction('Show all processors', self)
@@ -309,10 +317,13 @@ class TrackWidget(QGroupBox):
 
         self._track_buttons = QHBoxLayout(self)
         self._layout.addLayout(self._track_buttons)
-        #self._mute_button = QPushButton('Mute', self)
-        #self._track_buttons.addWidget(self._mute_button)
-        #self._mute_button.setCheckable(True)
-        #self._mute_button.setChecked(self._controller.get_processor_bypass_state(self._id))
+        
+        self._mute_button = QPushButton('Mute', self)
+        self._track_buttons.addWidget(self._mute_button)
+        self._mute_button.setCheckable(True)
+        self._mute_id = self._controller.parameters.get_parameter_id(track_info.id, 'mute')
+        self._mute_button.setChecked(self._controller.parameters.get_parameter_value(self._id, self._mute_id) == 1)
+
         self._delete_button = QPushButton('Delete', self)
         self._track_buttons.addWidget(self._delete_button)
         self._add_plugin_button = QPushButton('Add Plugin', self)
@@ -320,13 +331,13 @@ class TrackWidget(QGroupBox):
         self._track_buttons.addStretch(0)
 
     def _connect_signals(self):
-        #self._mute_button.clicked.connect(self.mute_track)
+        self._mute_button.clicked.connect(self.mute_track)
         self._delete_button.clicked.connect(self.delete_track)
         self._add_plugin_button.clicked.connect(self.add_plugin)
 
     def mute_track(self, arg):
-        #state = self._mute_button.isChecked()
-        self._controller.audio_graph.set_processor_bypass_state(self._id, state)
+        state = self._mute_button.isChecked()
+        muted = self._controller.parameters.set_parameter_value(self._id, self._mute_id, 1 if state == True else 0)
 
     def delete_track(self, arg):
         self._controller.audio_graph.delete_track(self._id)
@@ -347,7 +358,7 @@ class TrackWidget(QGroupBox):
             self._proc_layout.removeWidget(p)
             self._proc_layout.insertWidget(index - 1, p)
 
-        # There is a 'hidden' strech element that should always remain at the end
+        # There is a 'hidden' stretch element that should always remain at the end
         # for layout purposes, so never move the processor past that element.
         elif direction == Direction.DOWN and index < self._proc_layout.count() - 2:
             self._proc_layout.removeWidget(p)
@@ -436,6 +447,8 @@ class ProcessorWidget(QGroupBox):
         if processor_info.program_count > 0:
             for program in self._controller.programs.get_processor_programs(self._id):
                 self._program_selector.addItem(program.name)
+            current_program =self._controller.programs.get_processor_current_program(self._id)
+            self._program_selector.setCurrentIndex(current_program)
             
         else:
             self._program_selector.addItem('No programs')
@@ -855,6 +868,26 @@ class Controller(SushiController):
             self.transport.set_sync_mode(sushi.SyncMode.LINK)
         if txt_mode == 'Midi':
             self.transport.set_sync_mode(sushi.SyncMode.MIDI)
+
+    def save_session(self):
+        filename, _ = QFileDialog.getSaveFileName(self._view, 'Save Session As', '', '')
+
+        if filename:
+            if not filename.endswith('.sushi'):
+                filename += '.sushi'
+
+            saved_session = self.session.save_binary_session();
+            with open(filename, 'wb') as f:
+                f.write(saved_session)
+
+    def restore_session(self):
+        filename, _ = QFileDialog.getOpenFileName(self._view, 'Load Session', '', "Sushi Files (*.sushi)")
+
+        if filename:
+            with open(filename, 'rb') as f:
+                saved_session = f.read()
+
+            self.session.restore_binary_session(saved_session)
 
     def set_view(self, view):
         self._view = view
