@@ -8,7 +8,6 @@ from PySide2.QtWidgets import *
 from enum import IntEnum
 from pathlib import Path
 
-
 SUSHI_ADDRESS = ('localhost:51051')
 # Get protofile to generate grpc library
 proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
@@ -16,8 +15,9 @@ if proto_file is None:
     print('Environment variable SUSHI_GRPC_ELKPY_PROTO not defined, set it to point the .proto definition')
     sys.exit(-1)
 
-SYNCMODES = ['Internal', 'Midi', 'Gate', 'Link']
+SYNCMODES = ['Internal', 'Midi', 'Link']
 PLUGIN_TYPES = ['Internal', 'Vst2x', 'Vst3x', 'LV2']
+MODE_PLAYING = 2
 
 # Number of columns of parameters to display per processor
 # 1-3 works reasonably well
@@ -49,6 +49,7 @@ class MainWindow(QMainWindow):
     parameter_notification_received = Signal(sushi_grpc_types.ParameterValue)
     transport_notification_received = Signal(sushi_grpc_types.TransportUpdate)
     timing_notification_received = Signal(sushi_grpc_types.CpuTimings)
+    property_notification_received = Signal(sushi_grpc_types.PropertyValue)
 
     def __init__(self, controller):
         super().__init__()
@@ -99,6 +100,7 @@ class MainWindow(QMainWindow):
         self.parameter_notification_received.connect(self.process_parameter_notification)
         self.transport_notification_received.connect(self.process_transport_notification)
         self.timing_notification_received.connect(self.process_timing_notification)
+        self.property_notification_received.connect(self.process_property_notification)
 
         self._create_tracks()
 
@@ -171,27 +173,27 @@ class MainWindow(QMainWindow):
             self.tracks[n.parent_track.id].delete_processor(n.processor.id)
 
     def process_parameter_notification(self, n):
-        """
-        This is an example implementation of the earlier state of Parameter update notification.
-        sushi.testing.step_sequencer is currently the only processor that emits parameter notifications.
+        for id, track in self.tracks.items():
+            if n.parameter.processor_id == id:
+                track.handle_parameter_notification(n)
 
-        """
-        for t, v in self.tracks.items():
-            if n.parameter.processor_id in v.processors:
-                param = v.processors[n.parameter.processor_id]._parameters[n.parameter.parameter_id]
-                if n.value == 0.0:
-                    param.setStyleSheet("background-color: rgb(200, 0, 0); color: white")
-                else:
-                    param.setStyleSheet("background-color: none, color: black")
-                return
+            elif n.parameter.processor_id in track.processors:
+                track.processors[n.parameter.processor_id].handle_parameter_notification(n)
 
     def process_transport_notification(self, n):
         if n.HasField('tempo'):
             self.tpbar.set_tempo(n.tempo)
 
+        elif n.HasField('playing_mode'):
+            self.tpbar.set_playing(n.playing_mode.mode == MODE_PLAYING)
+
     def process_timing_notification(self, n):
         self.tpbar.set_cpu_value(n.average)
 
+    def process_property_notification(self, n):
+        for t, v in self.tracks.items():
+            if n.property.processor_id in v.processors:
+                v.processors[n.property.processor_id].handle_property_notification(n)
 
 class TransportBarWidget(QGroupBox):
     def __init__(self, controller):
@@ -335,6 +337,21 @@ class TrackWidget(QGroupBox):
         self._delete_button.clicked.connect(self.delete_track)
         self._add_plugin_button.clicked.connect(self.add_plugin)
 
+    def handle_parameter_notification(self, notif):
+        for pan_gain in self._pan_gain:
+            if notif.parameter.parameter_id == pan_gain.pan_id:
+                pan_gain.set_pan_slider(notif.normalized_value)
+                pan_gain.set_pan_label(notif.formatted_value)
+
+            elif notif.parameter.parameter_id == pan_gain.gain_id:
+                pan_gain.set_gain_slider(notif.normalized_value)
+                pan_gain.set_gain_label(notif.formatted_value)
+
+        if notif.parameter.parameter_id == self._mute_id:
+            self._mute_button.blockSignals(True)
+            self._mute_button.setChecked(True if notif.normalized_value > 0.5 else False)
+            self._mute_button.blockSignals(False)
+
     def mute_track(self, arg):
         state = self._mute_button.isChecked()
         muted = self._controller.parameters.set_parameter_value(self._id, self._mute_id, 1 if state == True else 0)
@@ -374,7 +391,8 @@ class ProcessorWidget(QGroupBox):
         self._controller = controller
         self._id = processor_info.id
         self._track_id = track_id
-        self._parameters = []
+        self._parameters = {}
+        self._properties = {}
         self._layout = QVBoxLayout(self)
         self.setLayout(self._layout)
 
@@ -394,7 +412,7 @@ class ProcessorWidget(QGroupBox):
             for p in parameters[col::MAX_COLUMNS]:
                 parameter = ParameterWidget(p, self._id, self._controller, self)
                 col_layout.addWidget(parameter)
-                self._parameters.append(parameter)
+                self._parameters[p.id] = parameter
 
             col_layout.addStretch()
         self._layout.addStretch()
@@ -408,6 +426,7 @@ class ProcessorWidget(QGroupBox):
         for p in properties:
             property = PropertyWidget(p, self._id, self._controller, self)
             prop_layout.addWidget(property)
+            self._properties[p.id] = property
 
         self._layout.addStretch()
 
@@ -460,6 +479,13 @@ class ProcessorWidget(QGroupBox):
         self._up_button.clicked.connect(self.up_clicked)
         self._down_button.clicked.connect(self.down_clicked)
 
+    def handle_parameter_notification(self, notif):
+        self._parameters[notif.parameter.parameter_id].set_slider_value(notif.normalized_value)
+        self._parameters[notif.parameter.parameter_id].set_label_value(notif.formatted_value)
+
+    def handle_property_notification(self, notif):
+        self._properties[notif.property.property_id].set_value(notif.value)
+
     def delete_processor_clicked(self):
         self._controller.delete_processor(self._track_id, self._id)
 
@@ -475,9 +501,6 @@ class ProcessorWidget(QGroupBox):
 
     def program_selector_changed(self, program_id):
         self._controller.programs.set_processor_program(self._id, program_id)
-        for param in self._parameters:
-            param.refresh()
-
 
 class ParameterWidget(QWidget):
     def __init__(self, parameter_info, processor_id, controller, parent):
@@ -505,24 +528,32 @@ class ParameterWidget(QWidget):
         self._layout.setContentsMargins(0,0,0,0)
 
         value = self._controller.parameters.get_parameter_value(self._processor_id, self._id)
-        self._value_slider.setValue(value * SLIDER_MAX_VALUE)
-        self.refresh()
-        self._connect_signals()
+        self.set_slider_value(value)
+        txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self._id)
+        self.set_label_value(txt_value)
+
+        if parameter_info.automatable:
+            self._connect_signals()
+        else:
+            # It an output only parameter, it's not meant to be set by the user
+            self._value_slider.setEnabled(False)
+
 
     def _connect_signals(self):
         self._value_slider.valueChanged.connect(self.value_changed)
 
-    def refresh(self):
-        value = self._controller.parameters.get_parameter_value(self._processor_id, self._id)
-        self._value_slider.setValue(value * SLIDER_MAX_VALUE)
-        txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self._id)
-        self._value_label.setText(txt_value + ' ' + self._unit)
-
     def value_changed(self):
         value = float(self._value_slider.value()) / SLIDER_MAX_VALUE
         self._controller.parameters.set_parameter_value(self._processor_id, self._id, value)
-        txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self._id)
-        self._value_label.setText(txt_value + ' ' + self._unit)
+
+    def set_slider_value(self, value):
+        ## Set value without triggering a signal
+        self._value_slider.blockSignals(True)
+        self._value_slider.setValue(value * SLIDER_MAX_VALUE)
+        self._value_slider.blockSignals(False)
+
+    def set_label_value(self, value):
+        self._value_label.setText(value + ' ' + self._unit)
 
 class PropertyWidget(QWidget):
     def __init__(self, property_info, processor_id, controller, parent):
@@ -559,6 +590,11 @@ class PropertyWidget(QWidget):
         value = self._edit_box.text()
         self._controller.parameters.set_property_value(self._processor_id, self._id, value)
 
+    def set_value(self, value):
+        self._edit_box.blockSignals(True)
+        self._edit_box.setText(value)
+        self._edit_box.blockSignals(False)
+
     def open_file_dialog(self):
         dialog = QFileDialog(self)
         if dialog.exec_():
@@ -571,8 +607,8 @@ class PanGainWidget(QWidget):
     def __init__(self, processor_id, name, gain_id, pan_id, controller, parent):
         super().__init__(parent)
         self._processor_id = processor_id
-        self._gain_id = gain_id
-        self._pan_id = pan_id
+        self.gain_id = gain_id
+        self.pan_id = pan_id
         self._controller = controller
         self.setFixedWidth(SLIDER_MIN_WIDTH)
 
@@ -600,37 +636,45 @@ class PanGainWidget(QWidget):
         self._pan_label = QLabel('', self)
         self._layout.addWidget(self._pan_label, 0, Qt.AlignHCenter)
 
-        value = self._controller.parameters.get_parameter_value(self._processor_id, self._pan_id)
-        self._pan_slider.setValue(value * SLIDER_MAX_VALUE)
-        self.pan_changed()
-        value = self._controller.parameters.get_parameter_value(self._processor_id, self._gain_id)
-        self._gain_slider.setValue(value * SLIDER_MAX_VALUE)
-        self.gain_changed()
+        value = self._controller.parameters.get_parameter_value(self._processor_id, pan_id)
+        self.set_pan_slider(value)
+        txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self.pan_id)
+        self.set_pan_label(txt_value)
+
+        value = self._controller.parameters.get_parameter_value(self._processor_id, gain_id)
+        self.set_gain_slider(value)
+        txt_value = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self.gain_id)
+        self.set_gain_label(txt_value)
+        
         self._connect_signals()
 
     def _connect_signals(self):
         self._pan_slider.valueChanged.connect(self.pan_changed)
         self._gain_slider.valueChanged.connect(self.gain_changed)
 
-    def _update_values(self):
-        value = self._controller.parameters.get_parameter_value(self._processor_id, self._pan_id)
-        self._pan_slider.setValue(value * SLIDER_MAX_VALUE)
-        self.pan_changed()
-        value = self._controller.parameters.get_parameter_value(self._processor_id, self._gain_id)
-        self._gain_slider.setValue(value * SLIDER_MAX_VALUE)
-        self.gain_changed()
-
     def pan_changed(self):
         value = float(self._pan_slider.value()) / SLIDER_MAX_VALUE
-        self._controller.parameters.set_parameter_value(self._processor_id, self._pan_id, value)
-        pan_value = self._controller.parameters.get_parameter_value(self._processor_id, self._pan_id)
-        self._pan_label.setText(str(pan_value))
+        self._controller.parameters.set_parameter_value(self._processor_id, self.pan_id, value)
 
     def gain_changed(self):
         value = float(self._gain_slider.value()) / SLIDER_MAX_VALUE
-        self._controller.parameters.set_parameter_value(self._processor_id, self._gain_id, value)
-        txt_gain = self._controller.parameters.get_parameter_value_as_string(self._processor_id, self._gain_id)
-        self._gain_label.setText(txt_gain + ' ' + 'dB')
+        self._controller.parameters.set_parameter_value(self._processor_id, self.gain_id, value)
+
+    def set_pan_slider(self, value):
+        self._pan_slider.blockSignals(True)
+        self._pan_slider.setValue(value * SLIDER_MAX_VALUE)
+        self._pan_slider.blockSignals(False)
+
+    def set_pan_label(self, txt_value):
+        self._pan_label.setText(txt_value)
+
+    def set_gain_slider(self, value):
+        self._gain_slider.blockSignals(True)
+        self._gain_slider.setValue(value * SLIDER_MAX_VALUE)
+        self._gain_slider.blockSignals(False)
+
+    def set_gain_label(self, txt_value):
+        self._gain_label.setText(txt_value + ' ' + 'dB')
 
 
 class AddTrackDialog(QDialog):
@@ -674,8 +718,7 @@ class AddTrackDialog(QDialog):
         self._layout.addWidget(self._outputs_lbl, 4, 0)
         self._layout.addWidget(self._outputs_sb, 4, 1)
 
-        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok |
-                                               QDialogButtonBox.Cancel)
+        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_box.button(QDialogButtonBox.Ok).setDefault(True)
         self.button_box.button(QDialogButtonBox.Ok).setEnabled(True)
         self._layout.addWidget(self.button_box, 5, 1)
@@ -698,7 +741,6 @@ class AddTrackDialog(QDialog):
             self._inputs_lbl.hide()
             self._outputs_sb.hide()
             self._outputs_lbl.hide()
-        # self._channel_cnt = idx + 1
 
 
 class AddPluginDialog(QDialog):
@@ -774,37 +816,44 @@ class Controller(SushiController):
     def __init__(self, address, proto_file):
         super().__init__(address, proto_file)
         self._view = None
+        
+    def emit_notification(self, notif):
+        try:
+            if type(notif) == sushi_grpc_types.TrackUpdate:
+                self._view.track_notification_received.emit(notif)
+            elif type(notif) == sushi_grpc_types.ProcessorUpdate:
+                self._view.processor_notification_received.emit(notif)
+            elif type(notif) == sushi_grpc_types.ParameterUpdate:
+                self._view.parameter_notification_received.emit(notif)
+            elif type(notif) == sushi_grpc_types.TransportUpdate:
+                self._view.transport_notification_received.emit(notif)
+            elif type(notif) == sushi_grpc_types.CpuTimings:
+                self._view.timing_notification_received.emit(notif)
+            elif type(notif) == sushi_grpc_types.PropertyValue:
+                self._view.property_notification_received.emit(notif)
+            else:
+                print(type(notif))
+
+        ## Note, if an exception in a notification handler is not caught, that notification stops working 
+        except Exception as e:
+            print(e)
+
+
+    def subscribe_to_notifications(self):
         self.notifications.subscribe_to_track_changes(self.emit_notification)
         self.notifications.subscribe_to_processor_changes(self.emit_notification)
         self.notifications.subscribe_to_parameter_updates(self.emit_notification)
         self.notifications.subscribe_to_transport_changes(self.emit_notification)
         self.notifications.subscribe_to_timing_updates(self.emit_notification)
+        self.notifications.subscribe_to_property_updates(self.emit_notification)
         self.timings.set_timings_enabled(True)
         self.timings.reset_all_timings();
 
-    def emit_notification(self, notif):
-        if type(notif) == sushi_grpc_types.TrackUpdate:
-            self._view.track_notification_received.emit(notif)
-        elif type(notif) == sushi_grpc_types.ProcessorUpdate:
-            self._view.processor_notification_received.emit(notif)
-        elif type(notif) == sushi_grpc_types.ParameterValue:
-            self._view.parameter_notification_received.emit(notif)
-        elif type(notif) == sushi_grpc_types.TransportUpdate:
-            self._view.transport_notification_received.emit(notif)
-        elif type(notif) == sushi_grpc_types.CpuTimings:
-            self._view.timing_notification_received.emit(notif)
-        else:
-            print(type(notif))
-
     def set_playing(self):
         self.transport.set_playing_mode(2)
-        if not self._view is  None:
-            self._view.tpbar.set_playing(True)
 
     def set_stopped(self):
         self.transport.set_playing_mode(1)
-        if not self._view is  None:
-            self._view.tpbar.set_playing(False)
 
     def delete_processor(self, track_id, processor_id):
         self.audio_graph.delete_processor_from_track(processor_id, track_id)
@@ -857,7 +906,6 @@ class Controller(SushiController):
             before_processor = track_info.processors[index + 2]
 
         self.audio_graph.move_processor_on_track(processor_id, track_id, track_id, add_to_back, before_processor)
-        track_info = self.audio_graph.get_track_info(track_id)
 
         self._view.tracks[track_id].move_processor(processor_id, direction)
 
@@ -894,8 +942,6 @@ class Controller(SushiController):
 
 
 # Client code
-
-
 def main():
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
@@ -903,6 +949,7 @@ def main():
     window = MainWindow(controller)
     window.show()
     controller.set_view(window)
+    controller.subscribe_to_notifications()
     sys.exit(app.exec_())
 
 
