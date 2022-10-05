@@ -1,0 +1,7 @@
+PySide2
+
+# Own library not found by pip. Find it here https://github.com/elk-audio/elkpy.git
+# elkpy~=0.11.0
+protobuf==3.20.1
+grpcio-tools==1.14.1
+grpcio==1.46

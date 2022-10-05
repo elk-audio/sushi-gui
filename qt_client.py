@@ -810,7 +810,7 @@ class AddPluginDialog(QDialog):
             self._uid_entry.setEnabled(False)
 
 
-# Expand the controller with a few convinience functions that better match our use case
+# Expand the controller with a few convenience functions that better match our use case
 class Controller(SushiController):
 
     def __init__(self, address, proto_file):
