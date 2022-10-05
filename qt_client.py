@@ -310,7 +310,7 @@ class TrackWidget(QGroupBox):
         pan_gain_layout.addWidget(self._pan_gain[0], 0, Qt.AlignLeft)
 
         # Create 1 pan/gain control per extra output bus
-        for bus in range(1, track_info.output_busses):
+        for bus in range(1, track_info.buses):
             gain_id = self._controller.parameters.get_parameter_id(track_info.id, 'gain_sub_' + str(bus))
             pan_id = self._controller.parameters.get_parameter_id(track_info.id, 'pan_sub_' + str(bus))
             pan_gain = PanGainWidget(self._id, 'Sub Bus ' + str(bus), gain_id, pan_id, self._controller, self)
