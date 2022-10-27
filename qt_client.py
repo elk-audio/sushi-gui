@@ -954,7 +954,7 @@ def main():
     window.show()
     controller.set_view(window)
     controller.subscribe_to_notifications()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 if __name__ == '__main__':
