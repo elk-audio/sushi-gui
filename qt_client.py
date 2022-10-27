@@ -1,10 +1,14 @@
 import os
 import sys
+
 from elkpy.sushicontroller import SushiController
 from elkpy import sushi_info_types as sushi
 from elkpy import grpc_gen
-from PySide2.QtCore import Qt, Signal
-from PySide2.QtWidgets import *
+
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtWidgets import *
+from PySide6.QtGui import QAction
+
 from enum import IntEnum
 from pathlib import Path
 
@@ -791,21 +795,21 @@ class AddPluginDialog(QDialog):
         self.button_box.rejected.connect(self.reject)
 
     def type_changed(self, type_index):
-        type = type_index + 1
-        self._type = type
-        if (type == sushi.PluginType.INTERNAL):
+        plugin_type = type_index + 1
+        self._type = plugin_type
+        if plugin_type == sushi.PluginType.INTERNAL:
             self._path_entry.setEnabled(False)
             self._uid_entry.setEnabled(True)
 
-        elif (type == sushi.PluginType.VST2X):
+        elif plugin_type == sushi.PluginType.VST2X:
             self._path_entry.setEnabled(True)
             self._uid_entry.setEnabled(False)
 
-        elif (type == sushi.PluginType.VST3X):
+        elif plugin_type == sushi.PluginType.VST3X:
             self._path_entry.setEnabled(True)
             self._uid_entry.setEnabled(True)
 
-        elif (type == sushi.PluginType.LV2):
+        elif plugin_type == sushi.PluginType.LV2:
             self._path_entry.setEnabled(True)
             self._uid_entry.setEnabled(False)
 

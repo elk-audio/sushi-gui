@@ -1,4 +1,4 @@
-PySide2
+PySide6
 
 # Own library not found by pip. Find it here https://github.com/elk-audio/elkpy.git
 # elkpy~=0.11.0
