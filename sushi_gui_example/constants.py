@@ -1,10 +1,4 @@
-import os
 from enum import IntEnum
-from elkpy import grpc_gen
-
-
-# If sushi is running on another device replace 'localhost' with the ip of that device 
-SUSHI_ADDRESS = ('localhost:51051')
 
 SYNCMODES = ['Internal', 'Midi', 'Link']
 PLUGIN_TYPES = ['Internal', 'Vst2x', 'Vst3x', 'LV2']
@@ -30,12 +24,3 @@ SLIDER_MAX_VALUE         = 1024
 class Direction(IntEnum):
     UP = 1
     DOWN = 2
-
-# Get protofile to generate grpc library
-proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
-if proto_file is None:
-    print('Environment variable SUSHI_GRPC_ELKPY_PROTO not defined, set it to point the .proto definition')
-    sys.exit(-1)
-
-# Get the sushi notification types direcly from the generated grpc types
-sushi_grpc_types, _ = grpc_gen.modules_from_proto(proto_file)
