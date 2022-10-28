@@ -6,13 +6,12 @@ from constants import *
 from widgets import *
 
 class MainWindow(QMainWindow):
-
-    track_notification_received = Signal(sushi_grpc_types.TrackUpdate)
-    processor_notification_received = Signal(sushi_grpc_types.ProcessorUpdate)
-    parameter_notification_received = Signal(sushi_grpc_types.ParameterValue)
-    transport_notification_received = Signal(sushi_grpc_types.TransportUpdate)
-    timing_notification_received = Signal(sushi_grpc_types.CpuTimings)
-    property_notification_received = Signal(sushi_grpc_types.PropertyValue)
+    track_notification_received = Signal(object)
+    processor_notification_received = Signal(object)
+    parameter_notification_received = Signal(object)
+    transport_notification_received = Signal(object)
+    timing_notification_received = Signal(object)
+    property_notification_received = Signal(object)
 
     def __init__(self, controller):
         super().__init__()

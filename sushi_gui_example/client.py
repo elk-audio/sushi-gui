@@ -1,9 +1,8 @@
-import os
 import sys
 
-from constants import *
-from dialogs import *
-from widgets import *
+from PySide6.QtWidgets import QApplication
+
+from constants import proto_file
 from controller import Controller
 from main_window import MainWindow 
 
