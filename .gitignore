@@ -3,3 +3,5 @@ venv
 
 .idea
 
+sushi_gui_example/__pycache__/
+sushi_gui_example/sushi_rpc_pb2*
