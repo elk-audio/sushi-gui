@@ -48,6 +48,18 @@ To achieve this, you need at least 2 things:
 SUSHI_ADDRESS = 'localhost:51051'
 ```
 
+## Packaging the GUI app with PyInstaller
+The repo contains a `client.spec` file. This is a specification file to be used by PyInstaller that will produce a bundled executable app named `sushi_gui`.
+
+With the venv **activated**:
+```
+pip install pyinstaller 
+pyinstaller client.spec
+```
+You will find a folder called `client` in `dist/`. This can be zipped and distributed. Inside that folder is `sushi_gui` that can be executed without **any** of the installation steps
+described above, except for 1 limitation:
+- The controlled Sushi instance MUST be on the same machine
+
 ## Dependency list
   * grpcio 
   * grpc-tools
