@@ -8,10 +8,9 @@ from elkpy import grpc_gen
 from controller import Controller
 from main_window import MainWindow 
 
-from pathlib import Path
 
 # If sushi is running on another device replace 'localhost' with the ip of that device 
-SUSHI_ADDRESS = ('localhost:51051')
+SUSHI_ADDRESS = 'localhost:51051'
 
 # Get protofile to generate grpc library
 proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
@@ -21,6 +20,7 @@ if proto_file is None:
 
 # Get the sushi notification types direcly from the generated grpc types
 sushi_grpc_types, _ = grpc_gen.modules_from_proto(proto_file)
+
 
 def main():
     app = QApplication(sys.argv)

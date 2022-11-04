@@ -1,4 +1,10 @@
-from PySide6.QtWidgets import *
+from typing import Optional
+
+from PySide6.QtWidgets import QDialog, QGridLayout, QLabel, QLineEdit, QComboBox, QSpinBox, QDialogButtonBox
+
+from constants import PLUGIN_TYPES
+from elkpy import sushi_info_types as sushi
+
 
 class AddTrackDialog(QDialog):
     def __init__(self, parent):
@@ -10,9 +16,9 @@ class AddTrackDialog(QDialog):
         self.setLayout(self._layout)
 
         self.name_label = QLabel('Name', self)
-        self._layout.addWidget(self.name_label, 0,0)
+        self._layout.addWidget(self.name_label, 0, 0)
         self._name_entry = QLineEdit(self)
-        self._layout.addWidget(self._name_entry,0,1)
+        self._layout.addWidget(self._name_entry, 0, 1)
 
         nr_of_channels = QLabel('Track type:')
         self._layout.addWidget(nr_of_channels, 2, 0)
@@ -48,6 +54,22 @@ class AddTrackDialog(QDialog):
 
         self._connect_signals()
 
+    @property
+    def track_type(self):
+        return self._track_type
+
+    @property
+    def inputs_sb(self):
+        return self._inputs_sb
+
+    @property
+    def outputs_sb(self):
+        return self._outputs_sb
+
+    @property
+    def name_entry(self):
+        return self._name_entry
+
     def _connect_signals(self):
         self._track_type.currentIndexChanged.connect(self._update_nr_of_channels)
         self.button_box.accepted.connect(self.accept)
@@ -74,7 +96,7 @@ class AddPluginDialog(QDialog):
         self._layout = QGridLayout(self)
         self.setLayout(self._layout)
 
-        self._type = None
+        self._type: Optional[sushi.PluginType] = None
 
         type_label = QLabel('Type', self)
         self._layout.addWidget(type_label, 0, 0)
@@ -84,36 +106,52 @@ class AddPluginDialog(QDialog):
             self._type_box.addItem(t)
 
         name_label = QLabel('Name', self)
-        self._layout.addWidget(name_label, 1,0)
+        self._layout.addWidget(name_label, 1, 0)
         self._name_entry = QLineEdit(self)
         self._name_entry.setMinimumWidth(200)
-        self._layout.addWidget(self._name_entry,1,1)
+        self._layout.addWidget(self._name_entry, 1, 1)
 
         self._uid_label = QLabel('Uid', self)
-        self._layout.addWidget(self._uid_label, 2,0)
+        self._layout.addWidget(self._uid_label, 2, 0)
         self._uid_entry = QLineEdit(self)
-        self._layout.addWidget(self._uid_entry,2,1)
+        self._layout.addWidget(self._uid_entry, 2, 1)
 
         self._path_label = QLabel('Path', self)
-        self._layout.addWidget(self._path_label, 3,0)
+        self._layout.addWidget(self._path_label, 3, 0)
         self._path_entry = QLineEdit(self)
         self._path_entry.setEnabled(False)
-        self._layout.addWidget(self._path_entry,3,1)
+        self._layout.addWidget(self._path_entry, 3, 1)
 
         self.button_box = QDialogButtonBox(QDialogButtonBox.Ok |
-                                               QDialogButtonBox.Cancel)
+                                           QDialogButtonBox.Cancel)
         self.button_box.button(QDialogButtonBox.Ok).setDefault(True)
         self.button_box.button(QDialogButtonBox.Ok).setEnabled(True)
         self._layout.addWidget(self.button_box, 4, 1)
-        
+
         self._connect_signals()
 
-    def _connect_signals(self):
+    @property
+    def name_entry(self):
+        return self._name_entry
+
+    @property
+    def uid_entry(self):
+        return self._uid_entry
+
+    @property
+    def path_entry(self):
+        return self._path_entry
+
+    @property
+    def plugin_type(self):
+        return self._type
+
+    def _connect_signals(self) -> None:
         self._type_box.currentIndexChanged.connect(self.type_changed)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
-    def type_changed(self, type_index):
+    def type_changed(self, type_index: int) -> None:
         plugin_type = type_index + 1
         self._type = plugin_type
         if plugin_type == sushi.PluginType.INTERNAL:

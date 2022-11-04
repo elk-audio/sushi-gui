@@ -1,57 +1,56 @@
+from PySide6.QtWidgets import QFileDialog
 from elkpy.sushicontroller import SushiController
 from elkpy import sushi_info_types as sushi
 
-from dialogs import *
-from constants import *
+from dialogs import AddTrackDialog, AddPluginDialog
+from constants import Direction
 
 
 # Expand the controller with a few convenience functions that better match our use case
 class Controller(SushiController):
 
-    def __init__(self, address, proto_file):
+    def __init__(self, address: str, proto_file: str) -> None:
         super().__init__(address, proto_file)
         self._view = None
         
-    def emit_track_notification(self, notification):
+    def emit_track_notification(self, notification) -> None:
         try:
             self._view.track_notification_received.emit(notification)
-
-        ## Note, if an exception in a notification handler is not caught, that notification stops working 
+        # Note, if an exception in a notification handler is not caught, that notification stops working
         except Exception as e:
             print(e)
 
-    def emit_processor_notification(self, notification):
+    def emit_processor_notification(self, notification) -> None:
         try:
             self._view.processor_notification_received.emit(notification)
         except Exception as e:
             print(e)
 
-
-    def emit_parameter_notification(self, notification):
+    def emit_parameter_notification(self, notification) -> None:
         try:
             self._view.parameter_notification_received.emit(notification)
         except Exception as e:
             print(e)
 
-    def emit_transport_notification(self, notification):
+    def emit_transport_notification(self, notification) -> None:
         try:
             self._view.transport_notification_received.emit(notification)
         except Exception as e:
             print(e)
 
-    def emit_timing_notification(self, notification):
+    def emit_timing_notification(self, notification) -> None:
         try:
             self._view.timing_notification_received.emit(notification)
         except Exception as e:
             print(e)
 
-    def emit_property_notification(self, notification):
+    def emit_property_notification(self, notification) -> None:
         try:
             self._view.property_notification_received.emit(notification)
         except Exception as e:
             print(e)
 
-    def subscribe_to_notifications(self):
+    def subscribe_to_notifications(self) -> None:
         self.notifications.subscribe_to_track_changes(self.emit_track_notification)
         self.notifications.subscribe_to_processor_changes(self.emit_processor_notification)
         self.notifications.subscribe_to_parameter_updates(self.emit_parameter_notification)
@@ -59,27 +58,27 @@ class Controller(SushiController):
         self.notifications.subscribe_to_timing_updates(self.emit_timing_notification)
         self.notifications.subscribe_to_property_updates(self.emit_property_notification)
         self.timings.set_timings_enabled(True)
-        self.timings.reset_all_timings();
+        self.timings.reset_all_timings()
 
-    def set_playing(self):
+    def set_playing(self) -> None:
         self.transport.set_playing_mode(2)
 
-    def set_stopped(self):
+    def set_stopped(self) -> None:
         self.transport.set_playing_mode(1)
 
-    def delete_processor(self, track_id, processor_id):
+    def delete_processor(self, track_id: int, processor_id: int) -> None:
         self.audio_graph.delete_processor_from_track(processor_id, track_id)
 
-    def delete_track(self, track_id):
+    def delete_track(self, track_id: int) -> None:
         super().audio_graph.delete_track(track_id)
 
-    def add_track(self):
+    def add_track(self) -> None:
         dialog = AddTrackDialog(self._view)
         if dialog.exec_():
-            track_type = dialog._track_type.currentText()
-            inputs = dialog._inputs_sb.value()
-            outputs = dialog._outputs_sb.value()
-            name = dialog._name_entry.text().strip()
+            track_type = dialog.track_type.currentText()
+            inputs = dialog.inputs_sb.value()
+            outputs = dialog.outputs_sb.value()
+            name = dialog.name_entry.text().strip()
 
             if track_type == 'Multibus':
                 self.audio_graph.create_multibus_track(name, outputs, inputs)
@@ -91,10 +90,10 @@ class Controller(SushiController):
     def add_plugin(self, track_id):
         dialog = AddPluginDialog(self._view)
         if dialog.exec_():
-            name = dialog._name_entry.text().strip()
-            uid = dialog._uid_entry.text().strip()
-            path = dialog._path_entry.text().strip()
-            p_type = dialog._type
+            name = dialog.name_entry.text().strip()
+            uid = dialog.uid_entry.text().strip()
+            path = dialog.path_entry.text().strip()
+            p_type = dialog.plugin_type
             try:
                 self.audio_graph.create_processor_on_track(name, uid, path, p_type, track_id, 0, True)
             except Exception as e:
