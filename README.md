@@ -39,7 +39,7 @@ If you find yourself using is often and wanting to set the variable *once and fo
 
     $ python3 ./client.py
 
-## Controlling Sushi when it is NOT running on the same machine
+## Controlling Sushi when it is running on another machine
 To achieve this, you need at least 2 things:
 - The `sushi_rpc.proto` file. This is required but you don't need Sushi itself. You could in principle get that file only, store it locally and set SUSHI_GRPC_ELKPY_PROTO to it.
 - The IP address of the machine running the Sushi instance you want to control. Replace `localhost` with it in `client.py` but keep the port number:
