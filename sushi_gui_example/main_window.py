@@ -8,12 +8,12 @@ from widgets import TransportBarWidget, TrackWidget
 
 
 class MainWindow(QMainWindow):
-    track_notification_received = Signal()
-    processor_notification_received = Signal()
-    parameter_notification_received = Signal()
-    transport_notification_received = Signal()
-    timing_notification_received = Signal()
-    property_notification_received = Signal()
+    track_notification_received = Signal(object)
+    processor_notification_received = Signal(object)
+    parameter_notification_received = Signal(object)
+    transport_notification_received = Signal(object)
+    timing_notification_received = Signal(object)
+    property_notification_received = Signal(object)
 
     def __init__(self, controller: 'SushiController') -> None:
         super().__init__()
@@ -151,8 +151,9 @@ class MainWindow(QMainWindow):
         elif n.HasField('playing_mode'):
             self.tpbar.set_playing(n.playing_mode.mode == MODE_PLAYING)
 
-    def process_timing_notification(self, n) -> None:
-        self.tpbar.set_cpu_value(n.average)
+    def process_timing_notification(self, n = None) -> None:
+        if n: 
+            self.tpbar.set_cpu_value(n.average)
 
     def process_property_notification(self, n) -> None:
         for t, v in self.tracks.items():
