@@ -1,8 +1,7 @@
 PySide6>=6.4
 
-# Own library not found by pip. Find it here https://github.com/elk-audio/elkpy.git
-# elkpy~=0.11.0
-protobuf==3.20
-grpcio-tools~=1.14
-grpcio~=1.47
-google==3.0.0
+elkpy
+# protobuf==3.20
+grpcio-tools~=1.48.2
+grpcio~=1.48.2
+

@@ -13,6 +13,7 @@ from main_window import MainWindow
 
 # If sushi is running on another device replace 'localhost' with the ip of that device 
 SUSHI_ADDRESS = 'localhost:51051'
+# SUSHI_ADDRESS = '192.168.1.108:51051'
 
 # Get protofile to generate grpc library
 proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')

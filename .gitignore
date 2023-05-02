@@ -3,7 +3,8 @@ venv
 
 .idea
 
-sushi_gui_example/__pycache__/
-sushi_gui_example/sushi_rpc_pb2*
-sushi_gui_example/build/
-sushi_gui_example/dist/
+src/__pycache__/
+src/sushi_rpc_pb2*
+src/build/
+src/dist/
+
