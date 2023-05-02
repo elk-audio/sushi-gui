@@ -2,6 +2,7 @@
 
 import sys
 import os
+import time
 
 from PySide6.QtWidgets import QApplication
 
@@ -35,6 +36,13 @@ def main():
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
     controller = Controller(SUSHI_ADDRESS, proto_file)
+    while True:
+        try:
+            controller.audio_graph.get_all_tracks()
+            break
+        except:
+            print(f'Waiting for Sushi...')
+            time.sleep(2)
     window = MainWindow(controller)
     window.show()
     controller.set_view(window)
