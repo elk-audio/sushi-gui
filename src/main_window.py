@@ -1,10 +1,31 @@
+import os
+import sys
+from typing import Optional
+from elkpy import grpc_gen
+
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout, QMainWindow, QMessageBox
 from elkpy.sushicontroller import SushiController
 from elkpy import sushi_info_types as sushi
 from constants import MODE_PLAYING
+from controller import Controller
 from widgets import TransportBarWidget, TrackWidget
+
+
+# Get protofile to generate grpc library
+proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
+if proto_file is None:
+    print('Environment variable SUSHI_GRPC_ELKPY_PROTO not defined, setting it to the local proto file')
+    os.environ['SUSHI_GRPC_ELKPY_PROTO'] = str('./sushi_rpc.proto')
+    proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
+
+    if proto_file is None:
+        print("No proto file found")
+        sys.exit(-1)
+
+# Get the sushi notification types direcly from the generated grpc types
+sushi_grpc_types, _ = grpc_gen.modules_from_proto(proto_file)
 
 
 class MainWindow(QMainWindow):
@@ -15,9 +36,9 @@ class MainWindow(QMainWindow):
     timing_notification_received = Signal(object)
     property_notification_received = Signal(object)
 
-    def __init__(self, controller: 'SushiController') -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self._controller = controller
+        self._controller: Optional['SushiController'] = None
         self.setWindowTitle('Sushi')
 
         self._window_layout = QVBoxLayout()
@@ -32,9 +53,9 @@ class MainWindow(QMainWindow):
         self.help_menu = self.menuBar().addMenu("&Info")
 
         save = QAction('Save', self)
-        save.triggered.connect(controller.save_session)
+        save.triggered.connect(self.save_session)
         load = QAction('Load', self)
-        load.triggered.connect(controller.restore_session)
+        load.triggered.connect(self.restore_session)
 
         self.file_menu.addAction(save)
         self.file_menu.addAction(load)
@@ -53,7 +74,9 @@ class MainWindow(QMainWindow):
         self.help_menu.addAction(tracks)
         self.help_menu.addAction(inputs)
 
-        self.tpbar = TransportBarWidget(self._controller)
+        self.current_sushi_ip = 'localhost:51051'
+
+        self.tpbar = TransportBarWidget(parent=self)
         self._window_layout.addWidget(self.tpbar)
         self.tracks = {}
         self._track_layout = QHBoxLayout(self)
@@ -66,7 +89,33 @@ class MainWindow(QMainWindow):
         self.timing_notification_received.connect(self.process_timing_notification)
         self.property_notification_received.connect(self.process_property_notification)
 
+        try:
+            self.setup_sushi_controller()
+        except:
+            pass
+
+    def setup_sushi_controller(self) -> None:
+        for idx, t in self.tracks.items():
+            t.deleteLater()
+            self._track_layout.removeWidget(t)
+        self._controller = Controller(address=self.current_sushi_ip, proto_file=proto_file)
+        self._controller.set_view(self)
+        self._controller.subscribe_to_notifications()
+        self.tpbar.initialize()
+        self.tracks = {}
         self._create_tracks()
+
+    def save_session(self):
+        try:
+            self._controller.save_session()
+        except:
+            pass
+
+    def restore_session(self):
+        try:
+            self._controller.restore_session()
+        except:
+            pass
 
     def delete_track(self, track_id: int) -> None:
         track = self.tracks.pop(track_id)

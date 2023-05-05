@@ -10,12 +10,18 @@ from constants import SYNCMODES, Direction, PROCESSOR_WIDTH, MAX_COLUMNS, ICON_B
 
 
 class TransportBarWidget(QGroupBox):
-    def __init__(self, controller: 'SushiController'):
+    def __init__(self, parent):
         super().__init__()
-        self._controller = controller
+        self._parent = parent
+        self._controller = None
         self._layout = QHBoxLayout(self)
         self.setLayout(self._layout)
         self._create_widgets()
+
+    def initialize(self):
+        self._controller = self._parent._controller
+        self._tempo.setValue(self._controller.transport.get_tempo())
+        self._connect_signals()
 
     def _create_widgets(self) -> None:
         self._syncmode_label = QLabel('Sync mode', self)
@@ -30,7 +36,6 @@ class TransportBarWidget(QGroupBox):
 
         self._tempo = QDoubleSpinBox(self)
         self._tempo.setRange(20, 999)
-        self._tempo.setValue(self._controller.transport.get_tempo())
         self._layout.addWidget(self._tempo)
 
         self._stop_button = QPushButton('', self)
@@ -49,8 +54,14 @@ class TransportBarWidget(QGroupBox):
         self._cpu_meter = QLabel("Cpu: -", self)
         self._layout.addWidget(self._cpu_meter)
 
+        self._sushi_ip_lbl = QLabel("Sushi IP:", self)
+        self._sushi_ip_tbox = QLineEdit(self)
+        self._sushi_ip_tbox.setText(self._parent.current_sushi_ip)
+        self._layout.addWidget(self._sushi_ip_lbl)
+        self._layout.addWidget(self._sushi_ip_tbox)
+
         self._layout.addStretch(0)
-        self._connect_signals()
+        self._sushi_ip_tbox.editingFinished.connect(self.set_sushi_ip)
 
     def _connect_signals(self) -> None:
         self._play_button.clicked.connect(self._controller.set_playing)
@@ -68,6 +79,15 @@ class TransportBarWidget(QGroupBox):
 
     def set_cpu_value(self, value: float) -> None:
         self._cpu_meter.setText(f"Cpu: {value * 100:.1f}%")
+
+    def set_sushi_ip(self) -> None:
+        print(self._sushi_ip_tbox.text())
+        if len(self._sushi_ip_tbox.text().split(':')) <= 1:
+            self._parent.current_sushi_ip = self._sushi_ip_tbox.text() + ':51051'
+        else:
+            self._parent.current_sushi_ip = self._sushi_ip_tbox.text()
+
+        self._parent.setup_sushi_controller()
 
 
 class TrackWidget(QGroupBox):
