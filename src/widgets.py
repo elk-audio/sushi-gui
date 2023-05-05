@@ -54,14 +54,16 @@ class TransportBarWidget(QGroupBox):
         self._cpu_meter = QLabel("Cpu: -", self)
         self._layout.addWidget(self._cpu_meter)
 
-        self._sushi_ip_lbl = QLabel("Sushi IP:", self)
+        self._sushi_ip_lbl = QLabel("IP:", self)
         self._sushi_ip_tbox = QLineEdit(self)
         self._sushi_ip_tbox.setText(self._parent.current_sushi_ip)
+        self._connect_btn = QPushButton('Connect', self)
         self._layout.addWidget(self._sushi_ip_lbl)
         self._layout.addWidget(self._sushi_ip_tbox)
+        self._layout.addWidget(self._connect_btn)
 
         self._layout.addStretch(0)
-        self._sushi_ip_tbox.editingFinished.connect(self.set_sushi_ip)
+        self._connect_btn.clicked.connect(self.set_sushi_ip)
 
     def _connect_signals(self) -> None:
         self._play_button.clicked.connect(self._controller.set_playing)
