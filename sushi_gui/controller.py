@@ -2,8 +2,8 @@ from PySide6.QtWidgets import QFileDialog
 from elkpy.sushicontroller import SushiController
 from elkpy import sushi_info_types as sushi
 
-from dialogs import AddTrackDialog, AddPluginDialog
-from constants import Direction
+from .dialogs import AddTrackDialog, AddPluginDialog
+from .constants import Direction
 
 
 # Expand the controller with a few convenience functions that better match our use case

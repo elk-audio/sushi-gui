@@ -2,7 +2,7 @@
 
 import sys
 from PySide6.QtWidgets import QApplication
-from main_window import MainWindow
+from sushi_gui.main_window import MainWindow
 
 
 # If sushi is running on another device replace 'localhost' with the ip of that device 

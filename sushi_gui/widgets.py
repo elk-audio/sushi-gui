@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QGroupBox, QHBoxLayout, QLabel, QComboBox, QDouble
 from elkpy.sushicontroller import SushiController
 from elkpy import sushi_info_types as sushi
 
-from constants import SYNCMODES, Direction, PROCESSOR_WIDTH, MAX_COLUMNS, ICON_BUTTON_WIDTH, PARAMETER_VALUE_WIDTH, \
+from .constants import SYNCMODES, Direction, PROCESSOR_WIDTH, MAX_COLUMNS, ICON_BUTTON_WIDTH, PARAMETER_VALUE_WIDTH, \
     SLIDER_MIN_WIDTH, SLIDER_MAX_VALUE, PAN_SLIDER_WIDTH
 
 

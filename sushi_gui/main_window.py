@@ -8,16 +8,16 @@ from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout, QMainWindow, QMessageBox
 from elkpy.sushicontroller import SushiController
 from elkpy import sushi_info_types as sushi
-from constants import MODE_PLAYING
-from controller import Controller
-from widgets import TransportBarWidget, TrackWidget
+from .constants import MODE_PLAYING
+from .controller import Controller
+from .widgets import TransportBarWidget, TrackWidget
 
 
 # Get protofile to generate grpc library
 proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
 if proto_file is None:
     print('Environment variable SUSHI_GRPC_ELKPY_PROTO not defined, setting it to the local proto file')
-    os.environ['SUSHI_GRPC_ELKPY_PROTO'] = str('./sushi_rpc.proto')
+    os.environ['SUSHI_GRPC_ELKPY_PROTO'] = str('./sushi_gui/sushi_rpc.proto')
     proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
 
     if proto_file is None:

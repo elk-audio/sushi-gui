@@ -2,7 +2,7 @@ from typing import Optional
 
 from PySide6.QtWidgets import QDialog, QGridLayout, QLabel, QLineEdit, QComboBox, QSpinBox, QDialogButtonBox
 
-from constants import PLUGIN_TYPES
+from .constants import PLUGIN_TYPES
 from elkpy import sushi_info_types as sushi
 
 
