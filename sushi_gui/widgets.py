@@ -284,17 +284,17 @@ class ProcessorWidget(QGroupBox):
         self._delete_button.setToolTip('Delete processor')
         common_layout.addWidget(self._delete_button)
 
-        self._up_button = QPushButton('', self)
-        self._up_button.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_ArrowUp')))
-        self._up_button.setToolTip('Move processor up')
-        self._up_button.setFixedWidth(ICON_BUTTON_WIDTH)
-        common_layout.addWidget(self._up_button)
-
-        self._down_button = QPushButton('', self)
-        self._down_button.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_ArrowDown')))
-        self._down_button.setToolTip('Move processor down')
-        self._down_button.setFixedWidth(ICON_BUTTON_WIDTH)
-        common_layout.addWidget(self._down_button)
+        # self._up_button = QPushButton('', self)
+        # self._up_button.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_ArrowUp')))
+        # self._up_button.setToolTip('Move processor up')
+        # self._up_button.setFixedWidth(ICON_BUTTON_WIDTH)
+        # common_layout.addWidget(self._up_button)
+        #
+        # self._down_button = QPushButton('', self)
+        # self._down_button.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_ArrowDown')))
+        # self._down_button.setToolTip('Move processor down')
+        # self._down_button.setFixedWidth(ICON_BUTTON_WIDTH)
+        # common_layout.addWidget(self._down_button)
     
 
         self._program_selector = QComboBox(self)
@@ -312,8 +312,8 @@ class ProcessorWidget(QGroupBox):
         self._mute_button.clicked.connect(self.mute_processor_clicked)
         self._program_selector.currentIndexChanged.connect(self.program_selector_changed)
         self._delete_button.clicked.connect(self.delete_processor_clicked)
-        self._up_button.clicked.connect(self.up_clicked)
-        self._down_button.clicked.connect(self.down_clicked)
+        # self._up_button.clicked.connect(self.up_clicked)
+        # self._down_button.clicked.connect(self.down_clicked)
 
     def handle_parameter_notification(self, notif: sushi.ParameterInfo) -> None:
         self._parameters[notif.parameter.parameter_id].set_slider_value(notif.normalized_value)

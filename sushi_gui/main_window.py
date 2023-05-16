@@ -36,7 +36,7 @@ class MainWindow(QMainWindow):
     timing_notification_received = Signal(object)
     property_notification_received = Signal(object)
 
-    def __init__(self) -> None:
+    def __init__(self, sushi_address: str) -> None:
         super().__init__()
         self._controller: Optional['SushiController'] = None
         self.setWindowTitle('Sushi')
@@ -74,7 +74,7 @@ class MainWindow(QMainWindow):
         self.help_menu.addAction(tracks)
         self.help_menu.addAction(inputs)
 
-        self.current_sushi_ip = '192.168.1.108:51051'
+        self.current_sushi_ip = sushi_address
 
         self.tpbar = TransportBarWidget(parent=self)
         self._window_layout.addWidget(self.tpbar)
