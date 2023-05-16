@@ -74,7 +74,7 @@ class MainWindow(QMainWindow):
         self.help_menu.addAction(tracks)
         self.help_menu.addAction(inputs)
 
-        self.current_sushi_ip = 'localhost:51051'
+        self.current_sushi_ip = '192.168.1.108:51051'
 
         self.tpbar = TransportBarWidget(parent=self)
         self._window_layout.addWidget(self.tpbar)
