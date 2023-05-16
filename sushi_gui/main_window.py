@@ -96,8 +96,11 @@ class MainWindow(QMainWindow):
 
     def setup_sushi_controller(self) -> None:
         for idx, t in self.tracks.items():
-            t.deleteLater()
-            self._track_layout.removeWidget(t)
+            try:
+                t.deleteLater()
+                self._track_layout.removeWidget(t)
+            except RuntimeError:
+                pass
         self._controller = Controller(address=self.current_sushi_ip, proto_file=proto_file)
         self._controller.set_view(self)
         self._controller.subscribe_to_notifications()

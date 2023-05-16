@@ -83,7 +83,6 @@ class TransportBarWidget(QGroupBox):
         self._cpu_meter.setText(f"Cpu: {value * 100:.1f}%")
 
     def set_sushi_ip(self) -> None:
-        print(self._sushi_ip_tbox.text())
         if len(self._sushi_ip_tbox.text().split(':')) <= 1:
             self._parent.current_sushi_ip = self._sushi_ip_tbox.text() + ':51051'
         else:
