@@ -62,11 +62,6 @@ annoying when the processor addition is done via other means which do allow for 
 GUI will **not** reflect the new ordering: the new plugin will always be shown at the bottom of the stack even though
 it is actually somewhere else. Keep that in mind.
 
-### Restarting Sushi
-When the GUI starts, it first queries the current state of Sushi to build its initial layout and widgets. From then on, 
-it will only update on update notifications from Sushi. That means that you can not simply stop and restart Sushi and
-expect the GUI to be in sync with it. You have to stop and restart the GUI every time you restart Sushi.
-
 ---
 
 
