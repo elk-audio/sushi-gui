@@ -17,14 +17,14 @@ from .widgets import TransportBarWidget, TrackWidget
 proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
 if proto_file is None:
     print('Environment variable SUSHI_GRPC_ELKPY_PROTO not defined, setting it to the local proto file')
-    os.environ['SUSHI_GRPC_ELKPY_PROTO'] = str('./sushi_gui/sushi_rpc.proto')
+    os.environ['SUSHI_GRPC_ELKPY_PROTO'] = str('./sushi-grpc-api/sushi_rpc.proto')
     proto_file = os.environ.get('SUSHI_GRPC_ELKPY_PROTO')
 
     if proto_file is None:
         print("No proto file found")
         sys.exit(-1)
 
-# Get the sushi notification types direcly from the generated grpc types
+# Get the sushi notification types directly from the generated grpc types
 sushi_grpc_types, _ = grpc_gen.modules_from_proto(proto_file)
 
 

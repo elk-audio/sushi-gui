@@ -1,4 +1,4 @@
-# QT UI
+# SUSHI GUI
 A generic GUI for controlling Sushi over gRPC, built with Python and QT.
 It can control both local instances and remote devices. 
 Intended for testing and development.
@@ -6,7 +6,7 @@ Intended for testing and development.
 ## Installation
 It is assumed you have Python 3 on your system. And Sushi, of course...
 
-
+After cloning this repo, do not forget to run `git submodule update --init --recursive`! 
 ### Dependencies
 The preferred way to install deps is in a virtual environment. Here is how to do it with the builtin `venv` module. Using 
 `virtualenv` instead is also possible.
@@ -15,19 +15,22 @@ The preferred way to install deps is in a virtual environment. Here is how to do
 - `pip install -r requirements.txt` to install all the dependencies in the environment
 
 ### Sushi .proto definitions
-In the Sushi repo, you will find the `.proto` definition file for Sushi. Specifically in `sushi/rpc_interface/protos/sushi_rpc.proto`
+`sushi-grpc-api` is included in this repo as a submodule. It contains the proto definition file for Sushi.
+In the Sushi repo, you will find the `.proto` definition file for Sushi. By default, this GUI will use that.
 
-You need to set an environment variable to that:
+In case you need to use another proto file, you should set the environment variable SUSHI_GRPC_ELKPY_PROTO to that
+path.
+
+Also, note that Sushi comes with its proto file as file when you check it out. Specifically in `sushi/rpc_interface/protos/sushi_rpc.proto`.
+So setting environment variable like that:
 ```
 $ export SUSHI_GRPC_ELKPY_PROTO=path_to_sushi/rpc_interface/protos/sushi_rpc.proto
 ```
+will make the GUI use the proto file included with Sushi.
 
-If you find yourself using is often and wanting to set the variable *once and for all*, you should add the command to your
+If you find yourself using this often and wanting to set the variable *once and for all*, you should add the command to your
 `.bashrc` or `.zshrc`, depending on which shell you are using.
 
-For convenience, we added a copy of `sushi_rpc.proto` to this repo that `client.py` will default to using in case the
-env variable is not set. Be aware that this is not the preferred method as we cannot guarantee regular updates to 
-this copy. Using the actual proto file that comes with Sushi will always ensure best compatibility and latest features.
 
 ---
 
