@@ -21,7 +21,7 @@ In the Sushi repo, you will find the `.proto` definition file for Sushi. By defa
 In case you need to use another proto file, you should set the environment variable SUSHI_GRPC_ELKPY_PROTO to that
 path.
 
-Also, note that Sushi comes with its proto file as file when you check it out. Specifically in `sushi/rpc_interface/protos/sushi_rpc.proto`.
+Also, note that Sushi comes with its proto file when you check it out. Specifically in `sushi/rpc_interface/protos/sushi_rpc.proto`.
 So setting environment variable like that:
 ```
 $ export SUSHI_GRPC_ELKPY_PROTO=path_to_sushi/rpc_interface/protos/sushi_rpc.proto
