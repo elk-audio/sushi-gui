@@ -36,23 +36,19 @@ If you find yourself using this often and wanting to set the variable *once and 
 
 
 ## Usage
+Assuming that Sushi is running on your machine:
 
     $ python3 ./client.py
 
 ## Controlling Sushi when it is running on another machine
-To achieve this, you need at least 2 things:
-- The `sushi_rpc.proto` file. This is required but you don't need Sushi itself. You could in principle get that file only, 
-store it locally and set SUSHI_GRPC_ELKPY_PROTO to it. Feel free to use the included copy of `sushi_rpc.proto` but do
-remember that it might not be 100% up-to-date.
-- The IP address of the machine running the Sushi instance you want to control. Replace `localhost` with it in `client.py` but keep the port number:
+The GUI lets you specify an IP address and port number to connect to. Simple as that.
 
+In case you need to hard-code a different default address than `localhost:51051`, feel free
+to edit `client.py:4`:
 ```
 SUSHI_ADDRESS = 'localhost:51051'
 ```
-becomes
-```
-SUSHI_ADDRESS = 'sushi_current_ip_address:51051'
-```
+with the new default address.
 
 ## Limitations
 Although meant as a debugging/testing tools for Sushi developers, this GUI does **not** implement all of Sushi's features.
@@ -67,8 +63,6 @@ it is actually somewhere else. Keep that in mind.
 
 ---
 
-
-
 ## Packaging the GUI app with PyInstaller
 The repo contains a `client.spec` file. This is a specification file to be used by PyInstaller that will produce a bundled executable app named `sushi_gui`.
 
@@ -78,8 +72,7 @@ pip install pyinstaller
 pyinstaller client.spec
 ```
 You will find a folder called `client` in `dist/`. This can be zipped and distributed. Inside that folder is `sushi_gui` that can be executed without **any** of the installation steps
-described above, except for 1 limitation:
-- The controlled Sushi instance MUST be on the same machine
+described above.
 
 ## Dependency list
   * grpcio 
