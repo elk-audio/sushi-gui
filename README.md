@@ -38,13 +38,13 @@ If you find yourself using this often and wanting to set the variable *once and 
 ## Usage
 Assuming that Sushi is running on your machine:
 
-    $ python3 ./client.py
+    $ python3 ./sushi-gui.py
 
 ## Controlling Sushi when it is running on another machine
 The GUI lets you specify an IP address and port number to connect to. Simple as that.
 
 In case you need to hard-code a different default address than `localhost:51051`, feel free
-to edit `client.py:4`:
+to edit `sushi-gui.py:4`:
 ```
 SUSHI_ADDRESS = 'localhost:51051'
 ```
@@ -62,20 +62,5 @@ GUI will **not** reflect the new ordering: the new plugin will always be shown a
 it is actually somewhere else. Keep that in mind.
 
 ---
+Copyright 2023 Elk Audio AB, Stockholm, Sweden.
 
-## Packaging the GUI app with PyInstaller
-The repo contains a `client.spec` file. This is a specification file to be used by PyInstaller that will produce a bundled executable app named `sushi_gui`.
-
-With the venv **activated**:
-```
-pip install pyinstaller 
-pyinstaller client.spec
-```
-You will find a folder called `client` in `dist/`. This can be zipped and distributed. Inside that folder is `sushi_gui` that can be executed without **any** of the installation steps
-described above.
-
-## Dependency list
-  * grpcio 
-  * grpc-tools
-  * PySide6
-  * elkpy
