@@ -91,8 +91,8 @@ class MainWindow(QMainWindow):
 
         try:
             self.setup_sushi_controller()
-        except:
-            pass
+        except Exception as e:
+            print(f'NO SUSHI: {e}')
 
     def setup_sushi_controller(self) -> None:
         for idx, t in self.tracks.items():
@@ -101,6 +101,8 @@ class MainWindow(QMainWindow):
                 self._track_layout.removeWidget(t)
             except RuntimeError:
                 pass
+        if self._controller:
+            self._controller.close()
         self._controller = Controller(address=self.current_sushi_ip, proto_file=proto_file)
         self._controller.set_view(self)
         self._controller.subscribe_to_notifications()
