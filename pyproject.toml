@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=59.5.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sushi_gui"
+version = "1.0.0"
+authors = [
+  { name="Maxime Gendebien", email="max@elk.audio" },
+  { name="Gustav Andersson", email="gustav@elk.audio" },
+]
+description = "A simple GUI for Sushi, using PySide and gRPC."
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
+]
+dependencies = ['elkpy', 'grpcio', 'grpcio-tools', 'PySide>=6.4']

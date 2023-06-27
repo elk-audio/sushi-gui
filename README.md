@@ -1,28 +1,66 @@
-# QT UI
-Generic GUI for controlling Sushi over gRPC, built with python and QT. Can control both local instances and remote devices. Intended for testing and development.
+# SUSHI GUI
+A generic GUI for controlling Sushi over gRPC, built with Python and QT.
+It can control both local instances and remote devices. 
+Intended for testing and development.
+
+## Installation
+It is assumed you have Python 3 on your system. And Sushi, of course...
+
+After cloning this repo, do not forget to run `git submodule update --init --recursive`! 
+### Dependencies
+The preferred way to install deps is in a virtual environment. Here is how to do it with the builtin `venv` module. Using 
+`virtualenv` instead is also possible.
+- `python3 -m venv venv` will create a virtual environment named *venv* with your installed Python
+- `source venv/bin/activate` to activate that environment
+- `pip install -r requirements.txt` to install all the dependencies in the environment
+
+### Sushi .proto definitions
+`sushi-grpc-api` is included in this repo as a submodule. It contains the proto definition file for Sushi.
+In the Sushi repo, you will find the `.proto` definition file for Sushi. By default, this GUI will use that.
+
+In case you need to use another proto file, you should set the environment variable SUSHI_GRPC_ELKPY_PROTO to that
+path.
+
+Also, note that Sushi comes with its proto file when you check it out. Specifically in `sushi/rpc_interface/protos/sushi_rpc.proto`.
+So setting environment variable like that:
+```
+$ export SUSHI_GRPC_ELKPY_PROTO=path_to_sushi/rpc_interface/protos/sushi_rpc.proto
+```
+will make the GUI use the proto file included with Sushi.
+
+If you find yourself using this often and wanting to set the variable *once and for all*, you should add the command to your
+`.bashrc` or `.zshrc`, depending on which shell you are using.
+
+
+---
+
 
 ## Usage
+Assuming that Sushi is running on your machine:
 
-    $ python3 ./qt_client.py
+    $ python3 ./sushi-gui.py
 
-## Dependencies
-  * grpc-tools >= 1.29
-  * protobuf
-  * PySide2
+## Controlling Sushi when it is running on another machine
+The GUI lets you specify an IP address and port number to connect to. Simple as that.
 
-## Notes
-* Make sure to set the path to _sushi_rpc.proto_ before launching. 
-* If controlling Sushi running on a remote device, change the ip from localhost to the *ip of the elk device*.
-* It is assumed that you have copied the ElkPy package to the UI top directory, as advised in the ElkPy documentation. 
-If you want to use ElkPy from another place, do not forget to adapt the relevant `import` statements. 
+In case you need to hard-code a different default address than `localhost:51051`, feel free
+to edit `sushi-gui.py:4`:
+```
+SUSHI_ADDRESS = 'localhost:51051'
+```
+with the new default address.
 
-# TK UI (deprecated)
-`client.py` is a generic GUI for controlling Sushi over gRPC, built with python and Tk. Can control both local instances and remote devices. Intended for testing and development and not for externa use. UI is very ugly and the code not up to standard for publishing.
+## Limitations
+Although meant as a debugging/testing tools for Sushi developers, this GUI does **not** implement all of Sushi's features.
+Most notably, some behavior one might expect after learning about the notification system is missing:
 
-Only works with Sushi version <= 0.9, use QT UI with more recent versions of Sushi
+### Processor update notifications and ordering
+Sushi allows for adding processor anywhere in the processor stack. But this GUI does not. When adding a plugin, it will
+always add it at the bottom of the stack, i.e. in the last position in the audio flow. This limitation gets even more
+annoying when the processor addition is done via other means which do allow for insertion in any position because this 
+GUI will **not** reflect the new ordering: the new plugin will always be shown at the bottom of the stack even though
+it is actually somewhere else. Keep that in mind.
 
-## Usage
+---
+Copyright 2023 Elk Audio AB, Stockholm, Sweden.
 
-	$ python3 ./client.py
-
-Make sure to set the path to _sushi_rpc.proto_ before launching. If controlling Sushi running on a remote device, change the ip from localhost to the ip of the elk device.

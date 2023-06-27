@@ -1,0 +1,12 @@
+venv/*
+venv
+
+.idea
+
+sushi_gui/__pycache__/
+sushi_gui/sushi_rpc_pb2*
+sushi_gui/build/
+sushi_gui/dist/
+__pycache__/
+sushi_rpc_pb2*
+

@@ -1,0 +1,7 @@
+PySide6>=6.4
+
+elkpy
+grpcio-tools
+grpcio
+
+
