@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QFileDialog
 from elkpy.sushicontroller import SushiController
 from elkpy import sushi_info_types as sushi
 
-from .dialogs import AddTrackDialog, AddPluginDialog
+from .dialogs import AddTrackDialog, AddPluginDialog, AddCustomPluginDialog
 from .constants import Direction
 
 
@@ -101,7 +101,7 @@ class Controller(SushiController):
                 print('Error creating plugin: {}'.format(e))   
 
     def add_custom_plugin(self, track_id):
-        dialog = AddPluginDialog(self._view)
+        dialog = AddCustomPluginDialog(self._view)
         if dialog.exec_():
             name = dialog.name_entry.text().strip()
             uid = dialog.uid_entry.text().strip()

@@ -97,14 +97,38 @@ class AddPluginDialog(QDialog):
         self._layout = QGridLayout(self)
         self.setLayout(self._layout)
 
-        self._type: Optional[sushi.PluginType] = None
-
         plug_lbl = QLabel('Plug', self)
         self._layout.addWidget(plug_lbl, 4, 0)
         self._plug_box = QComboBox(self)
         self._layout.addWidget(self._plug_box, 4, 1)
         for k, v in PLUGIN_DICT['plugins'].items():
             self._plug_box.addItem(k, userData=v)
+
+        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok |
+                                           QDialogButtonBox.Cancel)
+        self.button_box.button(QDialogButtonBox.Ok).setDefault(True)
+        self.button_box.button(QDialogButtonBox.Ok).setEnabled(True)
+        self._layout.addWidget(self.button_box, 5, 1)
+
+        self._connect_signals()
+
+    @property
+    def selected_plugin(self) -> dict:
+        return self._plug_box.currentData()
+
+    def _connect_signals(self) -> None:
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+
+class AddCustomPluginDialog(QDialog):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setWindowTitle('Add custom plugin')
+
+        self._layout = QGridLayout(self)
+        self.setLayout(self._layout)
+
+        self._type: Optional[sushi.PluginType] = None
 
         type_label = QLabel('Type', self)
         self._layout.addWidget(type_label, 0, 0)
@@ -134,7 +158,7 @@ class AddPluginDialog(QDialog):
                                            QDialogButtonBox.Cancel)
         self.button_box.button(QDialogButtonBox.Ok).setDefault(True)
         self.button_box.button(QDialogButtonBox.Ok).setEnabled(True)
-        self._layout.addWidget(self.button_box, 5, 1)
+        self._layout.addWidget(self.button_box, 4, 1)
 
         self._connect_signals()
 
@@ -159,7 +183,6 @@ class AddPluginDialog(QDialog):
         return self._plug_box.currentData()
 
     def _connect_signals(self) -> None:
-        self._plug_box.currentIndexChanged.connect(self.plugin_changed)
         self._type_box.currentIndexChanged.connect(self.type_changed)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
@@ -183,5 +206,3 @@ class AddPluginDialog(QDialog):
             self._path_entry.setEnabled(True)
             self._uid_entry.setEnabled(False)
 
-    def plugin_changed(self, plugin: dict) -> None:
-        print(plugin)

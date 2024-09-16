@@ -165,12 +165,15 @@ class TrackWidget(QGroupBox):
         self._track_buttons.addWidget(self._delete_button)
         self._add_plugin_button = QPushButton('Add Plugin', self)
         self._track_buttons.addWidget(self._add_plugin_button)
+        self._add_custom_plugin_button = QPushButton('Add Custom', self)
+        self._track_buttons.addWidget(self._add_custom_plugin_button)
         self._track_buttons.addStretch(0)
 
     def _connect_signals(self) -> None:
         self._mute_button.clicked.connect(self.mute_track)
         self._delete_button.clicked.connect(self.delete_track)
         self._add_plugin_button.clicked.connect(self.add_plugin)
+        self._add_custom_plugin_button.clicked.connect(self.add_custom_plugin)
 
     def handle_parameter_notification(self, notif: sushi.ParameterInfo) -> None:
         for pan_gain in self._pan_gain:
@@ -196,6 +199,9 @@ class TrackWidget(QGroupBox):
 
     def add_plugin(self, arg):
         self._controller.add_plugin(self._id)
+
+    def add_custom_plugin(self, arg):
+        self._controller.add_custom_plugin(self._id)
 
     def delete_processor(self, processor_id: int) -> None:
         p = self.processors.pop(processor_id)
