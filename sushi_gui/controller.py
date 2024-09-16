@@ -91,6 +91,18 @@ class Controller(SushiController):
     def add_plugin(self, track_id):
         dialog = AddPluginDialog(self._view)
         if dialog.exec_():
+            plug = dialog.selected_plugin
+            name = plug['name']
+            uid = plug['uid']
+            p_type = 0
+            try:
+                self.audio_graph.create_processor_on_track(name, uid, None, p_type, track_id, 0, True)
+            except Exception as e:
+                print('Error creating plugin: {}'.format(e))   
+
+    def add_custom_plugin(self, track_id):
+        dialog = AddPluginDialog(self._view)
+        if dialog.exec_():
             name = dialog.name_entry.text().strip()
             uid = dialog.uid_entry.text().strip()
             path = dialog.path_entry.text().strip()

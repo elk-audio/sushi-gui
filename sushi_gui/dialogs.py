@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QDialog, QGridLayout, QLabel, QLineEdit, QComboBox
 
 from .constants import PLUGIN_TYPES
 from elkpy import sushi_info_types as sushi
+from .plugin_list import PLUGIN_DICT
 
 
 class AddTrackDialog(QDialog):
@@ -98,6 +99,13 @@ class AddPluginDialog(QDialog):
 
         self._type: Optional[sushi.PluginType] = None
 
+        plug_lbl = QLabel('Plug', self)
+        self._layout.addWidget(plug_lbl, 4, 0)
+        self._plug_box = QComboBox(self)
+        self._layout.addWidget(self._plug_box, 4, 1)
+        for k, v in PLUGIN_DICT['plugins'].items():
+            self._plug_box.addItem(k, userData=v)
+
         type_label = QLabel('Type', self)
         self._layout.addWidget(type_label, 0, 0)
         self._type_box = QComboBox(self)
@@ -126,7 +134,7 @@ class AddPluginDialog(QDialog):
                                            QDialogButtonBox.Cancel)
         self.button_box.button(QDialogButtonBox.Ok).setDefault(True)
         self.button_box.button(QDialogButtonBox.Ok).setEnabled(True)
-        self._layout.addWidget(self.button_box, 4, 1)
+        self._layout.addWidget(self.button_box, 5, 1)
 
         self._connect_signals()
 
@@ -146,7 +154,12 @@ class AddPluginDialog(QDialog):
     def plugin_type(self):
         return self._type
 
+    @property
+    def selected_plugin(self) -> dict:
+        return self._plug_box.currentData()
+
     def _connect_signals(self) -> None:
+        self._plug_box.currentIndexChanged.connect(self.plugin_changed)
         self._type_box.currentIndexChanged.connect(self.type_changed)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
@@ -169,3 +182,6 @@ class AddPluginDialog(QDialog):
         elif plugin_type == sushi.PluginType.LV2:
             self._path_entry.setEnabled(True)
             self._uid_entry.setEnabled(False)
+
+    def plugin_changed(self, plugin: dict) -> None:
+        print(plugin)
