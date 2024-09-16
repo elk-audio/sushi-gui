@@ -5,7 +5,7 @@ a = Analysis(
     ['sushi-gui.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('sushi_gui/plugins.json', 'sushi_gui/')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

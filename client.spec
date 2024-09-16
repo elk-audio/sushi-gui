@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['client.py'],
+    ['sushi-gui.py'],
     pathex=[],
     binaries=[],
     hookspath=[],

@@ -1,10 +1,11 @@
 from typing import Optional
 
 from PySide6.QtWidgets import QDialog, QGridLayout, QLabel, QLineEdit, QComboBox, QSpinBox, QDialogButtonBox
+from sushi_gui import INSTALLED_PLUGINS
 
 from .constants import PLUGIN_TYPES
 from elkpy import sushi_info_types as sushi
-from .plugin_list import PLUGIN_DICT
+# from .plugin_list import PLUGIN_DICT
 
 
 class AddTrackDialog(QDialog):
@@ -101,7 +102,7 @@ class AddPluginDialog(QDialog):
         self._layout.addWidget(plug_lbl, 4, 0)
         self._plug_box = QComboBox(self)
         self._layout.addWidget(self._plug_box, 4, 1)
-        for k, v in PLUGIN_DICT['plugins'].items():
+        for k, v in INSTALLED_PLUGINS['plugins'].items():
             self._plug_box.addItem(k, userData=v)
 
         self.button_box = QDialogButtonBox(QDialogButtonBox.Ok |
