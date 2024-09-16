@@ -36,8 +36,10 @@ class MainWindow(QMainWindow):
     timing_notification_received = Signal(object)
     property_notification_received = Signal(object)
 
-    def __init__(self, sushi_address: str) -> None:
+    def __init__(self, sushi_address: str, plugins: dict) -> None:
         super().__init__()
+
+        self.installed_plugins: dict = plugins
         self._controller: Optional['SushiController'] = None
         self.setWindowTitle('Sushi')
 
