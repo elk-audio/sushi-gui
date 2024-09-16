@@ -10,3 +10,5 @@ sushi_gui/dist/
 __pycache__/
 sushi_rpc_pb2*
 
+build/
+dist/

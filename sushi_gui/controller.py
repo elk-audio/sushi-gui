@@ -67,7 +67,8 @@ class Controller(SushiController):
         self.transport.set_playing_mode(1)
 
     def delete_processor(self, track_id: int, processor_id: int) -> None:
-        self.audio_graph.delete_processor_from_track(processor_id, track_id)
+        ev = self.audio_graph.delete_processor_from_track(processor_id, track_id)
+        print(ev)
 
     def delete_track(self, track_id: int) -> None:
         super().audio_graph.delete_track(track_id)
@@ -83,7 +84,7 @@ class Controller(SushiController):
             if track_type == 'Multibus':
                 self.audio_graph.create_multibus_track(name, outputs, inputs)
             elif track_type == 'Stereo':
-                self.audio_graph.create_track(name, 2)
+                print(self.audio_graph.create_track(name, 2))
             elif track_type == 'Mono':
                 self.audio_graph.create_track(name, 1)
 

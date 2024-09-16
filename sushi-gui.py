@@ -11,7 +11,7 @@ SUSHI_ADDRESS = 'localhost:51051'
 
 def main():
     app = QApplication(sys.argv)
-    app.setStyle('Fusion')
+    app.setStyle('fusion')
     window = MainWindow(sushi_address=SUSHI_ADDRESS)
     window.show()
     sys.exit(app.exec())
