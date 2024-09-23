@@ -4,9 +4,15 @@ It can control both local instances and remote devices.
 Intended for testing and development.
 
 ## Installation
-It is assumed you have Python 3 on your system. And Sushi, of course...
+It is assumed you have Python 3 on your system. And that Sushi is running on your local machine or on a remote device with a known IP.
 
-After cloning this repo, do not forget to run `git submodule update --init --recursive`! 
+```bash
+git clone ...
+
+git submodule update --init --recursive
+
+```
+
 ### Dependencies
 The preferred way to install deps is in a virtual environment. Here is how to do it with the builtin `venv` module. Using 
 `virtualenv` instead is also possible.
@@ -36,9 +42,9 @@ If you find yourself using this often and wanting to set the variable *once and 
 
 
 ## Usage
-Assuming that Sushi is running on your machine:
+Assuming that the virtual environment is activated:
 
-    $ python3 ./sushi-gui.py
+    $ python3 sushi-gui.py
 
 ## Controlling Sushi when it is running on another machine
 The GUI lets you specify an IP address and port number to connect to. Simple as that.
@@ -52,12 +58,13 @@ with the new default address.
 
 ## Limitations
 Although meant as a debugging/testing tools for Sushi developers, this GUI does **not** implement all of Sushi's features.
-Most notably, some behavior one might expect after learning about the notification system is missing:
+Most notably, a certain behavior one might expect after learning about Sushi's notification system is missing:
 
 ### Processor update notifications and ordering
 Sushi allows for adding processor anywhere in the processor stack. But this GUI does not. When adding a plugin, it will
-always add it at the bottom of the stack, i.e. in the last position in the audio flow. This limitation gets even more
-annoying when the processor addition is done via other means which do allow for insertion in any position because this 
+always add it at the bottom of the stack, i.e. in the last position in the audio flow. 
+
+This limitation gets even more annoying when the processor addition is done via other means which do allow for insertion in any position because this 
 GUI will **not** reflect the new ordering: the new plugin will always be shown at the bottom of the stack even though
 it is actually somewhere else. Keep that in mind.
 
