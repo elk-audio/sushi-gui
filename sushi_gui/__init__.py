@@ -1,4 +1,3 @@
-
 INSTALLED_PLUGINS = {
     "plugins": {
 

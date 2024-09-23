@@ -1,17 +1,22 @@
+from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QFileDialog
 from elkpy.sushicontroller import SushiController
 from elkpy import sushi_info_types as sushi
-
 from .dialogs import AddTrackDialog, AddPluginDialog, AddCustomPluginDialog
 from .constants import Direction
+
+if TYPE_CHECKING:
+    from sushi_gui.main_window import MainWindow
 
 
 # Expand the controller with a few convenience functions that better match our use case
 class Controller(SushiController):
+    '''This expands on the SushiController class that comes with elkpy by adding to it QT specific
+        functionality, like signal handling'''
 
     def __init__(self, address: str, proto_file: str) -> None:
         super().__init__(address, proto_file)
-        self._view = None
+        self._view: MainWindow
         
     def emit_track_notification(self, notification) -> None:
         try:
@@ -71,7 +76,7 @@ class Controller(SushiController):
         print(ev)
 
     def delete_track(self, track_id: int) -> None:
-        super().audio_graph.delete_track(track_id)
+        self.audio_graph.delete_track(track_id)
 
     def add_track(self) -> None:
         dialog = AddTrackDialog(self._view)
@@ -88,7 +93,7 @@ class Controller(SushiController):
             elif track_type == 'Mono':
                 self.audio_graph.create_track(name, 1)
 
-    def add_plugin(self, track_id):
+    def add_plugin(self, track_id: int) -> None:
         dialog = AddPluginDialog(self._view)
         if dialog.exec_():
             plug = dialog.selected_plugin
@@ -100,7 +105,7 @@ class Controller(SushiController):
             except Exception as e:
                 print('Error creating plugin: {}'.format(e))   
 
-    def add_custom_plugin(self, track_id):
+    def add_custom_plugin(self, track_id: int) -> None:
         dialog = AddCustomPluginDialog(self._view)
         if dialog.exec_():
             name = dialog.name_entry.text().strip()
@@ -112,7 +117,7 @@ class Controller(SushiController):
             except Exception as e:
                 print('Error creating plugin: {}'.format(e))   
 
-    def move_processor(self, track_id, processor_id, direction):
+    def move_processor(self, track_id: int, processor_id: int, direction: Direction) -> None:
         track_info = self.audio_graph.get_track_info(track_id)
         index = track_info.processors.index(processor_id)
 
@@ -133,7 +138,7 @@ class Controller(SushiController):
 
         self._view.tracks[track_id].move_processor(processor_id, direction)
 
-    def set_sync_mode_txt(self, txt_mode):
+    def set_sync_mode_txt(self, txt_mode: sushi.SyncMode) -> None:
         if txt_mode == 'Internal':
             self.transport.set_sync_mode(sushi.SyncMode.INTERNAL)
         elif txt_mode == 'Link':
@@ -141,7 +146,7 @@ class Controller(SushiController):
         if txt_mode == 'Midi':
             self.transport.set_sync_mode(sushi.SyncMode.MIDI)
 
-    def save_session(self):
+    def save_session(self) -> None:
         filename, _ = QFileDialog.getSaveFileName(self._view, 'Save Session As', '', '')
 
         if filename:
@@ -161,5 +166,5 @@ class Controller(SushiController):
 
             self.session.restore_binary_session(saved_session)
 
-    def set_view(self, view):
+    def set_view(self, view: 'MainWindow') -> None:
         self._view = view

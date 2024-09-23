@@ -4,21 +4,27 @@ from PySide6.QtWidgets import QGroupBox, QHBoxLayout, QLabel, QComboBox, QDouble
 
 from elkpy.sushicontroller import SushiController
 from elkpy import sushi_info_types as sushi
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from sushi_gui.main_window import MainWindow
+    from sushi_gui.controller import Controller
 
 from .constants import SYNCMODES, Direction, PROCESSOR_WIDTH, MAX_COLUMNS, ICON_BUTTON_WIDTH, PARAMETER_VALUE_WIDTH, \
     SLIDER_MIN_WIDTH, SLIDER_MAX_VALUE, PAN_SLIDER_WIDTH
 
 
 class TransportBarWidget(QGroupBox):
-    def __init__(self, parent):
+    def __init__(self, parent: 'MainWindow') -> None:
         super().__init__()
         self._parent = parent
-        self._controller = None
+        self._controller: 'Controller'
         self._layout = QHBoxLayout(self)
         self.setLayout(self._layout)
         self._create_widgets()
 
-    def initialize(self):
+    def initialize(self) -> None:
         self._controller = self._parent._controller
         self._tempo.setValue(self._controller.transport.get_tempo())
         self._connect_signals()
@@ -92,14 +98,14 @@ class TransportBarWidget(QGroupBox):
 
 
 class TrackWidget(QGroupBox):
-    def __init__(self, controller: 'SushiController', track_info: sushi.TrackInfo, parent: QWidget) -> None:
+    def __init__(self, controller: 'Controller', track_info: sushi.TrackInfo, parent: 'MainWindow') -> None:
         super().__init__(track_info.name, parent)
         self._id = track_info.id
         self._parent = parent
         self._controller = controller
         self._layout = QVBoxLayout(self)
         self.setLayout(self._layout)
-        self.processors = {}
+        self.processors: dict = {}
         self._create_processors(track_info)
         self._create_common_controls(track_info)
         self._connect_signals()
@@ -192,15 +198,15 @@ class TrackWidget(QGroupBox):
 
     def mute_track(self, arg) -> None:
         state = self._mute_button.isChecked()
-        muted = self._controller.parameters.set_parameter_value(self._id, self._mute_id, 1 if state == True else 0)
+        self._controller.parameters.set_parameter_value(self._id, self._mute_id, 1 if state == True else 0)
 
     def delete_track(self, arg) -> None:
         self._controller.audio_graph.delete_track(self._id)
 
-    def add_plugin(self, arg):
+    def add_plugin(self, arg) -> None:
         self._controller.add_plugin(self._id)
 
-    def add_custom_plugin(self, arg):
+    def add_custom_plugin(self, arg) -> None:
         self._controller.add_custom_plugin(self._id)
 
     def delete_processor(self, processor_id: int) -> None:
@@ -224,7 +230,7 @@ class TrackWidget(QGroupBox):
 
 
 class ProcessorWidget(QGroupBox):
-    def __init__(self, controller: SushiController, processor_info: sushi.ProcessorInfo, track_id: int, parent: QWidget) -> None:
+    def __init__(self, controller: 'Controller', processor_info: sushi.ProcessorInfo, track_id: int, parent: 'MainWindow') -> None:
         super().__init__(processor_info.name, parent)
         self.setFixedWidth(PROCESSOR_WIDTH * MAX_COLUMNS)
         # Make sure the ProcessorWidget doesn't expand to much, as that looks ugly
@@ -289,19 +295,6 @@ class ProcessorWidget(QGroupBox):
         self._delete_button.setToolTip('Delete processor')
         common_layout.addWidget(self._delete_button)
 
-        # self._up_button = QPushButton('', self)
-        # self._up_button.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_ArrowUp')))
-        # self._up_button.setToolTip('Move processor up')
-        # self._up_button.setFixedWidth(ICON_BUTTON_WIDTH)
-        # common_layout.addWidget(self._up_button)
-        #
-        # self._down_button = QPushButton('', self)
-        # self._down_button.setIcon(self.style().standardIcon(getattr(QStyle, 'SP_ArrowDown')))
-        # self._down_button.setToolTip('Move processor down')
-        # self._down_button.setFixedWidth(ICON_BUTTON_WIDTH)
-        # common_layout.addWidget(self._down_button)
-    
-
         self._program_selector = QComboBox(self)
         common_layout.addWidget(self._program_selector)
         if processor_info.program_count > 0:
@@ -317,8 +310,6 @@ class ProcessorWidget(QGroupBox):
         self._mute_button.clicked.connect(self.mute_processor_clicked)
         self._program_selector.currentIndexChanged.connect(self.program_selector_changed)
         self._delete_button.clicked.connect(self.delete_processor_clicked)
-        # self._up_button.clicked.connect(self.up_clicked)
-        # self._down_button.clicked.connect(self.down_clicked)
 
     def handle_parameter_notification(self, notif: sushi.ParameterInfo) -> None:
         self._parameters[notif.parameter.parameter_id].set_slider_value(notif.normalized_value)
@@ -338,14 +329,14 @@ class ProcessorWidget(QGroupBox):
 
     def mute_processor_clicked(self, arg) -> None:
         state = self._mute_button.isChecked()
-        self._controller.audio_graph.set_processor_bypass_state(self._id, state)        
+        self._controller.audio_graph.set_processor_bypass_state(self._id, state)
 
     def program_selector_changed(self, program_id: int) -> None:
         self._controller.programs.set_processor_program(self._id, program_id)
 
 
 class ParameterWidget(QWidget):
-    def __init__(self, parameter_info: sushi.ParameterInfo, processor_id: int, controller: SushiController, parent: QWidget) -> None:
+    def __init__(self, parameter_info: sushi.ParameterInfo, processor_id: int, controller: 'Controller', parent: 'MainWindow') -> None:
         super().__init__(parent)
         self._controller = controller
         self._id = parameter_info.id
@@ -398,7 +389,7 @@ class ParameterWidget(QWidget):
 
 
 class PropertyWidget(QWidget):
-    def __init__(self, property_info: sushi.PropertyInfo, processor_id: int, controller: 'SushiController' , parent: QWidget) -> None:
+    def __init__(self, property_info: sushi.PropertyInfo, processor_id: int, controller: 'Controller' , parent: 'MainWindow') -> None:
         super().__init__(parent)
         self._controller = controller
         self._id = property_info.id
@@ -446,7 +437,7 @@ class PropertyWidget(QWidget):
 
 
 class PanGainWidget(QWidget):
-    def __init__(self, processor_id: int, name: str, gain_id: int, pan_id: int, controller: 'SushiController', parent: QWidget) -> None:
+    def __init__(self, processor_id: int, name: str, gain_id: int, pan_id: int, controller: 'Controller', parent: 'MainWindow') -> None:
         super().__init__(parent)
         self._processor_id = processor_id
         self.gain_id = gain_id

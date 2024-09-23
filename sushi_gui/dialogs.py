@@ -1,20 +1,22 @@
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from PySide6.QtWidgets import QDialog, QGridLayout, QLabel, QLineEdit, QComboBox, QSpinBox, QDialogButtonBox
 from sushi_gui import INSTALLED_PLUGINS
 
+if TYPE_CHECKING:
+    from sushi_gui.main_window import MainWindow
+
 from .constants import PLUGIN_TYPES
 from elkpy import sushi_info_types as sushi
-# from .plugin_list import PLUGIN_DICT
 
 
 class AddTrackDialog(QDialog):
-    def __init__(self, parent):
+    def __init__(self, parent: 'MainWindow') -> None:
         super().__init__(parent)
         self.setModal(True)
         self.setWindowTitle('Add new track')
 
-        self._layout = QGridLayout(self)
+        self._layout: QGridLayout = QGridLayout(self)
         self.setLayout(self._layout)
 
         self.name_label = QLabel('Name', self)
@@ -57,27 +59,27 @@ class AddTrackDialog(QDialog):
         self._connect_signals()
 
     @property
-    def track_type(self):
+    def track_type(self) -> QComboBox:
         return self._track_type
 
     @property
-    def inputs_sb(self):
+    def inputs_sb(self) -> QSpinBox:
         return self._inputs_sb
 
     @property
-    def outputs_sb(self):
+    def outputs_sb(self) -> QSpinBox:
         return self._outputs_sb
 
     @property
-    def name_entry(self):
+    def name_entry(self) -> QLineEdit:
         return self._name_entry
 
-    def _connect_signals(self):
+    def _connect_signals(self) -> None:
         self._track_type.currentIndexChanged.connect(self._update_nr_of_channels)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
-    def _update_nr_of_channels(self, idx: int):
+    def _update_nr_of_channels(self, idx: int) -> None:
         if idx == 2:
             self._inputs_sb.show()
             self._inputs_lbl.show()
@@ -91,7 +93,9 @@ class AddTrackDialog(QDialog):
 
 
 class AddPluginDialog(QDialog):
-    def __init__(self, parent):
+    '''This dialog adds Sushi Internal plugins only. It presents them as a drop-down list.'''
+
+    def __init__(self, parent: 'MainWindow'):
         super().__init__(parent)
         self.setWindowTitle('Add new plugin')
 
@@ -122,7 +126,9 @@ class AddPluginDialog(QDialog):
         self.button_box.rejected.connect(self.reject)
 
 class AddCustomPluginDialog(QDialog):
-    def __init__(self, parent):
+    '''This lets the user add any VST or LV2 plugin present on the system by specifying a path or uid.'''
+
+    def __init__(self, parent: 'MainWindow'):
         super().__init__(parent)
         self.setWindowTitle('Add custom plugin')
 
@@ -164,19 +170,19 @@ class AddCustomPluginDialog(QDialog):
         self._connect_signals()
 
     @property
-    def name_entry(self):
+    def name_entry(self) -> QLineEdit:
         return self._name_entry
 
     @property
-    def uid_entry(self):
+    def uid_entry(self) -> QLineEdit:
         return self._uid_entry
 
     @property
-    def path_entry(self):
+    def path_entry(self) -> QLineEdit:
         return self._path_entry
 
     @property
-    def plugin_type(self):
+    def plugin_type(self) -> sushi.PluginType:
         return self._type
 
     @property

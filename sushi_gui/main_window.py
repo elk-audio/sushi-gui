@@ -39,7 +39,8 @@ class MainWindow(QMainWindow):
     def __init__(self, sushi_address: str) -> None:
         super().__init__()
 
-        self._controller: Optional['SushiController'] = None
+        self._controller: Controller
+        # self._controller: Optional['Controller'] = None
         self.setWindowTitle('Sushi')
 
         self._window_layout = QVBoxLayout()
@@ -96,14 +97,17 @@ class MainWindow(QMainWindow):
             print(f'NO SUSHI: {e}')
 
     def setup_sushi_controller(self) -> None:
-        for idx, t in self.tracks.items():
+        for t in self.tracks.values():
             try:
                 t.deleteLater()
                 self._track_layout.removeWidget(t)
             except RuntimeError:
                 pass
-        if self._controller:
-            self._controller.close()
+        try:
+            if self._controller:
+                self._controller.close()
+        except:
+            pass
         self._controller = Controller(address=self.current_sushi_ip, proto_file=proto_file)
         self._controller.set_view(self)
         self._controller.subscribe_to_notifications()
@@ -111,13 +115,13 @@ class MainWindow(QMainWindow):
         self.tracks = {}
         self._create_tracks()
 
-    def save_session(self):
+    def save_session(self) -> None:
         try:
             self._controller.save_session()
         except:
             pass
 
-    def restore_session(self):
+    def restore_session(self) -> None:
         try:
             self._controller.restore_session()
         except:
