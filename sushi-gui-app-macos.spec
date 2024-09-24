@@ -45,7 +45,7 @@ exe = EXE(
 app = BUNDLE(
     exe,
     name='sushi_gui.app',
-    icon=None,
+    icon='elk_logo.png',
     bundle_identifier='Sushi_GUI-app',
     version='0.0.1',
     info_plist={
