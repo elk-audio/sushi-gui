@@ -1,6 +1,5 @@
 INSTALLED_PLUGINS = {
     "plugins": {
-
         "Passthrough": {
             "name": "Passthrough",
             "uid": "sushi.testing.passthrough",
@@ -746,6 +745,112 @@ INSTALLED_PLUGINS = {
                 "destination_file": "Path to and name of the file to write to. \".wav\" is appended to the file name automatically."
             },
             "description": "Passthrough plugin that writes the audio to a wav file."
+        },
+
+        "Freeverb": {
+            "name": "Freeverb",
+            "uid": "sushi.testing.freeverb",
+            "parameters": [
+                {
+                    "name": "freeze"
+                },
+                {
+                    "name": "dry"
+                },
+                {
+                    "name": "wet"
+                },
+                {
+                    "name": "room_size"
+                },
+                {
+                    "name": "width"
+                },
+                {
+                    "name": "damp"
+                }
+            ]
+        },
+
+        "Bitcrusher": {
+            "name": "BW Bitcrusher",
+            "uid": "sushi.brickworks.bitcrusher"
+        },
+        "Chorus": {
+            "name": "BW Chorus",
+            "uid": "sushi.brickworks.chorus"
+        },
+        "Clip": {
+            "name": "BW Clip",
+            "uid": "sushi.brickworks.clip"
+        },
+        "Comb Delay": {
+            "name": "BW Comb delay",
+            "uid": "sushi.brickworks.comb_delay"
+        },
+        "BW Compressor": {
+            "name": "BW Compressor",
+            "uid": "sushi.brickworks.compressor"
+        },
+        "BW Distortion": {
+            "name": "BW Distortion",
+            "uid": "sushi.brickworks.dist"
+        },
+        "BW Drive": {
+            "name": "BW Drive",
+            "uid": "sushi.brickworks.drive"
+        },
+        "BW Eq3band": {
+            "name": "BW Eq3band",
+            "uid": "sushi.brickworks.eq3band"
+        },
+        "BW Flanger": {
+            "name": "BW Flanger",
+            "uid": "sushi.brickworks.flanger"
+        },
+        "BW Fuzz": {
+            "name": "BW Fuzz",
+            "uid": "sushi.brickworks.fuzz"
+        },
+        "BW Highpass": {
+            "name": "BW Highpass",
+            "uid": "sushi.brickworks.highpass"
+        },
+        "BW Multifilter": {
+            "name": "BW Multifilter",
+            "uid": "sushi.brickworks.multi_filter"
+        },
+        "BW Noise Gate": {
+            "name": "BW NoiseGate",
+            "uid": "sushi.brickworks.noise_gate"
+        },
+        "BW Notch": {
+            "name": "BW Notch",
+            "uid": "sushi.brickworks.notch"
+        },
+        "BW Phaser": {
+            "name": "BW Phaser",
+            "uid": "sushi.brickworks.phaser"
+        },
+        "BW Saturation": {
+            "name": "BW Saturation",
+            "uid": "sushi.brickworks.saturation"
+        },
+        "BW Tremolo": {
+            "name": "BW Tremolo",
+            "uid": "sushi.brickworks.tremolo"
+        },
+        "BW Vibrato": {
+            "name": "BW Vibrato",
+            "uid": "sushi.brickworks.vibrato"
+        },
+        "BW Wha": {
+            "name": "BW Wha",
+            "uid": "sushi.brickworks.wha"
+        },
+        "BW Simple synth": {
+            "name": "BW Simple synth",
+            "uid": "sushi.brickworks.simple_synth"
         }
     }
 }
