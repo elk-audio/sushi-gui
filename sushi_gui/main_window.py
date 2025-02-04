@@ -80,7 +80,7 @@ class MainWindow(QMainWindow):
 
         self.tpbar = TransportBarWidget(parent=self)
         self._window_layout.addWidget(self.tpbar)
-        self.tracks = {}
+        self.tracks: dict[int, TrackWidget] = {}
         self._track_layout = QHBoxLayout(self)
         self._window_layout.addLayout(self._track_layout)
 
@@ -193,6 +193,9 @@ class MainWindow(QMainWindow):
                     self.create_processor_on_track(t, n.parent_track.id)
                     break
         elif n.action == 2:  # PROCESSOR_DELETED
+            if self.tracks[n.parent_track.id].processors[n.processor.id].to_be_moved:
+                self.tracks[n.parent_track.id].processors[n.processor.id].to_be_moved = False
+                return
             self.tracks[n.parent_track.id].delete_processor(n.processor.id)
 
     def process_parameter_notification(self, n) -> None:

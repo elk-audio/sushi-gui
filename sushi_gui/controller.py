@@ -72,8 +72,7 @@ class Controller(SushiController):
         self.transport.set_playing_mode(1)
 
     def delete_processor(self, track_id: int, processor_id: int) -> None:
-        ev = self.audio_graph.delete_processor_from_track(processor_id, track_id)
-        print(ev)
+        self.audio_graph.delete_processor_from_track(processor_id, track_id)
 
     def delete_track(self, track_id: int) -> None:
         self.audio_graph.delete_track(track_id)
@@ -134,9 +133,9 @@ class Controller(SushiController):
         elif not add_to_back:
             before_processor = track_info.processors[index + 2]
 
-        self.audio_graph.move_processor_on_track(processor_id, track_id, track_id, add_to_back, before_processor)
-
         self._view.tracks[track_id].move_processor(processor_id, direction)
+        self.audio_graph.move_processor_on_track(processor_id, track_id, track_id, before_processor, add_to_back)
+
 
     def set_sync_mode_txt(self, txt_mode: sushi.SyncMode) -> None:
         if txt_mode == 'Internal':

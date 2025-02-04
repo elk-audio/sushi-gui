@@ -105,7 +105,7 @@ class TrackWidget(QGroupBox):
         self._controller = controller
         self._layout = QVBoxLayout(self)
         self.setLayout(self._layout)
-        self.processors: dict = {}
+        self.processors: dict[int, ProcessorWidget] = {}
         self._create_processors(track_info)
         self._create_common_controls(track_info)
         self._connect_signals()
@@ -216,6 +216,7 @@ class TrackWidget(QGroupBox):
 
     def move_processor(self, processor_id: int, direction: sushi.IntEnum) -> None:
         p = self.processors[processor_id]
+        p.to_be_moved = True
         index = self._proc_layout.indexOf(p)
         
         if direction == Direction.UP and index > 0:
@@ -241,6 +242,7 @@ class ProcessorWidget(QGroupBox):
         self._parameters = {}
         self._properties = {}
         self._layout = QVBoxLayout(self)
+        self.to_be_moved: bool = False
         self.setLayout(self._layout)
 
         self._create_common_controls(processor_info)
