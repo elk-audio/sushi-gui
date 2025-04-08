@@ -215,7 +215,7 @@ class MainWindow(QMainWindow):
 
     def process_timing_notification(self, n = None) -> None:
         if n: 
-            self.tpbar.set_cpu_value(n.average)
+            self.tpbar.set_cpu_value(n.main.average)
 
     def process_property_notification(self, n) -> None:
         for t, v in self.tracks.items():
