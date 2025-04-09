@@ -101,8 +101,6 @@ class TransportBarWidget(QGroupBox):
         self._tp_layout.addWidget(self._sushi_ip_lbl)
         self._tp_layout.addWidget(self._sushi_ip_tbox)
         self._tp_layout.addWidget(self._connect_btn)
-
-        # self._tp_layout.addStretch(0)
         self._connect_btn.clicked.connect(self.set_sushi_ip)
 
     def _connect_signals(self) -> None:
@@ -119,8 +117,19 @@ class TransportBarWidget(QGroupBox):
     def set_tempo(self, tempo: float) -> None:
         self._tempo.setValue(tempo)
 
-    def set_cpu_value(self, value: float) -> None:
-        self._cpu_meter.setText(f"Cpu: {value * 100:.1f}%")
+    def set_cpu_value(self, values: list[float]) -> None:
+        main = values[0]
+        if len(values) > 1:
+            threads = values[1:]
+            threads_formatted = " - ".join([f"{t * 100:.1f}%" for t in threads])
+            self._cpu_meter.setText(
+                f"Cpu: {main * 100:.1f}% - Threads: {threads_formatted}"
+            )
+        else:
+            self._cpu_meter.setText(
+                f"Cpu: {main * 100:.1f}%"
+            )
+
 
     def set_sushi_ip(self) -> None:
         if len(self._sushi_ip_tbox.text().split(":")) <= 1:
