@@ -396,9 +396,12 @@ class ParameterWidget(QWidget):
 
     def set_slider_value(self, value: float) -> None:
         ## Set value without triggering a signal
-        self._value_slider.blockSignals(True)
-        self._value_slider.setValue(value * SLIDER_MAX_VALUE)
-        self._value_slider.blockSignals(False)
+        if value <= 1.0:
+            self._value_slider.blockSignals(True)
+            self._value_slider.setValue(value * SLIDER_MAX_VALUE)
+            self._value_slider.blockSignals(False)
+        else:
+            print(f"Value too big: {value}")
 
     def set_label_value(self, value: str) -> None:
         self._value_label.setText(value + ' ' + self._unit)
