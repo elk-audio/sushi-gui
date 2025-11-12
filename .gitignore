@@ -12,3 +12,5 @@ sushi_rpc_pb2*
 
 build/
 dist/
+sushi_gui.egg-info
+uv.lock
