@@ -25,8 +25,8 @@ if proto_file is None:
     print(
         "Environment variable SUSHI_GRPC_ELKPY_PROTO not defined => using elkpy included protofile"
     )
-
-if proto_file is not None:
+else:
+    print(f"Using proto file from env var SUSHI_GRPC_ELKPY_PROTO: {proto_file}")
     sushi_grpc_types, _ = grpc_gen.modules_from_proto(proto_file)
 
 

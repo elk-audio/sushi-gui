@@ -18,4 +18,8 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
 ]
-dependencies = ['elkpy', 'grpcio', 'grpcio-tools', 'PySide>=6.4']
+dependencies = [
+ 'grpcio',
+ 'grpcio-tools',
+ 'PySide>=6.4',
+]

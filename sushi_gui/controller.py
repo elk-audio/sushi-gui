@@ -74,7 +74,6 @@ class Controller(SushiController):
             self.emit_property_notification
         )
         self.timings.set_timings_enabled(True)
-        print("here")
         self.timings.reset_all_timings()
 
     def set_playing(self) -> None:
