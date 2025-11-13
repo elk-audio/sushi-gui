@@ -23,17 +23,11 @@ from .widgets import TransportBarWidget, TrackWidget
 proto_file = os.environ.get("SUSHI_GRPC_ELKPY_PROTO")
 if proto_file is None:
     print(
-        "Environment variable SUSHI_GRPC_ELKPY_PROTO not defined, setting it to the local proto file"
+        "Environment variable SUSHI_GRPC_ELKPY_PROTO not defined => using elkpy included protofile"
     )
-    os.environ["SUSHI_GRPC_ELKPY_PROTO"] = str("./sushi-grpc-api/sushi_rpc.proto")
-    proto_file = os.environ.get("SUSHI_GRPC_ELKPY_PROTO")
 
-    if proto_file is None:
-        print("No proto file found")
-        sys.exit(-1)
-
-# Get the sushi notification types directly from the generated grpc types
-sushi_grpc_types, _ = grpc_gen.modules_from_proto(proto_file)
+if proto_file is not None:
+    sushi_grpc_types, _ = grpc_gen.modules_from_proto(proto_file)
 
 
 class MainWindow(QMainWindow):
@@ -122,9 +116,13 @@ class MainWindow(QMainWindow):
                 self._controller.close()
         except:
             pass
-        self._controller = Controller(
-            address=self.current_sushi_ip, proto_file=proto_file
-        )
+
+        if proto_file:
+            self._controller = Controller(
+                address=self.current_sushi_ip, proto_file=proto_file
+            )
+        else:
+            self._controller = Controller(address=self.current_sushi_ip)
         self._controller.set_view(self)
         self._controller.subscribe_to_notifications()
         self.tpbar.initialize()

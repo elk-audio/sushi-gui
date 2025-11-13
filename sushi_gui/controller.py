@@ -14,8 +14,11 @@ class Controller(SushiController):
     """This expands on the SushiController class that comes with elkpy by adding to it QT specific
     functionality, like signal handling"""
 
-    def __init__(self, address: str, proto_file: str) -> None:
-        super().__init__(address, proto_file)
+    def __init__(self, address: str, proto_file: str | None = None) -> None:
+        if proto_file:
+            super().__init__(address, proto_file)
+        else:
+            super().__init__(address)
         self._view: MainWindow
 
     def emit_track_notification(self, notification) -> None:
@@ -71,6 +74,7 @@ class Controller(SushiController):
             self.emit_property_notification
         )
         self.timings.set_timings_enabled(True)
+        print("here")
         self.timings.reset_all_timings()
 
     def set_playing(self) -> None:
