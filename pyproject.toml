@@ -21,5 +21,5 @@ classifiers = [
 dependencies = [
  'grpcio',
  'grpcio-tools',
- 'PySide>=6.4',
+ 'PySide6>=6.4',
 ]
