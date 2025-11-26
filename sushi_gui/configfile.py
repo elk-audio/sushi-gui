@@ -49,7 +49,7 @@ def get_processors_for_track(track_id: int, sc: SushiController) -> dict:
 
 def write_json_config_file(file_name: str, config: dict) -> None:
     with open(file_name, "w") as f:
-        f.write(json.dumps(config))
+        f.write(json.dumps(config, indent=2))
 
 
 if __name__ == "__main__":
