@@ -23,7 +23,7 @@ def build_config_json(sc: SushiController) -> dict:
         t = {
             "name": track.name,
             "channels": track.channels,
-            "processors": get_processors_for_track(track.id),
+            "processors": get_processors_for_track(track.id, sc),
         }
         config["tracks"].append(t)
 
@@ -34,8 +34,10 @@ def get_processors_for_track(track_id: int, sc: SushiController) -> dict:
     processors = []
 
     all_processors = sc.audio_graph.get_track_processors(track_id)
+    processor_list = []
     for processor in all_processors:
-        sc.audio_graph.get_processor_info()
+        processor_list.append(sc.audio_graph.get_processor_info(processor.id))
+    return processor_list
 
 
 if __name__ == "__main__":
