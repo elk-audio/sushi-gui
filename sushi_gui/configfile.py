@@ -3,6 +3,9 @@ from elkpy import sushi_info_types as st
 import json
 
 
+DEFAULT_DUMPED_CONFIG_FILENAME = "config_dump.json"
+
+
 def build_config_dict(sc: SushiController) -> dict:
     """This will get all configuration info from Sushi and package it in a dictionary"""
     config = {"host_config": {}, "tracks": []}
@@ -47,11 +50,11 @@ def get_processors_for_track(track_id: int, sc: SushiController) -> dict:
     return processors
 
 
-def write_json_config_file(file_name: str, config: dict) -> None:
+def write_json_config_file(file_name: str, sc: SushiController) -> None:
     with open(file_name, "w") as f:
-        f.write(json.dumps(config, indent=2))
+        f.write(json.dumps(build_config_dict(sc), indent=2))
 
 
 if __name__ == "__main__":
     sc = SushiController()
-    write_json_config_file("test_conf.json", build_config_dict(sc))
+    write_json_config_file(DEFAULT_DUMPED_CONFIG_FILENAME, sc)
