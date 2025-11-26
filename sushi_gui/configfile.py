@@ -1,8 +1,9 @@
 from elkpy.sushicontroller import SushiController
 from elkpy import sushi_info_types as st
+import json
 
 
-def build_config_json(sc: SushiController) -> dict:
+def build_config_dict(sc: SushiController) -> dict:
     """This will get all configuration info from Sushi and package it in a dictionary"""
     config = {"host_config": {}, "tracks": []}
 
@@ -34,12 +35,23 @@ def get_processors_for_track(track_id: int, sc: SushiController) -> dict:
     processors = []
 
     all_processors = sc.audio_graph.get_track_processors(track_id)
-    processor_list = []
     for processor in all_processors:
-        processor_list.append(sc.audio_graph.get_processor_info(processor.id))
-    return processor_list
+        proc = sc.audio_graph.get_processor_info(processor.id)
+        p = {
+            "name": proc.name,
+            "uid": "fill in uid here",
+            "path": "fill in path here",
+            "type": "fill in type here",
+        }
+        processors.append(p)
+    return processors
+
+
+def write_json_config_file(file_name: str, config: dict) -> None:
+    with open(file_name, "w") as f:
+        f.write(json.dumps(config))
 
 
 if __name__ == "__main__":
     sc = SushiController()
-    print(build_config_json(sc))
+    write_json_config_file("test_conf.json", build_config_dict(sc))
