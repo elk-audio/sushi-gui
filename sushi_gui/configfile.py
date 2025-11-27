@@ -1,5 +1,4 @@
 from elkpy.sushicontroller import SushiController
-from elkpy import sushi_info_types as st
 import json
 
 
@@ -27,14 +26,34 @@ def build_config_dict(sc: SushiController) -> dict:
         t = {
             "name": track.name,
             "channels": track.channels,
+            "inputs": [],
+            "outputs": [],
             "processors": get_processors_for_track(track.id, sc),
         }
+
+        # Getting input connections
+        for input in sc.audio_routing.get_input_connections_for_track(track.id):
+            t["inputs"].append(
+                {
+                    "track_channel": input.track_channel,
+                    "engine_channel": input.engine_channel,
+                }
+            )
+        # Getting output connections
+        for output in sc.audio_routing.get_output_connections_for_track(track.id):
+            t["outputs"].append(
+                {
+                    "track_channel": output.track_channel,
+                    "engine_channel": output.engine_channel,
+                }
+            )
+
         config["tracks"].append(t)
 
     return config
 
 
-def get_processors_for_track(track_id: int, sc: SushiController) -> dict:
+def get_processors_for_track(track_id: int, sc: SushiController) -> list:
     processors = []
 
     all_processors = sc.audio_graph.get_track_processors(track_id)
