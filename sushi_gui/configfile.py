@@ -28,7 +28,7 @@ def build_config_dict(sc: SushiController) -> dict:
             "channels": track.channels,
             "inputs": [],
             "outputs": [],
-            "processors": get_processors_for_track(track.id, sc),
+            "plugins": get_processors_for_track(track.id, sc),
         }
 
         # Getting input connections
