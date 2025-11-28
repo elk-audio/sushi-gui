@@ -626,10 +626,10 @@ INSTALLED_PLUGINS = {
                 {"name": "damp"},
             ],
         },
-        "Bitcrusher": {"name": "BW Bitcrusher", "uid": "sushi.brickworks.bitcrusher"},
-        "Chorus": {"name": "BW Chorus", "uid": "sushi.brickworks.chorus"},
-        "Clip": {"name": "BW Clip", "uid": "sushi.brickworks.clip"},
-        "Comb Delay": {"name": "BW Comb delay", "uid": "sushi.brickworks.comb_delay"},
+        "BW Bitcrusher": {"name": "BW Bitcrusher", "uid": "sushi.brickworks.bitcrusher"},
+        "BW Chorus": {"name": "BW Chorus", "uid": "sushi.brickworks.chorus"},
+        "BW Clip": {"name": "BW Clip", "uid": "sushi.brickworks.clip"},
+        "BW Comb Delay": {"name": "BW Comb delay", "uid": "sushi.brickworks.comb_delay"},
         "BW Compressor": {
             "name": "BW Compressor",
             "uid": "sushi.brickworks.compressor",
@@ -657,6 +657,14 @@ INSTALLED_PLUGINS = {
         "BW Simple synth": {
             "name": "BW Simple synth",
             "uid": "sushi.brickworks.simple_synth",
+        },
+        "BW Cab sim": {
+            "name": "BW Cab Sim",
+            "uid": "sushi.brickworks.cab_sim",
+        },
+        "BW Ring mod": {
+            "name": "BW Ring mod",
+            "uid": "sushi.brickworks.ring_mod",
         },
     }
 }
