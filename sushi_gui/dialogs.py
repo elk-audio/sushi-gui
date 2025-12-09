@@ -1,6 +1,14 @@
 from typing import Optional, TYPE_CHECKING
 
-from PySide6.QtWidgets import QDialog, QGridLayout, QLabel, QLineEdit, QComboBox, QSpinBox, QDialogButtonBox
+from PySide6.QtWidgets import (
+    QDialog,
+    QGridLayout,
+    QLabel,
+    QLineEdit,
+    QComboBox,
+    QSpinBox,
+    QDialogButtonBox,
+)
 from sushi_gui import INSTALLED_PLUGINS
 
 if TYPE_CHECKING:
@@ -11,29 +19,29 @@ from elkpy import sushi_info_types as sushi
 
 
 class AddTrackDialog(QDialog):
-    def __init__(self, parent: 'MainWindow') -> None:
+    def __init__(self, parent: "MainWindow") -> None:
         super().__init__(parent)
         self.setModal(True)
-        self.setWindowTitle('Add new track')
+        self.setWindowTitle("Add new track")
 
         self._layout: QGridLayout = QGridLayout(self)
         self.setLayout(self._layout)
 
-        self.name_label = QLabel('Name', self)
+        self.name_label = QLabel("Name", self)
         self._layout.addWidget(self.name_label, 0, 0)
         self._name_entry = QLineEdit(self)
         self._layout.addWidget(self._name_entry, 0, 1)
 
-        nr_of_channels = QLabel('Track type:')
+        nr_of_channels = QLabel("Track type:")
         self._layout.addWidget(nr_of_channels, 2, 0)
         self._track_type = QComboBox(self)
-        self._track_type.addItem('Mono')
-        self._track_type.addItem('Stereo')
-        self._track_type.addItem('Multibus')
+        self._track_type.addItem("Mono")
+        self._track_type.addItem("Stereo")
+        self._track_type.addItem("Multibus")
         self._track_type.setCurrentIndex(1)
         self._layout.addWidget(self._track_type, 2, 1)
 
-        self._inputs_lbl = QLabel('Inputs:')
+        self._inputs_lbl = QLabel("Inputs:")
         self._inputs_sb = QSpinBox()
         self._inputs_sb.setMinimum(1)
         self._inputs_sb.setMaximum(8)
@@ -42,7 +50,7 @@ class AddTrackDialog(QDialog):
         self._inputs_lbl.hide()
         self._inputs_sb.hide()
 
-        self._outputs_lbl = QLabel('Outputs:')
+        self._outputs_lbl = QLabel("Outputs:")
         self._outputs_lbl.hide()
         self._outputs_sb = QSpinBox()
         self._outputs_sb.hide()
@@ -51,7 +59,9 @@ class AddTrackDialog(QDialog):
         self._layout.addWidget(self._outputs_lbl, 4, 0)
         self._layout.addWidget(self._outputs_sb, 4, 1)
 
-        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.button_box = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        )
         self.button_box.button(QDialogButtonBox.Ok).setDefault(True)
         self.button_box.button(QDialogButtonBox.Ok).setEnabled(True)
         self._layout.addWidget(self.button_box, 5, 1)
@@ -93,24 +103,31 @@ class AddTrackDialog(QDialog):
 
 
 class AddPluginDialog(QDialog):
-    '''This dialog adds Sushi Internal plugins only. It presents them as a drop-down list.'''
+    """This dialog adds Sushi Internal plugins only. It presents them as a drop-down list."""
 
-    def __init__(self, parent: 'MainWindow'):
+    def __init__(self, parent: "MainWindow"):
         super().__init__(parent)
-        self.setWindowTitle('Add new plugin')
+        self.setWindowTitle("Add new plugin")
 
         self._layout = QGridLayout(self)
         self.setLayout(self._layout)
 
-        plug_lbl = QLabel('Plug', self)
+        plug_lbl = QLabel("Plug", self)
         self._layout.addWidget(plug_lbl, 4, 0)
         self._plug_box = QComboBox(self)
         self._layout.addWidget(self._plug_box, 4, 1)
-        for k, v in INSTALLED_PLUGINS['plugins'].items():
+        for k, v in INSTALLED_PLUGINS["plugins"].items():
             self._plug_box.addItem(k, userData=v)
 
-        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok |
-                                           QDialogButtonBox.Cancel)
+        name_label = QLabel("Name", self)
+        self._layout.addWidget(name_label, 1, 0)
+        self._name_entry = QLineEdit(self)
+        self._name_entry.setMinimumWidth(200)
+        self._layout.addWidget(self._name_entry, 1, 1)
+
+        self.button_box = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        )
         self.button_box.button(QDialogButtonBox.Ok).setDefault(True)
         self.button_box.button(QDialogButtonBox.Ok).setEnabled(True)
         self._layout.addWidget(self.button_box, 5, 1)
@@ -121,48 +138,54 @@ class AddPluginDialog(QDialog):
     def selected_plugin(self) -> dict:
         return self._plug_box.currentData()
 
+    @property
+    def plugin_name(self) -> str:
+        return self._name_entry.text()
+
     def _connect_signals(self) -> None:
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
-class AddCustomPluginDialog(QDialog):
-    '''This lets the user add any VST or LV2 plugin present on the system by specifying a path or uid.'''
 
-    def __init__(self, parent: 'MainWindow'):
+class AddCustomPluginDialog(QDialog):
+    """This lets the user add any VST or LV2 plugin present on the system by specifying a path or uid."""
+
+    def __init__(self, parent: "MainWindow"):
         super().__init__(parent)
-        self.setWindowTitle('Add custom plugin')
+        self.setWindowTitle("Add custom plugin")
 
         self._layout = QGridLayout(self)
         self.setLayout(self._layout)
 
         self._type: Optional[sushi.PluginType] = None
 
-        type_label = QLabel('Type', self)
+        type_label = QLabel("Type", self)
         self._layout.addWidget(type_label, 0, 0)
         self._type_box = QComboBox(self)
         self._layout.addWidget(self._type_box, 0, 1)
         for t in PLUGIN_TYPES:
             self._type_box.addItem(t)
 
-        name_label = QLabel('Name', self)
+        name_label = QLabel("Name", self)
         self._layout.addWidget(name_label, 1, 0)
         self._name_entry = QLineEdit(self)
         self._name_entry.setMinimumWidth(200)
         self._layout.addWidget(self._name_entry, 1, 1)
 
-        self._uid_label = QLabel('Uid', self)
+        self._uid_label = QLabel("Uid", self)
         self._layout.addWidget(self._uid_label, 2, 0)
         self._uid_entry = QLineEdit(self)
         self._layout.addWidget(self._uid_entry, 2, 1)
 
-        self._path_label = QLabel('Path', self)
+        self._path_label = QLabel("Path", self)
         self._layout.addWidget(self._path_label, 3, 0)
         self._path_entry = QLineEdit(self)
         self._path_entry.setEnabled(False)
         self._layout.addWidget(self._path_entry, 3, 1)
 
-        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok |
-                                           QDialogButtonBox.Cancel)
+        self.button_box = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        )
         self.button_box.button(QDialogButtonBox.Ok).setDefault(True)
         self.button_box.button(QDialogButtonBox.Ok).setEnabled(True)
         self._layout.addWidget(self.button_box, 4, 1)
@@ -212,4 +235,3 @@ class AddCustomPluginDialog(QDialog):
         elif plugin_type == sushi.PluginType.LV2:
             self._path_entry.setEnabled(True)
             self._uid_entry.setEnabled(False)
-
