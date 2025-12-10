@@ -1,3 +1,4 @@
+import time
 from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QFileDialog
 from elkpy.sushicontroller import SushiController
@@ -99,9 +100,22 @@ class Controller(SushiController):
             if track_type == "Multibus":
                 self.audio_graph.create_multibus_track(name, outputs, inputs)
             elif track_type == "Stereo":
-                print(self.audio_graph.create_track(name, 2))
+                self.audio_graph.create_track(name, 2)
             elif track_type == "Mono":
                 self.audio_graph.create_track(name, 1)
+
+            while True:
+                try:
+                    track_id = self.audio_graph.get_track_id(name)
+                    break
+                except Exception as e:
+                    print(e)
+                    time.sleep(0.3)
+
+            self.audio_routing.connect_output_channel_from_track(track_id, 0, 0)
+            if track_type == "Stereo":
+                self.audio_routing.connect_output_channel_from_track(track_id, 1, 1)
+            print(f"Connected audio outputs on track {name}")
 
     def add_plugin(self, track_id: int) -> None:
         dialog = AddPluginDialog(self._view)
