@@ -108,12 +108,31 @@ class Controller(SushiController):
         if dialog.exec_():
             plug = dialog.selected_plugin
             name = dialog.plugin_name
-            # name = plug['name']
-            uid = plug["uid"]
-            p_type = 0
+            print("Porrcoddio, trying to add: %s, %s" % (plug, name))
+
+            # Get uid and path, defaulting to None if not present
+            uid = plug.get("uid", None)
+            path = plug.get("path", None)
+
+            # Set plugin type based on the "type" field
+            plugin_type_str = plug.get("type", "internal").lower()
+            if plugin_type_str == "vst2x":
+                p_type = sushi.PluginType.VST2X
+            elif plugin_type_str == "vst3x":
+                p_type = sushi.PluginType.VST3X
+            elif plugin_type_str == "lv2":
+                p_type = sushi.PluginType.LV2
+            else:  # "internal" or default
+                p_type = sushi.PluginType.INTERNAL
+
+            # Ensure exactly one of uid or path is not None
+            if (uid is None and path is None) or (uid is not None and path is not None):
+                print(f"Error: Plugin must have exactly one of 'uid' or 'path', got uid={uid}, path={path}")
+                return
+
             try:
                 self.audio_graph.create_processor_on_track(
-                    name, uid, None, p_type, track_id, 0, True
+                    name, uid, path, p_type, track_id, 0, True
                 )
             except Exception as e:
                 print("Error creating plugin: {}".format(e))
