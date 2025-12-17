@@ -122,7 +122,6 @@ class Controller(SushiController):
         if dialog.exec_():
             plug = dialog.selected_plugin
             name = dialog.plugin_name
-            print("Porrcoddio, trying to add: %s, %s" % (plug, name))
 
             # Get uid and path, defaulting to None if not present
             uid = plug.get("uid", None)
