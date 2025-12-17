@@ -17,6 +17,7 @@ from elkpy import sushi_info_types as sushi
 from .constants import MODE_PLAYING
 from .controller import Controller
 from .widgets import TransportBarWidget, TrackWidget
+from .configfile import write_json_config_file, DEFAULT_DUMPED_CONFIG_FILENAME
 
 
 # Get protofile to generate grpc library
@@ -63,6 +64,10 @@ class MainWindow(QMainWindow):
 
         self.file_menu.addAction(save)
         self.file_menu.addAction(load)
+
+        write_config = QAction("Write JSON config", self)
+        write_config.triggered.connect(self._write_config)
+        self.tools_menu.addAction(write_config)
 
         about = QAction("About Sushi", self)
         about.triggered.connect(self.show_about_sushi)
@@ -128,6 +133,9 @@ class MainWindow(QMainWindow):
         self.tpbar.initialize()
         self.tracks = {}
         self._create_tracks()
+
+    def _write_config(self) -> None:
+        write_json_config_file(DEFAULT_DUMPED_CONFIG_FILENAME, self._controller)
 
     def save_session(self) -> None:
         try:

@@ -1,4 +1,5 @@
 from typing import Optional, TYPE_CHECKING
+from functools import partial
 
 from PySide6.QtWidgets import (
     QDialog,
@@ -8,6 +9,8 @@ from PySide6.QtWidgets import (
     QComboBox,
     QSpinBox,
     QDialogButtonBox,
+    QPushButton,
+    QMenu,
 )
 from sushi_gui import INSTALLED_PLUGINS
 
@@ -103,7 +106,7 @@ class AddTrackDialog(QDialog):
 
 
 class AddPluginDialog(QDialog):
-    """This dialog adds Sushi Internal plugins only. It presents them as a drop-down list."""
+    """This dialog adds Sushi Internal plugins only. It presents them as a categorized menu."""
 
     def __init__(self, parent: "MainWindow"):
         super().__init__(parent)
@@ -112,18 +115,32 @@ class AddPluginDialog(QDialog):
         self._layout = QGridLayout(self)
         self.setLayout(self._layout)
 
-        plug_lbl = QLabel("Plug", self)
-        self._layout.addWidget(plug_lbl, 4, 0)
-        self._plug_box = QComboBox(self)
-        self._layout.addWidget(self._plug_box, 4, 1)
-        for k, v in INSTALLED_PLUGINS["plugins"].items():
-            self._plug_box.addItem(k, userData=v)
+        # Store the selected plugin data
+        self._selected_plugin = None
+        self._selected_plugin_name = None
+
+        # Store submenu references to prevent Qt from deleting them
+        self._category_menus = []
+        self._subcategory_menus = []
 
         name_label = QLabel("Name", self)
         self._layout.addWidget(name_label, 1, 0)
         self._name_entry = QLineEdit(self)
         self._name_entry.setMinimumWidth(200)
         self._layout.addWidget(self._name_entry, 1, 1)
+
+        plug_lbl = QLabel("Plugin", self)
+        self._layout.addWidget(plug_lbl, 4, 0)
+
+        # Create button with menu for plugin selection
+        self._plug_button = QPushButton("Select Plugin...", self)
+        self._plug_button.setMinimumWidth(200)
+        self._layout.addWidget(self._plug_button, 4, 1)
+
+        # Create menu with categories
+        self._plug_menu = QMenu(self)
+        self._create_plugin_menu()
+        self._plug_button.setMenu(self._plug_menu)
 
         self.button_box = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel
@@ -134,9 +151,50 @@ class AddPluginDialog(QDialog):
 
         self._connect_signals()
 
+    def _create_plugin_menu(self) -> None:
+        """Create 3-level hierarchical menu from plugin categories."""
+        plugins_dict = INSTALLED_PLUGINS.get("plugins", {})
+
+        # Level 1: Iterate over main categories (e.g., "Internal", "Brickworks")
+        for category_name, subcategories in plugins_dict.items():
+            # Create submenu for this main category
+            category_menu = self._plug_menu.addMenu(category_name)
+            # Store reference to prevent Qt from deleting it
+            self._category_menus.append(category_menu)
+
+            # Level 2: Iterate over subcategories (e.g., "Utility", "EQ", "Generator")
+            if isinstance(subcategories, dict):
+                for subcategory_name, plugins in subcategories.items():
+                    # Create submenu for this subcategory
+                    subcategory_menu = category_menu.addMenu(subcategory_name)
+                    # Store reference to prevent Qt from deleting it
+                    self._subcategory_menus.append(subcategory_menu)
+
+                    # Level 3: Add each plugin as an action in the subcategory submenu
+                    if isinstance(plugins, dict):
+                        for plugin_key, plugin_data in plugins.items():
+                            action = subcategory_menu.addAction(plugin_key)
+                            # Store plugin data with the action
+                            action.setData({"key": plugin_key, "data": plugin_data})
+                            # Use functools.partial to properly capture the action in the closure
+                            action.triggered.connect(partial(self._plugin_selected, action))
+
+    def _plugin_selected(self, action) -> None:
+        """Handle plugin selection from menu."""
+        action_data = action.data()
+        self._selected_plugin = action_data["data"]
+        self._selected_plugin_name = action_data["key"]
+
+        # Update button text to show selection
+        self._plug_button.setText(self._selected_plugin_name)
+
+        # Auto-fill name field if empty
+        if not self._name_entry.text():
+            self._name_entry.setText(self._selected_plugin_name)
+
     @property
     def selected_plugin(self) -> dict:
-        return self._plug_box.currentData()
+        return self._selected_plugin
 
     @property
     def plugin_name(self) -> str:

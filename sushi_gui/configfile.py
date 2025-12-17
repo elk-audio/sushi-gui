@@ -1,0 +1,79 @@
+from elkpy.sushicontroller import SushiController
+import json
+
+
+DEFAULT_DUMPED_CONFIG_FILENAME = "config_dump.json"
+
+
+def build_config_dict(sc: SushiController) -> dict:
+    """This will get all configuration info from Sushi and package it in a dictionary"""
+    config = {"host_config": {}, "tracks": []}
+
+    # Getting host config data
+    sample_rate = int(sc.transport.get_samplerate())
+    playing_mode = sc.transport.get_playing_mode().name.lower()
+    sync_mode = sc.transport.get_sync_mode().name.lower()
+    tempo = sc.transport.get_tempo()
+
+    config["host_config"]["samplerate"] = sample_rate
+    config["host_config"]["playing_mode"] = playing_mode
+    config["host_config"]["tempo_sync"] = sync_mode
+    config["host_config"]["tempo"] = tempo
+
+    # Getting all tracks
+    all_tracks = sc.audio_graph.get_all_tracks()
+    for track in all_tracks:
+        t = {
+            "name": track.name,
+            "channels": track.channels,
+            "inputs": [],
+            "outputs": [],
+            "plugins": get_processors_for_track(track.id, sc),
+        }
+
+        # Getting input connections
+        for input in sc.audio_routing.get_input_connections_for_track(track.id):
+            t["inputs"].append(
+                {
+                    "track_channel": input.track_channel,
+                    "engine_channel": input.engine_channel,
+                }
+            )
+        # Getting output connections
+        for output in sc.audio_routing.get_output_connections_for_track(track.id):
+            t["outputs"].append(
+                {
+                    "track_channel": output.track_channel,
+                    "engine_channel": output.engine_channel,
+                }
+            )
+
+        config["tracks"].append(t)
+
+    return config
+
+
+def get_processors_for_track(track_id: int, sc: SushiController) -> list:
+    processors = []
+
+    all_processors = sc.audio_graph.get_track_processors(track_id)
+    for processor in all_processors:
+        proc = sc.audio_graph.get_processor_info(processor.id)
+        p = {
+            "name": proc.name,
+            "uid": "fill in uid here",
+            "path": "fill in path here",
+            "type": "fill in type here",
+        }
+        processors.append(p)
+    return processors
+
+
+def write_json_config_file(file_name: str, sc: SushiController) -> None:
+    with open(file_name, "w") as f:
+        f.write(json.dumps(build_config_dict(sc), indent=2))
+
+
+if __name__ == "__main__":
+    sc = SushiController()
+    write_json_config_file(DEFAULT_DUMPED_CONFIG_FILENAME, sc)
