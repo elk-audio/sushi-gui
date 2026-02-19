@@ -134,7 +134,6 @@ def build_config_dict(sc: SushiController) -> dict:
             trk["outputs"].append(output_conn)
 
     config['initial_state'] = build_initial_state(config, sc)
-    print(config)
     return config
 
 
