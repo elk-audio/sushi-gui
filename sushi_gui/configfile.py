@@ -100,7 +100,7 @@ def build_config_dict(sc: SushiController) -> dict:
     st = SessionState(s)
 
     config = {"host_config": {}, "tracks": []}
-    config["host_config"]["samplerate"] = st.engine_state["sample_rate"]
+    config["host_config"]["samplerate"] = int(st.engine_state["sample_rate"])
     config["host_config"]["playing_mode"] = st.engine_state["playing_mode"]
     config["host_config"]["tempo_sync"] = st.engine_state["sync_mode"]
     config["host_config"]["tempo"] = st.engine_state["tempo"]
