@@ -9,6 +9,7 @@ from sushi_gui.main_window import MainWindow
 
 # If sushi is running on another device replace 'localhost' with the ip of that device
 SUSHI_ADDRESS = 'localhost:51051'
+
 if sys.platform == 'win32':
     SUSHI_ADDRESS = 'localhost:510'
 
