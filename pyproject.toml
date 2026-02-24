@@ -18,4 +18,4 @@ classifiers = [
   "Operating System :: OS Independent",
   "Intended Audience :: Developers",
 ]
-dependencies = ['elkpy==2.0.0rc5','grpcio', 'grpcio-tools', 'PySide6>=6.4']
+dependencies = ['elkpy==1.3.0rc1','grpcio', 'grpcio-tools', 'PySide6>=6.4']
