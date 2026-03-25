@@ -1,0 +1,1431 @@
+{
+  "plugins": {
+    "Internal": {
+      "Utility": {
+        "Passthrough": {
+          "name": "Passthrough",
+          "uid": "sushi.testing.passthrough"
+        },
+        "Gain": {
+          "name": "Gain",
+          "uid": "sushi.testing.gain"
+        },
+        "MonoSumming": {
+          "name": "MonoSumming",
+          "uid": "sushi.testing.mono_summing"
+        },
+        "PeakMeter": {
+          "name": "PeakMeter",
+          "uid": "sushi.testing.peakmeter"
+        },
+        "WavWriter": {
+          "name": "Wav Writer",
+          "uid": "sushi.testing.wav_writer"
+        }
+      },
+      "EQ": {
+        "Equalizer": {
+          "name": "Equalizer",
+          "uid": "sushi.testing.equalizer"
+        }
+      },
+      "Generator": {
+        "SamplePlayer": {
+          "name": "SamplePlayer",
+          "uid": "sushi.testing.sampleplayer"
+        },
+        "WavStreamer": {
+          "name": "Wave Streamer",
+          "uid": "sushi.testing.wav_streamer"
+        }
+      },
+      "Reverb": {
+        "Freeverb": {
+          "name": "Freeverb",
+          "uid": "sushi.testing.freeverb"
+        }
+      },
+      "MIDI & Control": {
+        "Arpeggiator": {
+          "name": "Arpeggiator",
+          "uid": "sushi.testing.arpeggiator"
+        },
+        "Transposer": {
+          "name": "Transposer",
+          "uid": "sushi.testing.transposer"
+        },
+        "StepSequencer": {
+          "name": "StepSequencer",
+          "uid": "sushi.testing.equalizer"
+        },
+        "CVtoControl": {
+          "name": "CV to Control",
+          "uid": "sushi.testing.cv_to_control"
+        },
+        "ControlToCV": {
+          "name": "Control to CV",
+          "uid": "sushi.testing.control_to_cv"
+        }
+      }
+    },
+    "Brickworks": {
+      "Distortion": {
+        "BW Bitcrusher": {
+          "name": "BW Bitcrusher",
+          "uid": "sushi.brickworks.bitcrusher"
+        },
+        "BW Distortion": {
+          "name": "BW Distortion",
+          "uid": "sushi.brickworks.dist"
+        },
+        "BW Drive": {
+          "name": "BW Drive",
+          "uid": "sushi.brickworks.drive"
+        },
+        "BW Fuzz": {
+          "name": "BW Fuzz",
+          "uid": "sushi.brickworks.fuzz"
+        },
+        "BW Saturation": {
+          "name": "BW Saturation",
+          "uid": "sushi.brickworks.saturation"
+        }
+      },
+      "EQ": {
+        "BW Eq3band": {
+          "name": "BW Eq3band",
+          "uid": "sushi.brickworks.eq3band"
+        },
+        "BW Highpass": {
+          "name": "BW Highpass",
+          "uid": "sushi.brickworks.highpass"
+        },
+        "BW Multifilter": {
+          "name": "BW Multifilter",
+          "uid": "sushi.brickworks.multi_filter"
+        },
+        "BW Notch": {
+          "name": "BW Notch",
+          "uid": "sushi.brickworks.notch"
+        },
+        "BW Cab sim": {
+          "name": "BW Cab Sim",
+          "uid": "sushi.brickworks.cab_sim"
+        }
+      },
+      "Dynamics": {
+        "BW Clip": {
+          "name": "BW Clip",
+          "uid": "sushi.brickworks.clip"
+        },
+        "BW Compressor": {
+          "name": "BW Compressor",
+          "uid": "sushi.brickworks.compressor"
+        },
+        "BW Noise Gate": {
+          "name": "BW NoiseGate",
+          "uid": "sushi.brickworks.noise_gate"
+        }
+      },
+      "Modulation": {
+        "BW Chorus": {
+          "name": "BW Chorus",
+          "uid": "sushi.brickworks.chorus"
+        },
+        "BW Flanger": {
+          "name": "BW Flanger",
+          "uid": "sushi.brickworks.flanger"
+        },
+        "BW Phaser": {
+          "name": "BW Phaser",
+          "uid": "sushi.brickworks.phaser"
+        },
+        "BW Tremolo": {
+          "name": "BW Tremolo",
+          "uid": "sushi.brickworks.tremolo"
+        },
+        "BW Vibrato": {
+          "name": "BW Vibrato",
+          "uid": "sushi.brickworks.vibrato"
+        },
+        "BW Wha": {
+          "name": "BW Wha",
+          "uid": "sushi.brickworks.wha"
+        },
+        "BW Ring mod": {
+          "name": "BW Ring mod",
+          "uid": "sushi.brickworks.ring_mod"
+        }
+      },
+      "Delay": {
+        "BW Comb Delay": {
+          "name": "BW Comb delay",
+          "uid": "sushi.brickworks.comb_delay"
+        }
+      },
+      "Generator": {
+        "BW Simple synth": {
+          "name": "BW Simple synth",
+          "uid": "sushi.brickworks.simple_synth"
+        }
+      }
+    },
+    "GxPlugins": {
+      "Overdrive": {
+        "GxBottleRocket": {
+          "name": "GxBottleRocket",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_bottlerocket_#_bottlerocket_"
+        },
+        "GxDOP250": {
+          "name": "GxDOP250",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_DOP250_#_DOP250_"
+        },
+        "GxGuvnor": {
+          "name": "GxGuvnor",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_guvnor_#_guvnor_"
+        },
+        "GxHotBox": {
+          "name": "GxHotBox",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_hotbox_#_hotbox_"
+        },
+        "GxSD1": {
+          "name": "GxSD1",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_sd1sim_#_sd1sim_"
+        },
+        "GxSD2Lead": {
+          "name": "GxSD2Lead",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_sd2lead_#_sd2lead_"
+        },
+        "GxValveCaster": {
+          "name": "GxValveCaster",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_valvecaster_#_valvecaster_"
+        },
+        "GxBoobTube": {
+          "name": "GxBoobTube",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_boobtube_#_boobtube_"
+        },
+        "GxShakaTube": {
+          "name": "GxShakaTube",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_shakatube_#_shakatube_"
+        },
+        "GxBaJaTubeDriver": {
+          "name": "GxBaJaTubeDriver",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_bajatubedriver_#_bajatubedriver_"
+        },
+        "GxTimRay": {
+          "name": "GxTimRay",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_timray_#_timray_"
+        },
+        "GxLuna": {
+          "name": "GxLuna",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_luna_#_luna_"
+        },
+        "GxSloopyBlue": {
+          "name": "GxSloopyBlue",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_sloopyblue_#_sloopyblue_"
+        },
+        "GxEternity": {
+          "name": "GxEternity",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_eternity_#_eternity_"
+        },
+        "GxClubDrive": {
+          "name": "GxClubDrive",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_clubdrive_#_clubdrive_"
+        }
+      },
+      "Fuzz/Distortion": {
+        "GxAxisFace": {
+          "name": "GxAxisFace",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_AxisFace_#_AxisFace_"
+        },
+        "GxFz1b": {
+          "name": "GxFz1b",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_maestro_fz1b_#_maestro_fz1b_"
+        },
+        "GxFz1s": {
+          "name": "GxFz1s",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_maestro_fz1s_#_maestro_fz1s_"
+        },
+        "GxHyperion": {
+          "name": "GxHyperion",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_hyperion_#_hyperion_"
+        },
+        "GxHeathkit": {
+          "name": "GxHeathkit",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_Heathkit_#_Heathkit_"
+        },
+        "GxKnightFuzz": {
+          "name": "GxKnightFuzz",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_KnightFuzz_#_KnightFuzz_"
+        },
+        "GxLiquidDrive": {
+          "name": "GxLiquidDrive",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_liquiddrive_#_liquiddrive_"
+        },
+        "GxSuppaToneBender": {
+          "name": "GxSuppaToneBender",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_sfp_#_sfp_"
+        },
+        "GxSaturator": {
+          "name": "GxSaturator",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_saturate_#_saturate_"
+        },
+        "GxSunFace": {
+          "name": "GxSunFace",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_SunFace_#_SunFace_"
+        },
+        "GxToneMachine": {
+          "name": "GxToneMachine",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_tonemachine_#_tonemachine_"
+        },
+        "GxTubeDistortion": {
+          "name": "GxTubeDistortion",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_TubeDistortion_#_TubeDistortion_"
+        },
+        "GxVintageFuzzMaster": {
+          "name": "GxVintageFuzzMaster",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_vfm_#_vfm_"
+        },
+        "GxVoodoFuzz": {
+          "name": "GxVoodoFuzz",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_voodoo_#_voodoo_"
+        }
+      },
+      "Amplifiers": {
+        "GxMicroAmp": {
+          "name": "GxMicroAmp",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_MicroAmp_#_MicroAmp_"
+        },
+        "GxVBassPreAmp": {
+          "name": "GxVBassPreAmp",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_voxbass_#_voxbass_"
+        },
+        "GxSVT": {
+          "name": "GxSVT",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_ampegsvt_#_ampegsvt_"
+        },
+        "GxVmk2": {
+          "name": "GxVmk2",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_vmk2d_#_vmk2d_"
+        },
+        "GxUvox720k": {
+          "name": "GxUvox720k",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_uvox_#_uvox_"
+        },
+        "GxCreamMachine": {
+          "name": "GxCreamMachine",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_CreamMachine_#_CreamMachine_"
+        },
+        "GxEpic": {
+          "name": "GxEpic",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_epic_#_epic_"
+        },
+        "GxSupersonic": {
+          "name": "GxSupersonic",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_supersonic_#_supersonic_"
+        },
+        "GxBlueAmp": {
+          "name": "GxBlueAmp",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_blueamp_#_blueamp_"
+        },
+        "GxPlexi": {
+          "name": "GxPlexi",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_plexi_#_plexi_"
+        },
+        "GxVSTB": {
+          "name": "GxVSTB",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_vstb_#_vstb_"
+        }
+      },
+      "Other": {
+        "GxQuack": {
+          "name": "GxQuack",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_quack_#_quack_"
+        },
+        "GxSlowGear": {
+          "name": "GxSlowGear",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_slowgear_#_slowgear_"
+        },
+        "GxUltraCab": {
+          "name": "GxUltraCab",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_ultracab_#_ultracab_"
+        }
+      }
+    },
+    "x42": {
+      "Tuning": {
+        "Fat1": {
+          "name": "Fat1 Auto-Tune",
+          "type": "lv2",
+          "path": "http://gareus.org/oss/lv2/fat1"
+        },
+        "Fat1 Microtonal": {
+          "name": "Fat1 Microtonal",
+          "type": "lv2",
+          "path": "http://gareus.org/oss/lv2/fat1#microtonal"
+        },
+        "Fat1 Scales": {
+          "name": "Fat1 Scales",
+          "type": "lv2",
+          "path": "http://gareus.org/oss/lv2/fat1#scales"
+        },
+        "Tuna": {
+          "name": "Tuna Chromatic Tuner",
+          "type": "lv2",
+          "path": "http://gareus.org/oss/lv2/tuna#mod"
+        }
+      },
+      "Generator": {
+        "TestSignal": {
+          "name": "Test Signal Generator",
+          "type": "lv2",
+          "path": "http://gareus.org/oss/lv2/testsignal"
+        }
+      }
+    },
+    "Infamous Plugins": {
+      "Delay": {
+        "BentDelay": {
+          "name": "Bent Delay",
+          "type": "lv2",
+          "path": "http://ssj71.github.io/infamousPlugins/plugs.html#bentdelay"
+        }
+      },
+      "Distortion": {
+        "CheapDist": {
+          "name": "Cheap Distortion",
+          "type": "lv2",
+          "path": "http://ssj71.github.io/infamousPlugins/plugs.html#cheapdist"
+        }
+      },
+      "Dynamics": {
+        "PowerCut": {
+          "name": "Power Cut",
+          "type": "lv2",
+          "path": "http://ssj71.github.io/infamousPlugins/plugs.html#powercut"
+        },
+        "PowerUp": {
+          "name": "Power Up",
+          "type": "lv2",
+          "path": "http://ssj71.github.io/infamousPlugins/plugs.html#powerup"
+        }
+      },
+      "Effect": {
+        "Octolo": {
+          "name": "Octolo",
+          "type": "lv2",
+          "path": "http://ssj71.github.io/infamousPlugins/plugs.html#octolo"
+        },
+        "Stuck": {
+          "name": "Stuck",
+          "type": "lv2",
+          "path": "http://ssj71.github.io/infamousPlugins/plugs.html#stuck"
+        }
+      },
+      "Filter": {
+        "HiP2B": {
+          "name": "HiP2B Filter",
+          "type": "lv2",
+          "path": "http://ssj71.github.io/infamousPlugins/plugs.html#hip2b"
+        }
+      },
+      "Synth": {
+        "CaSynth": {
+          "name": "CaSynth",
+          "type": "lv2",
+          "path": "http://ssj71.github.io/infamousPlugins/plugs.html#casynth"
+        }
+      },
+      "Utility": {
+        "EnvFollower": {
+          "name": "Envelope Follower",
+          "type": "lv2",
+          "path": "http://ssj71.github.io/infamousPlugins/plugs.html#envfollower"
+        },
+        "Mindi": {
+          "name": "Mindi MIDI Monitor",
+          "type": "lv2",
+          "path": "http://ssj71.github.io/infamousPlugins/plugs.html#mindi"
+        }
+      }
+    },
+    "VST3 Synths": {
+      "Synthesizer": {
+        "Dexed": {
+          "name": "Dexed FM Synthesizer",
+          "type": "vst3x",
+          "uid": "Dexed",
+          "path": "/opt/plugins/vst3/Dexed.vst3"
+        },
+        "OB-Xf": {
+          "name": "OB-Xf Virtual Analog",
+          "type": "vst3x",
+          "uid": "OB-Xf",
+          "path": "/opt/plugins/vst3/OB-Xf.vst3"
+        },
+        "JC303": {
+          "name": "JC303 Bass Synth",
+          "type": "vst3x",
+          "uid": "JC303",
+          "path": "/opt/plugins/vst3/JC303.vst3"
+        },
+        "JuicySF": {
+          "name": "JuicySF SoundFont Player",
+          "type": "vst3x",
+          "uid": "juicysfplugin",
+          "path": "/opt/plugins/vst3/juicysfplugin.vst3"
+        }
+      }
+    },
+    "VST3 Reverbs": {
+      "Reverb": {
+        "RSAlgorithmicVerb": {
+          "name": "RS Algorithmic Reverb",
+          "type": "vst3x",
+          "uid": "RSAlgorithmicVerb",
+          "path": "/opt/plugins/vst3/RSAlgorithmicVerb.vst3"
+        },
+        "IR Convolution": {
+          "name": "IR Convolution Reverb",
+          "type": "vst3x",
+          "uid": "IR Convolution",
+          "path": "/opt/plugins/vst3/IR Convolution.vst3"
+        },
+        "CloudReverb": {
+          "name": "Cloud Reverb",
+          "type": "vst3x",
+          "uid": "CloudReverb",
+          "path": "/opt/plugins/vst3/CloudReverb.vst3"
+        }
+      }
+    },
+    "MDA": {
+      "Synthesizer": {
+        "mdaDX10": {
+          "name": "MDA DX10",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaDX10.so"
+        },
+        "mdaJX10": {
+          "name": "MDA JX10",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaJX10.so"
+        },
+        "mdaEPiano": {
+          "name": "MDA EPiano",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaEPiano.so"
+        },
+        "mdaPiano": {
+          "name": "MDA Piano",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaPiano.so"
+        },
+        "mdaSubSynth": {
+          "name": "MDA SubSynth",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaSubSynth.so"
+        }
+      },
+      "Distortion": {
+        "mdaBandisto": {
+          "name": "MDA Bandisto",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaBandisto.so"
+        },
+        "mdaOverdrive": {
+          "name": "MDA Overdrive",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaOverdrive.so"
+        },
+        "mdaDegrade": {
+          "name": "MDA Degrade",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaDegrade.so"
+        },
+        "mdaCombo": {
+          "name": "MDA Combo",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaCombo.so"
+        }
+      },
+      "Dynamics": {
+        "mdaDynamics": {
+          "name": "MDA Dynamics",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaDynamics.so"
+        },
+        "mdaLimiter": {
+          "name": "MDA Limiter",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaLimiter.so"
+        },
+        "mdaTransient": {
+          "name": "MDA Transient",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaTransient.so"
+        },
+        "mdaEnvelope": {
+          "name": "MDA Envelope",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaEnvelope.so"
+        },
+        "mdaLoudness": {
+          "name": "MDA Loudness",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaLoudness.so"
+        },
+        "mdaMultiBand": {
+          "name": "MDA MultiBand",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaMultiBand.so"
+        }
+      },
+      "Delay": {
+        "mdaDelay": {
+          "name": "MDA Delay",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaDelay.so"
+        },
+        "mdaDubDelay": {
+          "name": "MDA DubDelay",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaDubDelay.so"
+        }
+      },
+      "Modulation": {
+        "mdaDetune": {
+          "name": "MDA Detune",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaDetune.so"
+        },
+        "mdaLeslie": {
+          "name": "MDA Leslie",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaLeslie.so"
+        },
+        "mdaRingMod": {
+          "name": "MDA RingMod",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaRingMod.so"
+        },
+        "mdaThruZero": {
+          "name": "MDA ThruZero",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaThruZero.so"
+        },
+        "mdaShepard": {
+          "name": "MDA Shepard",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaShepard.so"
+        }
+      },
+      "Filter": {
+        "mdaRezFilter": {
+          "name": "MDA RezFilter",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaRezFilter.so"
+        }
+      },
+      "Reverb": {
+        "mdaAmbience": {
+          "name": "MDA Ambience",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaAmbience.so"
+        }
+      },
+      "Vocal": {
+        "mdaDe-ess": {
+          "name": "MDA De-ess",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaDe-ess.so"
+        },
+        "mdaTalkBox": {
+          "name": "MDA TalkBox",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaTalkBox.so"
+        },
+        "mdaVocInput": {
+          "name": "MDA VocInput",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaVocInput.so"
+        },
+        "mdaVocoder": {
+          "name": "MDA Vocoder",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaVocoder.so"
+        }
+      },
+      "Stereo": {
+        "mdaImage": {
+          "name": "MDA Image",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaImage.so"
+        },
+        "mdaRoundPan": {
+          "name": "MDA RoundPan",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaRoundPan.so"
+        },
+        "mdaStereo": {
+          "name": "MDA Stereo",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaStereo.so"
+        }
+      },
+      "Utility": {
+        "mdaBeatBox": {
+          "name": "MDA BeatBox",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaBeatBox.so"
+        },
+        "mdaDither": {
+          "name": "MDA Dither",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaDither.so"
+        },
+        "mdaLooplex": {
+          "name": "MDA Looplex",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaLooplex.so"
+        },
+        "mdaSplitter": {
+          "name": "MDA Splitter",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaSplitter.so"
+        },
+        "mdaTestTone": {
+          "name": "MDA TestTone",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaTestTone.so"
+        },
+        "mdaTracker": {
+          "name": "MDA Tracker",
+          "type": "vst2x",
+          "path": "/home/mind/plugins/mda-vst2/mdaTracker.so"
+        }
+      }
+    },
+    "SHIRO": {
+      "Reverb": {
+        "Shiroverb": {
+          "name": "Shiroverb",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Shiroverb-vst.so"
+        }
+      },
+      "Delay": {
+        "Modulay": {
+          "name": "Modulay",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Modulay-vst.so"
+        }
+      },
+      "Vocal": {
+        "Larynx": {
+          "name": "Larynx Vocoder",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Larynx-vst.so"
+        }
+      },
+      "Synth": {
+        "Harmless": {
+          "name": "Harmless Synth",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Harmless-vst.so"
+        }
+      }
+    },
+    "Dragonfly": {
+      "Reverb": {
+        "DragonflyReverb": {
+          "name": "Dragonfly Reverb",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/DragonflyReverb-vst.so"
+        }
+      }
+    },
+    "AirWindows": {
+      "Ambience": {
+        "ClearCoat": {
+          "name": "ClearCoat",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ClearCoat.so"
+        },
+        "PitchDelay": {
+          "name": "PitchDelay",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/PitchDelay.so"
+        },
+        "TapeDelay2": {
+          "name": "TapeDelay2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/TapeDelay2.so"
+        },
+        "TripleSpread": {
+          "name": "TripleSpread",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/TripleSpread.so"
+        }
+      },
+      "Amp Sims": {
+        "ChimeyDeluxe": {
+          "name": "ChimeyDeluxe",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ChimeyDeluxe.so"
+        },
+        "ChimeyGuitar": {
+          "name": "ChimeyGuitar",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ChimeyGuitar.so"
+        },
+        "PointyGuitar": {
+          "name": "PointyGuitar",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/PointyGuitar.so"
+        }
+      },
+      "Bass": {
+        "DubSub2": {
+          "name": "DubSub2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/DubSub2.so"
+        },
+        "Elliptical": {
+          "name": "Elliptical",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Elliptical.so"
+        },
+        "OrbitKick": {
+          "name": "OrbitKick",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/OrbitKick.so"
+        }
+      },
+      "Biquads": {
+        "BiquadStack": {
+          "name": "BiquadStack",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/BiquadStack.so"
+        }
+      },
+      "Brightness": {
+        "Air4": {
+          "name": "Air4",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Air4.so"
+        },
+        "DeBess": {
+          "name": "DeBess",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/DeBess.so"
+        },
+        "Sinew": {
+          "name": "Sinew",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Sinew.so"
+        },
+        "Slew2": {
+          "name": "Slew2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Slew2.so"
+        },
+        "SlewSonic": {
+          "name": "SlewSonic",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/SlewSonic.so"
+        },
+        "Smooth": {
+          "name": "Smooth",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Smooth.so"
+        }
+      },
+      "Clipping": {
+        "OneCornerClip": {
+          "name": "OneCornerClip",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/OneCornerClip.so"
+        }
+      },
+      "Consoles": {
+        "Console0Buss": {
+          "name": "Console0Buss",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Console0Buss.so"
+        },
+        "Console0Channel": {
+          "name": "Console0Channel",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Console0Channel.so"
+        },
+        "Console9Buss": {
+          "name": "Console9Buss",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Console9Buss.so"
+        },
+        "Console9Channel": {
+          "name": "Console9Channel",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Console9Channel.so"
+        },
+        "ConsoleLABuss": {
+          "name": "ConsoleLABuss",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ConsoleLABuss.so"
+        },
+        "ConsoleLAChannel": {
+          "name": "ConsoleLAChannel",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ConsoleLAChannel.so"
+        },
+        "ConsoleMCBuss": {
+          "name": "ConsoleMCBuss",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ConsoleMCBuss.so"
+        },
+        "ConsoleMCChannel": {
+          "name": "ConsoleMCChannel",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ConsoleMCChannel.so"
+        },
+        "PurestConsoleBuss": {
+          "name": "PurestConsoleBuss",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/PurestConsoleBuss.so"
+        },
+        "PurestConsoleChannel": {
+          "name": "PurestConsoleChannel",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/PurestConsoleChannel.so"
+        }
+      },
+      "Distortion": {
+        "Mackity": {
+          "name": "Mackity",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Mackity.so"
+        }
+      },
+      "Dithers": {
+        "PaulDither": {
+          "name": "PaulDither",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/PaulDither.so"
+        },
+        "PaulWide": {
+          "name": "PaulWide",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/PaulWide.so"
+        },
+        "TPDFDither": {
+          "name": "TPDFDither",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/TPDFDither.so"
+        }
+      },
+      "Dynamics": {
+        "BeziComp": {
+          "name": "BeziComp",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/BeziComp.so"
+        },
+        "DigitalBlack": {
+          "name": "DigitalBlack",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/DigitalBlack.so"
+        },
+        "Gatelope": {
+          "name": "Gatelope",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Gatelope.so"
+        },
+        "Pop2": {
+          "name": "Pop2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Pop2.so"
+        },
+        "Pop3": {
+          "name": "Pop3",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Pop3.so"
+        },
+        "Pyewacket": {
+          "name": "Pyewacket",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Pyewacket.so"
+        },
+        "SoftGate": {
+          "name": "SoftGate",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/SoftGate.so"
+        },
+        "StoneFireComp": {
+          "name": "StoneFireComp",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/StoneFireComp.so"
+        }
+      },
+      "Effects": {
+        "Dubly3": {
+          "name": "Dubly3",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Dubly3.so"
+        },
+        "Energy2": {
+          "name": "Energy2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Energy2.so"
+        },
+        "GlitchShifter": {
+          "name": "GlitchShifter",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/GlitchShifter.so"
+        },
+        "PitchNasty": {
+          "name": "PitchNasty",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/PitchNasty.so"
+        },
+        "TakeCare": {
+          "name": "TakeCare",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/TakeCare.so"
+        },
+        "TremoSquare": {
+          "name": "TremoSquare",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/TremoSquare.so"
+        },
+        "Tremolo": {
+          "name": "Tremolo",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Tremolo.so"
+        },
+        "Trianglizer": {
+          "name": "Trianglizer",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Trianglizer.so"
+        }
+      },
+      "Filter": {
+        "Distance3": {
+          "name": "Distance3",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Distance3.so"
+        },
+        "Isolator3": {
+          "name": "Isolator3",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Isolator3.so"
+        },
+        "Parametric": {
+          "name": "Parametric",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Parametric.so"
+        },
+        "PearEQ": {
+          "name": "PearEQ",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/PearEQ.so"
+        },
+        "Silken": {
+          "name": "Silken",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Silken.so"
+        },
+        "SmoothEQ": {
+          "name": "SmoothEQ",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/SmoothEQ.so"
+        },
+        "SmoothEQ2": {
+          "name": "SmoothEQ2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/SmoothEQ2.so"
+        },
+        "Stonefire": {
+          "name": "Stonefire",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Stonefire.so"
+        },
+        "ToneSlant": {
+          "name": "ToneSlant",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ToneSlant.so"
+        },
+        "Weight": {
+          "name": "Weight",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Weight.so"
+        }
+      },
+      "Lo-Fi": {
+        "CrunchyGrooveWear": {
+          "name": "CrunchyGrooveWear",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/CrunchyGrooveWear.so"
+        },
+        "DeRez3": {
+          "name": "DeRez3",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/DeRez3.so"
+        },
+        "Flutter2": {
+          "name": "Flutter2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Flutter2.so"
+        },
+        "GrooveWear": {
+          "name": "GrooveWear",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/GrooveWear.so"
+        },
+        "HipCrush": {
+          "name": "HipCrush",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/HipCrush.so"
+        },
+        "Pockey2": {
+          "name": "Pockey2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Pockey2.so"
+        },
+        "Vibrato": {
+          "name": "Vibrato",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Vibrato.so"
+        }
+      },
+      "Noise": {
+        "TapeDust": {
+          "name": "TapeDust",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/TapeDust.so"
+        }
+      },
+      "Reverb": {
+        "Chamber": {
+          "name": "Chamber",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Chamber.so"
+        },
+        "CreamCoat": {
+          "name": "CreamCoat",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/CreamCoat.so"
+        },
+        "CrunchCoat": {
+          "name": "CrunchCoat",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/CrunchCoat.so"
+        },
+        "Galactic": {
+          "name": "Galactic",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Galactic.so"
+        },
+        "NonlinearSpace": {
+          "name": "NonlinearSpace",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/NonlinearSpace.so"
+        },
+        "VerbTiny": {
+          "name": "VerbTiny",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/VerbTiny.so"
+        },
+        "kAlienSpaceship": {
+          "name": "kAlienSpaceship",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/kAlienSpaceship.so"
+        },
+        "kBeyond": {
+          "name": "kBeyond",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/kBeyond.so"
+        },
+        "kCathedral5": {
+          "name": "kCathedral5",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/kCathedral5.so"
+        },
+        "kCosmos": {
+          "name": "kCosmos",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/kCosmos.so"
+        },
+        "kGuitarHall2": {
+          "name": "kGuitarHall2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/kGuitarHall2.so"
+        },
+        "kPlate140": {
+          "name": "kPlate140",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/kPlate140.so"
+        },
+        "kPlate240": {
+          "name": "kPlate240",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/kPlate240.so"
+        },
+        "kStation": {
+          "name": "kStation",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/kStation.so"
+        }
+      },
+      "Saturation": {
+        "Hypersoft": {
+          "name": "Hypersoft",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Hypersoft.so"
+        },
+        "Tube2": {
+          "name": "Tube2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Tube2.so"
+        }
+      },
+      "Stereo": {
+        "Srsly": {
+          "name": "Srsly",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Srsly.so"
+        },
+        "Srsly3": {
+          "name": "Srsly3",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Srsly3.so"
+        },
+        "ToVinyl4": {
+          "name": "ToVinyl4",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ToVinyl4.so"
+        },
+        "Wider": {
+          "name": "Wider",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Wider.so"
+        }
+      },
+      "Subtlety": {
+        "Discontapeity": {
+          "name": "Discontapeity",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Discontapeity.so"
+        },
+        "Discontinuity": {
+          "name": "Discontinuity",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Discontinuity.so"
+        },
+        "Inflamer": {
+          "name": "Inflamer",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Inflamer.so"
+        },
+        "Mastering2": {
+          "name": "Mastering2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Mastering2.so"
+        },
+        "PurestWarm2": {
+          "name": "PurestWarm2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/PurestWarm2.so"
+        },
+        "Shape": {
+          "name": "Shape",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Shape.so"
+        },
+        "SingleEndedTriode": {
+          "name": "SingleEndedTriode",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/SingleEndedTriode.so"
+        },
+        "Sweeten": {
+          "name": "Sweeten",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Sweeten.so"
+        }
+      },
+      "Tape": {
+        "TapeHack": {
+          "name": "TapeHack",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/TapeHack.so"
+        },
+        "ToTape8": {
+          "name": "ToTape8",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ToTape8.so"
+        }
+      },
+      "Utility": {
+        "BitShiftPan": {
+          "name": "BitShiftPan",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/BitShiftPan.so"
+        },
+        "Cans": {
+          "name": "Cans",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Cans.so"
+        },
+        "CansAW": {
+          "name": "CansAW",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/CansAW.so"
+        },
+        "DubPlate2": {
+          "name": "DubPlate2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/DubPlate2.so"
+        },
+        "Golem": {
+          "name": "Golem",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Golem.so"
+        },
+        "Monitoring3": {
+          "name": "Monitoring3",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/Monitoring3.so"
+        },
+        "PurestFade": {
+          "name": "PurestFade",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/PurestFade.so"
+        },
+        "PurestGain": {
+          "name": "PurestGain",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/PurestGain.so"
+        },
+        "SoftClock2": {
+          "name": "SoftClock2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/SoftClock2.so"
+        }
+      },
+      "XYZ Filters": {
+        "XBandpass": {
+          "name": "XBandpass",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/XBandpass.so"
+        },
+        "XHighpass": {
+          "name": "XHighpass",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/XHighpass.so"
+        },
+        "XLowpass": {
+          "name": "XLowpass",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/XLowpass.so"
+        },
+        "XNotch": {
+          "name": "XNotch",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/XNotch.so"
+        },
+        "XRegion": {
+          "name": "XRegion",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/XRegion.so"
+        },
+        "YBandpass": {
+          "name": "YBandpass",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/YBandpass.so"
+        },
+        "YHighpass": {
+          "name": "YHighpass",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/YHighpass.so"
+        },
+        "YLowpass": {
+          "name": "YLowpass",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/YLowpass.so"
+        },
+        "YNotch": {
+          "name": "YNotch",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/YNotch.so"
+        },
+        "ZBandpass2": {
+          "name": "ZBandpass2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ZBandpass2.so"
+        },
+        "ZHighpass2": {
+          "name": "ZHighpass2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ZHighpass2.so"
+        },
+        "ZLowpass2": {
+          "name": "ZLowpass2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ZLowpass2.so"
+        },
+        "ZNotch2": {
+          "name": "ZNotch2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ZNotch2.so"
+        },
+        "ZRegion2": {
+          "name": "ZRegion2",
+          "type": "vst2x",
+          "path": "/opt/plugins/vst/ZRegion2.so"
+        }
+      }
+    }
+  }
+}

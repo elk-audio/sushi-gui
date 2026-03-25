@@ -54,7 +54,7 @@ Assuming that the virtual environment is activated:
 
 Or, if you have `uv` installed:
 
-`uv run sushi-gui.py`
+`$ uv run sushi-gui.py`
 
 ## Controlling Sushi when it is running on another machine
 The GUI lets you specify an IP address and port number to connect to. Simple as that.
@@ -65,6 +65,18 @@ to edit `sushi-gui.py:4`:
 SUSHI_ADDRESS = 'localhost:51051'
 ```
 with the new default address.
+
+## Installed plugins list
+The list of plugins avaliable in the drop-down menu "Add Plugin" is controlled by the JSON file installed_plugins.json.
+By default, this has a list of Gx and airwindows plugins avaiable with the Sushi bundle for desktop computer.
+
+You can specify another JSON plugin database with the `--plugins-file` argument, for example with:
+
+```
+$ uv run sushi-gui.py --plugins-file installed_plugins_target.json
+```
+
+you can load the correct definitions for the plugin installed on a target Elk Audio OS embedded device running an image with the plugin pack installed.
 
 ## Limitations
 Although meant as a debugging/testing tools for Sushi developers, this GUI does **not** implement all of Sushi's features.

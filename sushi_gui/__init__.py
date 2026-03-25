@@ -24,14 +24,17 @@ def load_plugins_file(plugins_file_path=None):
 
     try:
         with open(plugins_file_path, 'r') as f:
-            INSTALLED_PLUGINS = json.load(f)
+            data = json.load(f)
         print(f"Loaded plugins from: {plugins_file_path}")
     except FileNotFoundError:
         print(f"Error: Plugins file not found at {plugins_file_path}")
-        INSTALLED_PLUGINS = {"plugins": {}}
+        data = {"plugins": {}}
     except json.JSONDecodeError as e:
         print(f"Error: Invalid JSON in plugins file: {e}")
-        INSTALLED_PLUGINS = {"plugins": {}}
+        data = {"plugins": {}}
+
+    INSTALLED_PLUGINS.clear()
+    INSTALLED_PLUGINS.update(data)
 
     return INSTALLED_PLUGINS
 
