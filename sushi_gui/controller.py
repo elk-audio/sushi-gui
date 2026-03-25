@@ -139,9 +139,14 @@ class Controller(SushiController):
                 p_type = sushi.PluginType.INTERNAL
 
             # Ensure exactly one of uid or path is not None
-            if (uid is None and path is None) or (uid is not None and path is not None):
-                print(f"Error: Plugin must have exactly one of 'uid' or 'path', got uid={uid}, path={path}")
-                return
+            if p_type == sushi.PluginType.VST3X:
+                if uid is None or path is None:
+                    print(f"Error: VST3X plugin must have both 'uid' and 'path', got uid={uid}, path={path}")
+                    return
+            else:
+                if (uid is None and path is None) or (uid is not None and path is not None):
+                    print(f"Error: Plugin must have exactly one of 'uid' or 'path', got uid={uid}, path={path}")
+                    return
 
             try:
                 self.audio_graph.create_processor_on_track(
