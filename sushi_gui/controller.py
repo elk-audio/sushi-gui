@@ -1,3 +1,4 @@
+import time
 from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QFileDialog
 from elkpy.sushicontroller import SushiController
@@ -14,8 +15,11 @@ class Controller(SushiController):
     """This expands on the SushiController class that comes with elkpy by adding to it QT specific
     functionality, like signal handling"""
 
-    def __init__(self, address: str, proto_file: str) -> None:
-        super().__init__(address, proto_file)
+    def __init__(self, address: str, proto_file: str | None = None) -> None:
+        if proto_file:
+            super().__init__(address, proto_file)
+        else:
+            super().__init__(address)
         self._view: MainWindow
 
     def emit_track_notification(self, notification) -> None:
@@ -96,21 +100,52 @@ class Controller(SushiController):
             if track_type == "Multibus":
                 self.audio_graph.create_multibus_track(name, outputs, inputs)
             elif track_type == "Stereo":
-                print(self.audio_graph.create_track(name, 2))
+                self.audio_graph.create_track(name, 2)
             elif track_type == "Mono":
                 self.audio_graph.create_track(name, 1)
+
+            while True:
+                try:
+                    track_id = self.audio_graph.get_track_id(name)
+                    break
+                except Exception as e:
+                    print(e)
+                    time.sleep(0.3)
+
+            self.audio_routing.connect_output_channel_from_track(track_id, 0, 0)
+            if track_type == "Stereo":
+                self.audio_routing.connect_output_channel_from_track(track_id, 1, 1)
+            print(f"Connected audio outputs on track {name}")
 
     def add_plugin(self, track_id: int) -> None:
         dialog = AddPluginDialog(self._view)
         if dialog.exec_():
             plug = dialog.selected_plugin
             name = dialog.plugin_name
-            # name = plug['name']
-            uid = plug["uid"]
-            p_type = 0
+
+            # Get uid and path, defaulting to None if not present
+            uid = plug.get("uid", None)
+            path = plug.get("path", None)
+
+            # Set plugin type based on the "type" field
+            plugin_type_str = plug.get("type", "internal").lower()
+            if plugin_type_str == "vst2x":
+                p_type = sushi.PluginType.VST2X
+            elif plugin_type_str == "vst3x":
+                p_type = sushi.PluginType.VST3X
+            elif plugin_type_str == "lv2":
+                p_type = sushi.PluginType.LV2
+            else:  # "internal" or default
+                p_type = sushi.PluginType.INTERNAL
+
+            # Ensure exactly one of uid or path is not None
+            if (uid is None and path is None) or (uid is not None and path is not None):
+                print(f"Error: Plugin must have exactly one of 'uid' or 'path', got uid={uid}, path={path}")
+                return
+
             try:
                 self.audio_graph.create_processor_on_track(
-                    name, uid, None, p_type, track_id, 0, True
+                    name, uid, path, p_type, track_id, 0, True
                 )
             except Exception as e:
                 print("Error creating plugin: {}".format(e))
