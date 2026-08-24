@@ -17,23 +17,18 @@ from elkpy import sushi_info_types as sushi
 from .constants import MODE_PLAYING
 from .controller import Controller
 from .widgets import TransportBarWidget, TrackWidget
+from .configfile import write_json_config_file, DEFAULT_DUMPED_CONFIG_FILENAME
 
 
 # Get protofile to generate grpc library
 proto_file = os.environ.get("SUSHI_GRPC_ELKPY_PROTO")
 if proto_file is None:
     print(
-        "Environment variable SUSHI_GRPC_ELKPY_PROTO not defined, setting it to the local proto file"
+        "Environment variable SUSHI_GRPC_ELKPY_PROTO not defined => using elkpy included protofile"
     )
-    os.environ["SUSHI_GRPC_ELKPY_PROTO"] = str("./sushi-grpc-api/sushi_rpc.proto")
-    proto_file = os.environ.get("SUSHI_GRPC_ELKPY_PROTO")
-
-    if proto_file is None:
-        print("No proto file found")
-        sys.exit(-1)
-
-# Get the sushi notification types directly from the generated grpc types
-sushi_grpc_types, _ = grpc_gen.modules_from_proto(proto_file)
+else:
+    print(f"Using proto file from env var SUSHI_GRPC_ELKPY_PROTO: {proto_file}")
+    sushi_grpc_types, _ = grpc_gen.modules_from_proto(proto_file)
 
 
 class MainWindow(QMainWindow):
@@ -69,6 +64,10 @@ class MainWindow(QMainWindow):
 
         self.file_menu.addAction(save)
         self.file_menu.addAction(load)
+
+        write_config = QAction("Write JSON config", self)
+        write_config.triggered.connect(self._write_config)
+        self.tools_menu.addAction(write_config)
 
         about = QAction("About Sushi", self)
         about.triggered.connect(self.show_about_sushi)
@@ -122,14 +121,21 @@ class MainWindow(QMainWindow):
                 self._controller.close()
         except:
             pass
-        self._controller = Controller(
-            address=self.current_sushi_ip, proto_file=proto_file
-        )
+
+        if proto_file:
+            self._controller = Controller(
+                address=self.current_sushi_ip, proto_file=proto_file
+            )
+        else:
+            self._controller = Controller(address=self.current_sushi_ip)
         self._controller.set_view(self)
         self._controller.subscribe_to_notifications()
         self.tpbar.initialize()
         self.tracks = {}
         self._create_tracks()
+
+    def _write_config(self) -> None:
+        write_json_config_file(DEFAULT_DUMPED_CONFIG_FILENAME, self._controller)
 
     def save_session(self) -> None:
         try:

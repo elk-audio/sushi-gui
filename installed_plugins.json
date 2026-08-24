@@ -1,0 +1,1033 @@
+{
+  "plugins": {
+    "Internal": {
+      "Utility": {
+        "Passthrough": {
+          "name": "Passthrough",
+          "uid": "sushi.testing.passthrough"
+        },
+        "Gain": {
+          "name": "Gain",
+          "uid": "sushi.testing.gain"
+        },
+        "MonoSumming": {
+          "name": "MonoSumming",
+          "uid": "sushi.testing.mono_summing"
+        },
+        "PeakMeter": {
+          "name": "PeakMeter",
+          "uid": "sushi.testing.peakmeter"
+        },
+        "WavWriter": {
+          "name": "Wav Writer",
+          "uid": "sushi.testing.wav_writer"
+        }
+      },
+      "EQ": {
+        "Equalizer": {
+          "name": "Equalizer",
+          "uid": "sushi.testing.equalizer"
+        }
+      },
+      "Generator": {
+        "SamplePlayer": {
+          "name": "SamplePlayer",
+          "uid": "sushi.testing.sampleplayer"
+        },
+        "WavStreamer": {
+          "name": "Wave Streamer",
+          "uid": "sushi.testing.wav_streamer"
+        }
+      },
+      "Reverb": {
+        "Freeverb": {
+          "name": "Freeverb",
+          "uid": "sushi.testing.freeverb"
+        }
+      },
+      "MIDI & Control": {
+        "Arpeggiator": {
+          "name": "Arpeggiator",
+          "uid": "sushi.testing.arpeggiator"
+        },
+        "Transposer": {
+          "name": "Transposer",
+          "uid": "sushi.testing.transposer"
+        },
+        "StepSequencer": {
+          "name": "StepSequencer",
+          "uid": "sushi.testing.equalizer"
+        },
+        "CVtoControl": {
+          "name": "CV to Control",
+          "uid": "sushi.testing.cv_to_control"
+        },
+        "ControlToCV": {
+          "name": "Control to CV",
+          "uid": "sushi.testing.control_to_cv"
+        }
+      }
+    },
+    "Brickworks": {
+      "Distortion": {
+        "BW Bitcrusher": {
+          "name": "BW Bitcrusher",
+          "uid": "sushi.brickworks.bitcrusher"
+        },
+        "BW Distortion": {
+          "name": "BW Distortion",
+          "uid": "sushi.brickworks.dist"
+        },
+        "BW Drive": {
+          "name": "BW Drive",
+          "uid": "sushi.brickworks.drive"
+        },
+        "BW Fuzz": {
+          "name": "BW Fuzz",
+          "uid": "sushi.brickworks.fuzz"
+        },
+        "BW Saturation": {
+          "name": "BW Saturation",
+          "uid": "sushi.brickworks.saturation"
+        }
+      },
+      "EQ": {
+        "BW Eq3band": {
+          "name": "BW Eq3band",
+          "uid": "sushi.brickworks.eq3band"
+        },
+        "BW Highpass": {
+          "name": "BW Highpass",
+          "uid": "sushi.brickworks.highpass"
+        },
+        "BW Multifilter": {
+          "name": "BW Multifilter",
+          "uid": "sushi.brickworks.multi_filter"
+        },
+        "BW Notch": {
+          "name": "BW Notch",
+          "uid": "sushi.brickworks.notch"
+        },
+        "BW Cab sim": {
+          "name": "BW Cab Sim",
+          "uid": "sushi.brickworks.cab_sim"
+        }
+      },
+      "Dynamics": {
+        "BW Clip": {
+          "name": "BW Clip",
+          "uid": "sushi.brickworks.clip"
+        },
+        "BW Compressor": {
+          "name": "BW Compressor",
+          "uid": "sushi.brickworks.compressor"
+        },
+        "BW Noise Gate": {
+          "name": "BW NoiseGate",
+          "uid": "sushi.brickworks.noise_gate"
+        }
+      },
+      "Modulation": {
+        "BW Chorus": {
+          "name": "BW Chorus",
+          "uid": "sushi.brickworks.chorus"
+        },
+        "BW Flanger": {
+          "name": "BW Flanger",
+          "uid": "sushi.brickworks.flanger"
+        },
+        "BW Phaser": {
+          "name": "BW Phaser",
+          "uid": "sushi.brickworks.phaser"
+        },
+        "BW Tremolo": {
+          "name": "BW Tremolo",
+          "uid": "sushi.brickworks.tremolo"
+        },
+        "BW Vibrato": {
+          "name": "BW Vibrato",
+          "uid": "sushi.brickworks.vibrato"
+        },
+        "BW Wha": {
+          "name": "BW Wha",
+          "uid": "sushi.brickworks.wha"
+        },
+        "BW Ring mod": {
+          "name": "BW Ring mod",
+          "uid": "sushi.brickworks.ring_mod"
+        }
+      },
+      "Delay": {
+        "BW Comb Delay": {
+          "name": "BW Comb delay",
+          "uid": "sushi.brickworks.comb_delay"
+        }
+      },
+      "Generator": {
+        "BW Simple synth": {
+          "name": "BW Simple synth",
+          "uid": "sushi.brickworks.simple_synth"
+        }
+      }
+    },
+    "GxPlugins": {
+      "Overdrive": {
+        "GxBottleRocket": {
+          "name": "GxBottleRocket",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_bottlerocket_#_bottlerocket_"
+        },
+        "GxDOP250": {
+          "name": "GxDOP250",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_DOP250_#_DOP250_"
+        },
+        "GxGuvnor": {
+          "name": "GxGuvnor",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_guvnor_#_guvnor_"
+        },
+        "GxHotBox": {
+          "name": "GxHotBox",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_hotbox_#_hotbox_"
+        },
+        "GxSD1": {
+          "name": "GxSD1",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_sd1sim_#_sd1sim_"
+        },
+        "GxSD2Lead": {
+          "name": "GxSD2Lead",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_sd2lead_#_sd2lead_"
+        },
+        "GxValveCaster": {
+          "name": "GxValveCaster",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_valvecaster_#_valvecaster_"
+        },
+        "GxBoobTube": {
+          "name": "GxBoobTube",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_boobtube_#_boobtube_"
+        },
+        "GxShakaTube": {
+          "name": "GxShakaTube",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_shakatube_#_shakatube_"
+        },
+        "GxBaJaTubeDriver": {
+          "name": "GxBaJaTubeDriver",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_bajatubedriver_#_bajatubedriver_"
+        },
+        "GxTimRay": {
+          "name": "GxTimRay",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_timray_#_timray_"
+        },
+        "GxLuna": {
+          "name": "GxLuna",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_luna_#_luna_"
+        },
+        "GxSloopyBlue": {
+          "name": "GxSloopyBlue",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_sloopyblue_#_sloopyblue_"
+        },
+        "GxEternity": {
+          "name": "GxEternity",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_eternity_#_eternity_"
+        },
+        "GxClubDrive": {
+          "name": "GxClubDrive",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_clubdrive_#_clubdrive_"
+        }
+      },
+      "Fuzz/Distortion": {
+        "GxAxisFace": {
+          "name": "GxAxisFace",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_AxisFace_#_AxisFace_"
+        },
+        "GxFz1b": {
+          "name": "GxFz1b",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_maestro_fz1b_#_maestro_fz1b_"
+        },
+        "GxFz1s": {
+          "name": "GxFz1s",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_maestro_fz1s_#_maestro_fz1s_"
+        },
+        "GxHyperion": {
+          "name": "GxHyperion",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_hyperion_#_hyperion_"
+        },
+        "GxHeathkit": {
+          "name": "GxHeathkit",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_Heathkit_#_Heathkit_"
+        },
+        "GxKnightFuzz": {
+          "name": "GxKnightFuzz",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_KnightFuzz_#_KnightFuzz_"
+        },
+        "GxLiquidDrive": {
+          "name": "GxLiquidDrive",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_liquiddrive_#_liquiddrive_"
+        },
+        "GxSuppaToneBender": {
+          "name": "GxSuppaToneBender",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_sfp_#_sfp_"
+        },
+        "GxSaturator": {
+          "name": "GxSaturator",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_saturate_#_saturate_"
+        },
+        "GxSunFace": {
+          "name": "GxSunFace",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_SunFace_#_SunFace_"
+        },
+        "GxToneMachine": {
+          "name": "GxToneMachine",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_tonemachine_#_tonemachine_"
+        },
+        "GxTubeDistortion": {
+          "name": "GxTubeDistortion",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_TubeDistortion_#_TubeDistortion_"
+        },
+        "GxVintageFuzzMaster": {
+          "name": "GxVintageFuzzMaster",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_vfm_#_vfm_"
+        },
+        "GxVoodoFuzz": {
+          "name": "GxVoodoFuzz",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_voodoo_#_voodoo_"
+        }
+      },
+      "Amplifiers": {
+        "GxMicroAmp": {
+          "name": "GxMicroAmp",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_MicroAmp_#_MicroAmp_"
+        },
+        "GxVBassPreAmp": {
+          "name": "GxVBassPreAmp",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_voxbass_#_voxbass_"
+        },
+        "GxSVT": {
+          "name": "GxSVT",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_ampegsvt_#_ampegsvt_"
+        },
+        "GxVmk2": {
+          "name": "GxVmk2",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_vmk2d_#_vmk2d_"
+        },
+        "GxUvox720k": {
+          "name": "GxUvox720k",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_uvox_#_uvox_"
+        },
+        "GxCreamMachine": {
+          "name": "GxCreamMachine",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_CreamMachine_#_CreamMachine_"
+        },
+        "GxEpic": {
+          "name": "GxEpic",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_epic_#_epic_"
+        },
+        "GxSupersonic": {
+          "name": "GxSupersonic",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_supersonic_#_supersonic_"
+        },
+        "GxBlueAmp": {
+          "name": "GxBlueAmp",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_blueamp_#_blueamp_"
+        },
+        "GxPlexi": {
+          "name": "GxPlexi",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_plexi_#_plexi_"
+        }
+      },
+      "Other": {
+        "GxQuack": {
+          "name": "GxQuack",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_quack_#_quack_"
+        },
+        "GxSlowGear": {
+          "name": "GxSlowGear",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_slowgear_#_slowgear_"
+        },
+        "GxUltraCab": {
+          "name": "GxUltraCab",
+          "type": "lv2",
+          "path": "http://guitarix.sourceforge.net/plugins/gx_ultracab_#_ultracab_"
+        }
+      }
+    },
+    "AirWindows": {
+      "Ambience": {
+        "ClearCoat": {
+          "name": "ClearCoat",
+          "type": "vst2x",
+          "path": "ClearCoat.vst"
+        },
+        "PitchDelay": {
+          "name": "PitchDelay",
+          "type": "vst2x",
+          "path": "PitchDelay.vst"
+        },
+        "TapeDelay2": {
+          "name": "TapeDelay2",
+          "type": "vst2x",
+          "path": "TapeDelay2.vst"
+        },
+        "TripleSpread": {
+          "name": "TripleSpread",
+          "type": "vst2x",
+          "path": "TripleSpread.vst"
+        }
+      },
+      "Amp Sims": {
+        "ChimeyDeluxe": {
+          "name": "ChimeyDeluxe",
+          "type": "vst2x",
+          "path": "ChimeyDeluxe.vst"
+        },
+        "ChimeyGuitar": {
+          "name": "ChimeyGuitar",
+          "type": "vst2x",
+          "path": "ChimeyGuitar.vst"
+        },
+        "PointyGuitar": {
+          "name": "PointyGuitar",
+          "type": "vst2x",
+          "path": "PointyGuitar.vst"
+        }
+      },
+      "Bass": {
+        "DubSub2": {
+          "name": "DubSub2",
+          "type": "vst2x",
+          "path": "DubSub2.vst"
+        },
+        "Elliptical": {
+          "name": "Elliptical",
+          "type": "vst2x",
+          "path": "Elliptical.vst"
+        },
+        "OrbitKick": {
+          "name": "OrbitKick",
+          "type": "vst2x",
+          "path": "OrbitKick.vst"
+        }
+      },
+      "Biquads": {
+        "BiquadStack": {
+          "name": "BiquadStack",
+          "type": "vst2x",
+          "path": "BiquadStack.vst"
+        }
+      },
+      "Brightness": {
+        "Air4": {
+          "name": "Air4",
+          "type": "vst2x",
+          "path": "Air4.vst"
+        },
+        "DeBess": {
+          "name": "DeBess",
+          "type": "vst2x",
+          "path": "DeBess.vst"
+        },
+        "Sinew": {
+          "name": "Sinew",
+          "type": "vst2x",
+          "path": "Sinew.vst"
+        },
+        "Slew2": {
+          "name": "Slew2",
+          "type": "vst2x",
+          "path": "Slew2.vst"
+        },
+        "SlewSonic": {
+          "name": "SlewSonic",
+          "type": "vst2x",
+          "path": "SlewSonic.vst"
+        },
+        "Smooth": {
+          "name": "Smooth",
+          "type": "vst2x",
+          "path": "Smooth.vst"
+        }
+      },
+      "Clipping": {
+        "OneCornerClip": {
+          "name": "OneCornerClip",
+          "type": "vst2x",
+          "path": "OneCornerClip.vst"
+        }
+      },
+      "Consoles": {
+        "Console0Buss": {
+          "name": "Console0Buss",
+          "type": "vst2x",
+          "path": "Console0Buss.vst"
+        },
+        "Console0Channel": {
+          "name": "Console0Channel",
+          "type": "vst2x",
+          "path": "Console0Channel.vst"
+        },
+        "Console9Buss": {
+          "name": "Console9Buss",
+          "type": "vst2x",
+          "path": "Console9Buss.vst"
+        },
+        "Console9Channel": {
+          "name": "Console9Channel",
+          "type": "vst2x",
+          "path": "Console9Channel.vst"
+        },
+        "ConsoleLABuss": {
+          "name": "ConsoleLABuss",
+          "type": "vst2x",
+          "path": "ConsoleLABuss.vst"
+        },
+        "ConsoleLAChannel": {
+          "name": "ConsoleLAChannel",
+          "type": "vst2x",
+          "path": "ConsoleLAChannel.vst"
+        },
+        "ConsoleMCBuss": {
+          "name": "ConsoleMCBuss",
+          "type": "vst2x",
+          "path": "ConsoleMCBuss.vst"
+        },
+        "ConsoleMCChannel": {
+          "name": "ConsoleMCChannel",
+          "type": "vst2x",
+          "path": "ConsoleMCChannel.vst"
+        },
+        "PurestConsoleBuss": {
+          "name": "PurestConsoleBuss",
+          "type": "vst2x",
+          "path": "PurestConsoleBuss.vst"
+        },
+        "PurestConsoleChannel": {
+          "name": "PurestConsoleChannel",
+          "type": "vst2x",
+          "path": "PurestConsoleChannel.vst"
+        }
+      },
+      "Distortion": {
+        "Mackity": {
+          "name": "Mackity",
+          "type": "vst2x",
+          "path": "Mackity.vst"
+        }
+      },
+      "Dithers": {
+        "PaulDither": {
+          "name": "PaulDither",
+          "type": "vst2x",
+          "path": "PaulDither.vst"
+        },
+        "PaulWide": {
+          "name": "PaulWide",
+          "type": "vst2x",
+          "path": "PaulWide.vst"
+        },
+        "TPDFDither": {
+          "name": "TPDFDither",
+          "type": "vst2x",
+          "path": "TPDFDither.vst"
+        }
+      },
+      "Dynamics": {
+        "BeziComp": {
+          "name": "BeziComp",
+          "type": "vst2x",
+          "path": "BeziComp.vst"
+        },
+        "DigitalBlack": {
+          "name": "DigitalBlack",
+          "type": "vst2x",
+          "path": "DigitalBlack.vst"
+        },
+        "Gatelope": {
+          "name": "Gatelope",
+          "type": "vst2x",
+          "path": "Gatelope.vst"
+        },
+        "Pop2": {
+          "name": "Pop2",
+          "type": "vst2x",
+          "path": "Pop2.vst"
+        },
+        "Pop3": {
+          "name": "Pop3",
+          "type": "vst2x",
+          "path": "Pop3.vst"
+        },
+        "Pyewacket": {
+          "name": "Pyewacket",
+          "type": "vst2x",
+          "path": "Pyewacket.vst"
+        },
+        "SoftGate": {
+          "name": "SoftGate",
+          "type": "vst2x",
+          "path": "SoftGate.vst"
+        },
+        "StoneFireComp": {
+          "name": "StoneFireComp",
+          "type": "vst2x",
+          "path": "StoneFireComp.vst"
+        }
+      },
+      "Effects": {
+        "Dubly3": {
+          "name": "Dubly3",
+          "type": "vst2x",
+          "path": "Dubly3.vst"
+        },
+        "Energy2": {
+          "name": "Energy2",
+          "type": "vst2x",
+          "path": "Energy2.vst"
+        },
+        "GlitchShifter": {
+          "name": "GlitchShifter",
+          "type": "vst2x",
+          "path": "GlitchShifter.vst"
+        },
+        "PitchNasty": {
+          "name": "PitchNasty",
+          "type": "vst2x",
+          "path": "PitchNasty.vst"
+        },
+        "TakeCare": {
+          "name": "TakeCare",
+          "type": "vst2x",
+          "path": "TakeCare.vst"
+        },
+        "TremoSquare": {
+          "name": "TremoSquare",
+          "type": "vst2x",
+          "path": "TremoSquare.vst"
+        },
+        "Tremolo": {
+          "name": "Tremolo",
+          "type": "vst2x",
+          "path": "Tremolo.vst"
+        },
+        "Trianglizer": {
+          "name": "Trianglizer",
+          "type": "vst2x",
+          "path": "Trianglizer.vst"
+        }
+      },
+      "Filter": {
+        "Distance3": {
+          "name": "Distance3",
+          "type": "vst2x",
+          "path": "Distance3.vst"
+        },
+        "Isolator3": {
+          "name": "Isolator3",
+          "type": "vst2x",
+          "path": "Isolator3.vst"
+        },
+        "Parametric": {
+          "name": "Parametric",
+          "type": "vst2x",
+          "path": "Parametric.vst"
+        },
+        "PearEQ": {
+          "name": "PearEQ",
+          "type": "vst2x",
+          "path": "PearEQ.vst"
+        },
+        "Silken": {
+          "name": "Silken",
+          "type": "vst2x",
+          "path": "Silken.vst"
+        },
+        "SmoothEQ": {
+          "name": "SmoothEQ",
+          "type": "vst2x",
+          "path": "SmoothEQ.vst"
+        },
+        "SmoothEQ2": {
+          "name": "SmoothEQ2",
+          "type": "vst2x",
+          "path": "SmoothEQ2.vst"
+        },
+        "Stonefire": {
+          "name": "Stonefire",
+          "type": "vst2x",
+          "path": "Stonefire.vst"
+        },
+        "ToneSlant": {
+          "name": "ToneSlant",
+          "type": "vst2x",
+          "path": "ToneSlant.vst"
+        },
+        "Weight": {
+          "name": "Weight",
+          "type": "vst2x",
+          "path": "Weight.vst"
+        }
+      },
+      "Lo-Fi": {
+        "CrunchyGrooveWear": {
+          "name": "CrunchyGrooveWear",
+          "type": "vst2x",
+          "path": "CrunchyGrooveWear.vst"
+        },
+        "DeRez3": {
+          "name": "DeRez3",
+          "type": "vst2x",
+          "path": "DeRez3.vst"
+        },
+        "Flutter2": {
+          "name": "Flutter2",
+          "type": "vst2x",
+          "path": "Flutter2.vst"
+        },
+        "GrooveWear": {
+          "name": "GrooveWear",
+          "type": "vst2x",
+          "path": "GrooveWear.vst"
+        },
+        "HipCrush": {
+          "name": "HipCrush",
+          "type": "vst2x",
+          "path": "HipCrush.vst"
+        },
+        "Pockey2": {
+          "name": "Pockey2",
+          "type": "vst2x",
+          "path": "Pockey2.vst"
+        },
+        "Vibrato": {
+          "name": "Vibrato",
+          "type": "vst2x",
+          "path": "Vibrato.vst"
+        }
+      },
+      "Noise": {
+        "TapeDust": {
+          "name": "TapeDust",
+          "type": "vst2x",
+          "path": "TapeDust.vst"
+        }
+      },
+      "Reverb": {
+        "Chamber": {
+          "name": "Chamber",
+          "type": "vst2x",
+          "path": "Chamber.vst"
+        },
+        "CreamCoat": {
+          "name": "CreamCoat",
+          "type": "vst2x",
+          "path": "CreamCoat.vst"
+        },
+        "CrunchCoat": {
+          "name": "CrunchCoat",
+          "type": "vst2x",
+          "path": "CrunchCoat.vst"
+        },
+        "Galactic": {
+          "name": "Galactic",
+          "type": "vst2x",
+          "path": "Galactic.vst"
+        },
+        "NonlinearSpace": {
+          "name": "NonlinearSpace",
+          "type": "vst2x",
+          "path": "NonlinearSpace.vst"
+        },
+        "VerbTiny": {
+          "name": "VerbTiny",
+          "type": "vst2x",
+          "path": "VerbTiny.vst"
+        },
+        "kAlienSpaceship": {
+          "name": "kAlienSpaceship",
+          "type": "vst2x",
+          "path": "kAlienSpaceship.vst"
+        },
+        "kBeyond": {
+          "name": "kBeyond",
+          "type": "vst2x",
+          "path": "kBeyond.vst"
+        },
+        "kCathedral5": {
+          "name": "kCathedral5",
+          "type": "vst2x",
+          "path": "kCathedral5.vst"
+        },
+        "kCosmos": {
+          "name": "kCosmos",
+          "type": "vst2x",
+          "path": "kCosmos.vst"
+        },
+        "kGuitarHall2": {
+          "name": "kGuitarHall2",
+          "type": "vst2x",
+          "path": "kGuitarHall2.vst"
+        },
+        "kPlate140": {
+          "name": "kPlate140",
+          "type": "vst2x",
+          "path": "kPlate140.vst"
+        },
+        "kPlate240": {
+          "name": "kPlate240",
+          "type": "vst2x",
+          "path": "kPlate240.vst"
+        },
+        "kStation": {
+          "name": "kStation",
+          "type": "vst2x",
+          "path": "kStation.vst"
+        }
+      },
+      "Saturation": {
+        "Hypersoft": {
+          "name": "Hypersoft",
+          "type": "vst2x",
+          "path": "Hypersoft.vst"
+        },
+        "Tube2": {
+          "name": "Tube2",
+          "type": "vst2x",
+          "path": "Tube2.vst"
+        }
+      },
+      "Stereo": {
+        "Srsly": {
+          "name": "Srsly",
+          "type": "vst2x",
+          "path": "Srsly.vst"
+        },
+        "Srsly3": {
+          "name": "Srsly3",
+          "type": "vst2x",
+          "path": "Srsly3.vst"
+        },
+        "ToVinyl4": {
+          "name": "ToVinyl4",
+          "type": "vst2x",
+          "path": "ToVinyl4.vst"
+        },
+        "Wider": {
+          "name": "Wider",
+          "type": "vst2x",
+          "path": "Wider.vst"
+        }
+      },
+      "Subtlety": {
+        "Discontapeity": {
+          "name": "Discontapeity",
+          "type": "vst2x",
+          "path": "Discontapeity.vst"
+        },
+        "Discontinuity": {
+          "name": "Discontinuity",
+          "type": "vst2x",
+          "path": "Discontinuity.vst"
+        },
+        "Inflamer": {
+          "name": "Inflamer",
+          "type": "vst2x",
+          "path": "Inflamer.vst"
+        },
+        "Mastering2": {
+          "name": "Mastering2",
+          "type": "vst2x",
+          "path": "Mastering2.vst"
+        },
+        "PurestWarm2": {
+          "name": "PurestWarm2",
+          "type": "vst2x",
+          "path": "PurestWarm2.vst"
+        },
+        "Shape": {
+          "name": "Shape",
+          "type": "vst2x",
+          "path": "Shape.vst"
+        },
+        "SingleEndedTriode": {
+          "name": "SingleEndedTriode",
+          "type": "vst2x",
+          "path": "SingleEndedTriode.vst"
+        },
+        "Sweeten": {
+          "name": "Sweeten",
+          "type": "vst2x",
+          "path": "Sweeten.vst"
+        }
+      },
+      "Tape": {
+        "TapeHack": {
+          "name": "TapeHack",
+          "type": "vst2x",
+          "path": "TapeHack.vst"
+        },
+        "ToTape8": {
+          "name": "ToTape8",
+          "type": "vst2x",
+          "path": "ToTape8.vst"
+        }
+      },
+      "Utility": {
+        "BitShiftPan": {
+          "name": "BitShiftPan",
+          "type": "vst2x",
+          "path": "BitShiftPan.vst"
+        },
+        "Cans": {
+          "name": "Cans",
+          "type": "vst2x",
+          "path": "Cans.vst"
+        },
+        "CansAW": {
+          "name": "CansAW",
+          "type": "vst2x",
+          "path": "CansAW.vst"
+        },
+        "DubPlate2": {
+          "name": "DubPlate2",
+          "type": "vst2x",
+          "path": "DubPlate2.vst"
+        },
+        "Golem": {
+          "name": "Golem",
+          "type": "vst2x",
+          "path": "Golem.vst"
+        },
+        "Monitoring3": {
+          "name": "Monitoring3",
+          "type": "vst2x",
+          "path": "Monitoring3.vst"
+        },
+        "PurestFade": {
+          "name": "PurestFade",
+          "type": "vst2x",
+          "path": "PurestFade.vst"
+        },
+        "PurestGain": {
+          "name": "PurestGain",
+          "type": "vst2x",
+          "path": "PurestGain.vst"
+        },
+        "SoftClock2": {
+          "name": "SoftClock2",
+          "type": "vst2x",
+          "path": "SoftClock2.vst"
+        }
+      },
+      "XYZ Filters": {
+        "XBandpass": {
+          "name": "XBandpass",
+          "type": "vst2x",
+          "path": "XBandpass.vst"
+        },
+        "XHighpass": {
+          "name": "XHighpass",
+          "type": "vst2x",
+          "path": "XHighpass.vst"
+        },
+        "XLowpass": {
+          "name": "XLowpass",
+          "type": "vst2x",
+          "path": "XLowpass.vst"
+        },
+        "XNotch": {
+          "name": "XNotch",
+          "type": "vst2x",
+          "path": "XNotch.vst"
+        },
+        "XRegion": {
+          "name": "XRegion",
+          "type": "vst2x",
+          "path": "XRegion.vst"
+        },
+        "YBandpass": {
+          "name": "YBandpass",
+          "type": "vst2x",
+          "path": "YBandpass.vst"
+        },
+        "YHighpass": {
+          "name": "YHighpass",
+          "type": "vst2x",
+          "path": "YHighpass.vst"
+        },
+        "YLowpass": {
+          "name": "YLowpass",
+          "type": "vst2x",
+          "path": "YLowpass.vst"
+        },
+        "YNotch": {
+          "name": "YNotch",
+          "type": "vst2x",
+          "path": "YNotch.vst"
+        },
+        "ZBandpass2": {
+          "name": "ZBandpass2",
+          "type": "vst2x",
+          "path": "ZBandpass2.vst"
+        },
+        "ZHighpass2": {
+          "name": "ZHighpass2",
+          "type": "vst2x",
+          "path": "ZHighpass2.vst"
+        },
+        "ZLowpass2": {
+          "name": "ZLowpass2",
+          "type": "vst2x",
+          "path": "ZLowpass2.vst"
+        },
+        "ZNotch2": {
+          "name": "ZNotch2",
+          "type": "vst2x",
+          "path": "ZNotch2.vst"
+        },
+        "ZRegion2": {
+          "name": "ZRegion2",
+          "type": "vst2x",
+          "path": "ZRegion2.vst"
+        }
+      }
+    }
+  }
+}
